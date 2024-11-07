@@ -1,12 +1,17 @@
 package project.Domain.Product;
 
-import lombok.AccessLevel;
-import lombok.Getter;
+import lombok.*;
+import org.springframework.data.annotation.Id;
 
-import java.util.UUID;
-
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product {
 
-    @Getter(AccessLevel.PUBLIC) private String productId;
-    @Getter(AccessLevel.PUBLIC) private Long price;
+    @Id
+    @Getter(AccessLevel.PUBLIC)
+    private String id;
+    @Getter(AccessLevel.PUBLIC)
+    private Long price;
 }
