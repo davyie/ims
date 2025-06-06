@@ -1,0 +1,55 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-container
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongodb-data:/data/db
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-jpa-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+  application:
+     image: application:1.0.0
+     restart: always
+     ports:
+       - "8080:8080"
+     depends_on:
+      - mysql-db
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+  # react-app:
+  #   build:
+  #     context: .
+  #     dockerfile: ./frontend/Dockerfile.dev
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true
+  #   stdin_open: true
+  #   tty: true
+volumes:
+  db-data:
+  mongodb-data:

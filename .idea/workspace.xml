@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3e2b7680-7f4e-4ad9-a89c-a20fa59f6eab" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Controllers/Controller.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Controllers/ProductController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/DTO/ProductDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Domain/Market/Market.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Domain/Market/MarketItem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Domain/Market/MarketStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Domain/Product/Product.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/ImsApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Infrastructure/MarketRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Infrastructure/ProductRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/Logging/LoggingAspect.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/RateLimiting/RateLimitAspect.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/RateLimiting/RateLimitConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/RateLimiting/RateLimitExceededException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/java/project/RateLimiting/RateLimiter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/ims/src/test/java/project/ims/ImsApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2xl39yQ1LlglJycEvJJcK1gaaf4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/davidyu/GitHub/ims_v2"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="ims_v2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="ims_v2" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3e2b7680-7f4e-4ad9-a89c-a20fa59f6eab" name="Changes" comment="" />
+      <created>1748498685739</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1748498685739</updated>
+    </task>
+    <servers />
+  </component>
+</project>

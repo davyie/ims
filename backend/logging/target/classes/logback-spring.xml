@@ -1,0 +1,30 @@
+<configuration>
+
+    <!-- Define log pattern -->
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>
+
+    <!-- Console appender: logs output to the console -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+<!--     File appender: logs output to a file-->
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>logs/app.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set log level for all packages to INFO and use the console appender -->
+    <root level="info">
+        <appender-ref ref="console" />
+<!--        <appender-ref ref="file" />-->
+    </root>
+
+<!--     Custom log level for a specific package-->
+    <logger name="com.example.*" level="info" />
+</configuration>

@@ -1,0 +1,9 @@
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/routes/CommandRoutes.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/routes/Routes.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/config/Config.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/queries/GetAllProductQuery.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/DTO/ProductDTO.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/routes/QueryRoutes.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/repository/ProductRepository.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/commands/CreateProductCommand.java
+/Users/davidyu/GitHub/ims_v2/backend/catalogue/src/main/java/com/example/domain/Product.java

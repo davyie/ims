@@ -1,0 +1,9 @@
+com/example/routes/CommandRoutes.class
+com/example/routes/QueryRoutes.class
+com/example/commands/CreateProductCommand.class
+com/example/routes/Routes.class
+com/example/repository/ProductRepository.class
+com/example/queries/GetAllProductQuery.class
+com/example/domain/Product.class
+com/example/config/Config.class
+com/example/DTO/ProductDTO.class

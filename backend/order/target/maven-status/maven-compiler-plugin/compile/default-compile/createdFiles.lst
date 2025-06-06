@@ -1,0 +1,12 @@
+com/example/OrderMapper.class
+com/example/OrderRepository.class
+com/example/queries/OrderQueryRoutes.class
+com/example/OrderDTO.class
+com/example/queries/GetOrderByNameQuery.class
+com/example/commands/CreateOrderCommand.class
+com/example/queries/GetAllQuery.class
+com/example/commands/OrderCommandHandler.class
+com/example/queries/OrderQueryHandler.class
+com/example/commands/OrderCommandRoutes.class
+com/example/OrderEntity.class
+com/example/commands/CreateOrderResult.class

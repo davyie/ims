@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Annotation profile for multimodule" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
+        </processorPath>
+        <module name="controller" />
+        <module name="application" />
+        <module name="rateLimiting" />
+        <module name="logging" />
+        <module name="filters" />
+        <module name="warehouse" />
+        <module name="rabbitmq" />
+        <module name="catalogue" />
+        <module name="common-cqrs" />
+        <module name="order" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="application" options="-parameters" />
+      <module name="catalogue" options="-parameters" />
+      <module name="common-cqrs" options="-parameters" />
+      <module name="controller" options="-parameters" />
+      <module name="filters" options="-parameters" />
+      <module name="logging" options="-parameters" />
+      <module name="multimodule" options="-parameters" />
+      <module name="order" options="-parameters" />
+      <module name="rabbitmq" options="-parameters" />
+      <module name="rateLimiting" options="-parameters" />
+      <module name="warehouse" options="-parameters" />
+    </option>
+  </component>
+</project>
