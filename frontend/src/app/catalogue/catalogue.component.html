@@ -1,0 +1,10 @@
+<app-header></app-header>
+<p>catalogue works!</p>
+<ul>
+    <li *ngFor="let item of items">
+        {{ item.name }} - {{ item.description }}
+</ul>
+<form onsubmit="onSubmit()">
+    <input type="text" [formControl]="searchString" placeholder="Search">
+    <button type="submit" (click)="onSubmit()">Search</button>
+</form>

@@ -4,10 +4,7 @@ import com.example.DTO.ProductDTO;
 import com.example.commands.CreateProductCommand;
 import com.example.domain.Product;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/commands")
@@ -20,6 +17,7 @@ public class CommandRoutes {
         this.cpc = cpc;
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping("/")
     public ProductDTO addProduct(@RequestBody ProductDTO productdto) {
         return cpc.createProduct(productdto);

@@ -26,40 +26,40 @@ public class LoggingAspect {
 //        logger.info("Entering method: {} with arguments {}", joinPoint.getSignature(), joinPoint.getArgs());
 //    }
 
-    @Before("execution(* com.example.routes.Routes.*(..))")
-    public void logBeforeHome(JoinPoint joinPoint) {
-        logger.info("Logs before entering {} ", joinPoint.getSignature());
-    }
+//    @Before("execution(* com.example.routes.Routes.*(..))")
+//    public void logBeforeHome(JoinPoint joinPoint) {
+//        logger.info("Logs before entering {} ", joinPoint.getSignature());
+//    }
+//
+//    @Before("execution(* com.example.routes.CommandRoutes.*(..))")
+//    public void logBeforeCommandRoute(JoinPoint joinPoint) {
+//        logger.info("Entering route: {} ", joinPoint.getSignature());
+//    }
+//
+//    @After("execution(* com.example.routes.CommandRoutes.*(..))")
+//    public void logAfterCommandRoute(JoinPoint joinPoint) {
+//        logger.info("Sending information back to client. Command is finished");
+//    }
+//
+//    @Before("execution(* com.example.commands.CreateProductCommand.*(..))")
+//    public void logBeforeCreateProductCommand(JoinPoint joinPoint) {
+//        logger.info("Entering command: {} ", joinPoint.getSignature());
+//    }
 
-    @Before("execution(* com.example.routes.CommandRoutes.*(..))")
-    public void logBeforeCommandRoute(JoinPoint joinPoint) {
-        logger.info("Entering route: {} ", joinPoint.getSignature());
-    }
-
-    @After("execution(* com.example.routes.CommandRoutes.*(..))")
-    public void logAfterCommandRoute(JoinPoint joinPoint) {
-        logger.info("Sending information back to client. Command is finished");
-    }
-
-    @Before("execution(* com.example.commands.CreateProductCommand.*(..))")
-    public void logBeforeCreateProductCommand(JoinPoint joinPoint) {
-        logger.info("Entering command: {} ", joinPoint.getSignature());
-    }
-
-    @After("execution(* com.example.commands.CreateProductCommand.*(..))")
-    public void logAfterCreateProductCommand(JoinPoint joinPoint) {
-        logger.info("Command has finished executing.");
-    }
-
-    @Before("execution(* com.example.repository.ProductRepository.*(..))")
-    public void logBeforeMongoDBRepository(JoinPoint joinPoint) {
-        logger.info("Entering method: {}. Accessing database to store the data", joinPoint.getSignature());
-    }
-
-    @After("execution(* com.example.repository.ProductRepository.*(..))")
-    public void logAfterMongoDBRepository(JoinPoint joinPoint) {
-        logger.info("Exiting method: {}. Exiting database", joinPoint.getSignature());
-    }
+//    @After("execution(* com.example.commands.CreateProductCommand.*(..))")
+//    public void logAfterCreateProductCommand(JoinPoint joinPoint) {
+//        logger.info("Command has finished executing.");
+//    }
+//
+//    @Before("execution(* com.example.repository.ProductRepository.*(..))")
+//    public void logBeforeMongoDBRepository(JoinPoint joinPoint) {
+//        logger.info("Entering method: {}. Accessing database to store the data", joinPoint.getSignature());
+//    }
+//
+//    @After("execution(* com.example.repository.ProductRepository.*(..))")
+//    public void logAfterMongoDBRepository(JoinPoint joinPoint) {
+//        logger.info("Exiting method: {}. Exiting database", joinPoint.getSignature());
+//    }
 
     // Log around method execution (before and after, and potentially log execution time)
     @Around(value = "execution(* com.example.*.*(..))")

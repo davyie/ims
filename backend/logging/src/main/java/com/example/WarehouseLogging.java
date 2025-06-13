@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Component
 public class WarehouseLogging {
-    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(WarehouseLogging.class);
 
     @Before("execution(* com.example.WarehouseController.*(..))")
     public void logController(JoinPoint joinPoint) {

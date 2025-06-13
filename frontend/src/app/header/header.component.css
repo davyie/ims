@@ -1,0 +1,73 @@
+/* Standard .header styles */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background-color: #0078d4; /* Microsoft blue */
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.header nav {
+    display: flex;
+    gap: 1rem;
+}
+
+.header nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.header nav a:hover {
+    color: #ffcc00; /* Highlight color */
+}
+
+.header .actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.header .actions button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #005a9e;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.header .actions button:hover {
+    background-color: #004578;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+}
+
+li {
+    display: inline-block;
+}
+
+a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+}
+
+a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+} 
