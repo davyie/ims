@@ -2,7 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
-      <profile name="Annotation profile for ims_v2" enabled="true">
+      <profile name="Annotation profile for ims" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -10,6 +10,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
+        <module name="market" />
         <module name="controller" />
         <module name="application" />
         <module name="common" />
@@ -32,7 +33,9 @@
       <module name="common-cqrs" options="-parameters" />
       <module name="controller" options="-parameters" />
       <module name="filters" options="-parameters" />
+      <module name="ims_v2" options="-parameters" />
       <module name="logging" options="-parameters" />
+      <module name="market" options="-parameters" />
       <module name="multimodule" options="-parameters" />
       <module name="order" options="-parameters" />
       <module name="rabbitmq" options="-parameters" />

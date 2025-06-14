@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.example</groupId>
-        <artifactId>ims_v2</artifactId>
+        <artifactId>ims</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 

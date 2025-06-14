@@ -1,5 +1,5 @@
-/Users/davidyu/GitHub/ims_v2/backend/logging/src/main/java/com/example/CatalogueLogging.java
-/Users/davidyu/GitHub/ims_v2/backend/logging/src/main/java/com/example/CommonLogging.java
-/Users/davidyu/GitHub/ims_v2/backend/logging/src/main/java/com/example/LoggingConfig.java
-/Users/davidyu/GitHub/ims_v2/backend/logging/src/main/java/com/example/LoggingAspect.java
-/Users/davidyu/GitHub/ims_v2/backend/logging/src/main/java/com/example/WarehouseLogging.java
+/Users/davidyu/GitHub/ims/backend/logging/src/main/java/com/example/WarehouseLogging.java
+/Users/davidyu/GitHub/ims/backend/logging/src/main/java/com/example/CommonLogging.java
+/Users/davidyu/GitHub/ims/backend/logging/src/main/java/com/example/CatalogueLogging.java
+/Users/davidyu/GitHub/ims/backend/logging/src/main/java/com/example/LoggingAspect.java
+/Users/davidyu/GitHub/ims/backend/logging/src/main/java/com/example/LoggingConfig.java

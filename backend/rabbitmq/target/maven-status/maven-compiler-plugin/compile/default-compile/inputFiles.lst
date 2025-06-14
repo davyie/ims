@@ -1,4 +1,4 @@
-/Users/davidyu/GitHub/ims_v2/backend/rabbitmq/src/main/java/com/example/MessageController.java
-/Users/davidyu/GitHub/ims_v2/backend/rabbitmq/src/main/java/com/example/MessageProducer.java
-/Users/davidyu/GitHub/ims_v2/backend/rabbitmq/src/main/java/com/example/RabbitMQConfig.java
-/Users/davidyu/GitHub/ims_v2/backend/rabbitmq/src/main/java/com/example/MessageConsumer.java
+/Users/davidyu/GitHub/ims/backend/rabbitmq/src/main/java/com/example/MessageConsumer.java
+/Users/davidyu/GitHub/ims/backend/rabbitmq/src/main/java/com/example/RabbitMQConfig.java
+/Users/davidyu/GitHub/ims/backend/rabbitmq/src/main/java/com/example/MessageProducer.java
+/Users/davidyu/GitHub/ims/backend/rabbitmq/src/main/java/com/example/MessageController.java
