@@ -1,12 +1,7 @@
-Research 
-- [x] @SpringApplication annotation 
-- [x] @ComponentScan annotation
-- [x] @Aspect annotation
-- [x] subpackages 
-- [] class loaders
-- [x] ApplicationContext
-- [x] @ConfigurationProperties
-Study how configuration works in spring.
+# About 
+This project is about creating an Inventory Management System (ims) for small businesses. 
+A business owner should be able to handle her warehouse inventory and extract inventory to separate markets. 
+During markets, she should be able to keep track of market inventory to see how much she has sold throughout a market. 
 
 # How build the project
 
