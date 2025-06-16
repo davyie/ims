@@ -1,6 +1,6 @@
 package com.example.warehouse.routes;
 
-import com.example.warehouse.domain.DecrementQuantity;
+import com.example.warehouse.domain.ChangeQuantity;
 import com.example.warehouse.domain.WarehouseItemQuantity;
 import com.example.warehouse.repository.WarehouseRepository;
 import com.example.warehouse.domain.Warehouse;
@@ -94,7 +94,7 @@ public class WarehouseController {
     }
 
     @PutMapping("/inventory/decrement")
-    public ResponseEntity<Warehouse> DecrementItemFromWarehouse(@RequestParam String warehouseId, @RequestBody DecrementQuantity dq) {
+    public ResponseEntity<Warehouse> DecrementItemFromWarehouse(@RequestParam String warehouseId, @RequestBody ChangeQuantity cq) {
         if (warehouseRepository.findById(warehouseId) == null) {return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
         Warehouse warehouse = warehouseRepository.findById(warehouseId).orElseThrow();
         List<WarehouseItemQuantity> list = warehouse.getInventory();
@@ -102,8 +102,8 @@ public class WarehouseController {
         while(it.hasNext()) {
             WarehouseItemQuantity iq = (WarehouseItemQuantity) it.next();
             WarehouseItem item =  iq.getItem();
-            if (item.getItemId() == dq.getItemId()) {
-                iq.decrementQuantity(dq.getQuantity());
+            if (item.getItemId() == cq.getItemId()) {
+                iq.decrementQuantity(cq.getQuantity());
             }
         }
         logger.info("From WarehouseController...");
@@ -119,7 +119,7 @@ public class WarehouseController {
     }
 
     @PutMapping("/inventory/increment")
-    public ResponseEntity<Warehouse> IncrementIteminWarehouse(@RequestParam String warehouseId, @RequestBody DecrementQuantity dq) {
+    public ResponseEntity<Warehouse> IncrementIteminWarehouse(@RequestParam String warehouseId, @RequestBody ChangeQuantity cq) {
         if (warehouseRepository.findById(warehouseId).isEmpty()) {return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
         Warehouse warehouse = warehouseRepository.findById(warehouseId).orElseThrow();
         List<WarehouseItemQuantity> list = warehouse.getInventory();
@@ -127,8 +127,8 @@ public class WarehouseController {
         while(it.hasNext()) {
             WarehouseItemQuantity iq = (WarehouseItemQuantity) it.next();
             WarehouseItem item = iq.getItem();
-            if (item.getItemId() == dq.getItemId()) {
-                iq.incrementQuantity(dq.getQuantity());
+            if (item.getItemId() == cq.getItemId()) {
+                iq.incrementQuantity(cq.getQuantity());
             }
         }
         warehouse.setInventory(list);

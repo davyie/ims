@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @AllArgsConstructor
-public class DecrementQuantity {
+public class ChangeQuantity {
     private Integer itemId;
     private Integer quantity;
 }

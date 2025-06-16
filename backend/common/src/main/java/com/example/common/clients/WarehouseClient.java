@@ -1,8 +1,6 @@
 package com.example.common.clients;
 
-import com.example.warehouse.domain.DecrementQuantity;
-import com.example.warehouse.domain.WarehouseItem;
-import com.example.warehouse.domain.WarehouseItemQuantity;
+import com.example.warehouse.domain.ChangeQuantity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -28,12 +26,22 @@ public class WarehouseClient {
     }
 
     public void decrementWarehouseItem(String warehouseId, Integer itemId, Integer quantity) {
-        DecrementQuantity dq = new DecrementQuantity();
-        dq.setItemId(itemId);
-        dq.setQuantity(quantity);
+        ChangeQuantity cq = new ChangeQuantity();
+        cq.setItemId(itemId);
+        cq.setQuantity(quantity);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity entity = new HttpEntity(dq, httpHeaders);
+        HttpEntity entity = new HttpEntity(cq, httpHeaders);
         restTemplate.put(url + "/inventory/decrement?warehouseId=" + warehouseId, entity, String.class);
+    }
+
+    public void incrementWarehouseItem(String warehouseId, Integer itemId, Integer quantity) {
+        ChangeQuantity cq = new ChangeQuantity();
+        cq.setItemId(itemId);
+        cq.setQuantity(quantity);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity entity = new HttpEntity(cq, headers);
+        restTemplate.put(url + "/inventory/increment?warehouseId=" + warehouseId, entity, String.class);
     }
 }

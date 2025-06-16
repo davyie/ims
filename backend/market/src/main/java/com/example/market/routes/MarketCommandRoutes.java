@@ -42,6 +42,6 @@ public class MarketCommandRoutes {
 
     @DeleteMapping("/delete/item")
     public ResponseEntity<Market> deleteItems(@RequestBody MarketItemQuantityDTO dto) {
-        return new ResponseEntity<>(this.dmic.execute(dto.getMarketName(), dto.getItemId(), dto.getQuantity()), HttpStatus.OK);
+        return new ResponseEntity<>(this.dmic.execute(dto.getWarehouseId(), dto.getMarketName(), dto.getItemId()), HttpStatus.OK);
     }
 }
