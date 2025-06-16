@@ -1,6 +1,5 @@
 package com.example.routes;
 
-import com.example.domain.Product;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

@@ -1,5 +1,7 @@
-package com.example;
+package com.example.queries;
 
+import com.example.repository.MarketRepository;
+import com.example.domain.MarketDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

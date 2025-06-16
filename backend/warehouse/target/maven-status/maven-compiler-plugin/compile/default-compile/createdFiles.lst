@@ -1,4 +1,5 @@
-com/example/Warehouse.class
-com/example/WarehouseController.class
-com/example/WarehouseItem.class
-com/example/WarehouseRepository.class
+com/example/warehouse/domain/WarehouseItem.class
+com/example/warehouse/repository/WarehouseRepository.class
+com/example/warehouse/domain/Warehouse.class
+com/example/warehouse/domain/WarehouseItemQuantity.class
+com/example/warehouse/routes/WarehouseController.class

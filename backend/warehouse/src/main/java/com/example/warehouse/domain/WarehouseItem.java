@@ -1,15 +1,13 @@
-package com.example;
+package com.example.warehouse.domain;
 
 
+import com.example.common.domain.Item;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 @Getter
 @Setter
-public class WarehouseItem {
-    @Id
-    private String id;
+public class WarehouseItem implements Item {
     private String name;
     private String description;
     private Integer itemId;

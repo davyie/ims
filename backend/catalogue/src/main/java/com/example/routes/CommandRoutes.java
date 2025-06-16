@@ -2,12 +2,11 @@ package com.example.routes;
 
 import com.example.DTO.ProductDTO;
 import com.example.commands.CreateProductCommand;
-import com.example.domain.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/commands")
+@RequestMapping("/com/example/commands")
 public class CommandRoutes {
 
     private CreateProductCommand cpc;
