@@ -27,30 +27,30 @@ Or you can run `./build.sh` from the terminal.
 
 ### Market 
 
-[x] Open Market 
-[] Add Item to Market 
-[] Sync Market inventory to Warehouse Inventory 
-[] Update market item 
-[] Delete market item 
-[] Decrement market item 
-[] Increment market item 
+- [x] Open Market 
+- [] Add Item to Market 
+- [] Sync Market inventory to Warehouse Inventory 
+- [] Update market item 
+- [] Delete market item 
+- [] Decrement market item 
+- [] Increment market item 
 
 ### Warehouse 
-[x] Open Warehouse 
-[x] Add Item to Warehouse
-[x] Decrement inventory 
-[] Increment inventory
-[x] Exception handling for stock under 0. Handling when trying to add item to market which has insufficient quantity. 
-[] 
+- [x] Open Warehouse 
+- [x] Add Item to Warehouse
+- [x] Decrement inventory 
+- [] Increment inventory
+- [x] Exception handling for stock under 0. Handling when trying to add item to market which has insufficient quantity. 
+- [] 
 
 ### Exception handling 
-[] Add IllegalStateException Aspect 
+- [] Add IllegalStateException Aspect 
 
 ### Logging
-[] Add Loggin Aspect 
+- [] Add Logging Aspect 
 
 ### Pricing 
-[] Open Warehouse 
+- [] Open Warehouse 
 
 
 
