@@ -23,7 +23,7 @@ else `docker compose up -d`
 
 Or you can run `./build.sh` from the terminal. 
 
-## Application Requirements
+## Application Requirements (Backend)
 
 ### Market 
 
@@ -55,5 +55,22 @@ Or you can run `./build.sh` from the terminal.
 - [] Open 
 
 
+## Application requirement (Frontend)
+
+### Market 
+
+- [] Open Market 
+- [] Add Item to Market 
+- [] Update market item 
+- [] Delete market item 
+- [] Decrement market item 
+- [] Increment market item 
+
+### Warehouse 
+- [] Open Warehouse 
+- [] Add Item to Warehouse
+- [] Decrement inventory 
+- [] Increment inventory
+- [] 
 
 
