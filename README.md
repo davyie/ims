@@ -45,6 +45,8 @@ Or you can run `./build.sh` from the terminal.
 
 ### Exception handling 
 - [] Add IllegalStateException Aspect 
+- [x] Handle Exceptions Globally 
+
 
 ### Logging
 - [x] Add Logging Aspect 
