@@ -1,8 +1,8 @@
-package com.example.commands;
+package com.example.market.commands;
 
-import com.example.repository.MarketRepository;
-import com.example.domain.Market;
-import com.example.domain.MarketDTO;
+import com.example.market.repository.MarketRepository;
+import com.example.market.domain.Market;
+import com.example.market.domain.MarketDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +17,9 @@ public class CreateMarketCommand {
 
     public MarketDTO execute(MarketDTO marketDTO) {
         Market market = new Market();
-        market.setName(market.getName());
-        market.setPrice(market.getPrice());
-        market.setItems(market.getItems());
+        market.setName(marketDTO.getName());
+        market.setPrice(marketDTO.getPrice());
+        market.setItems(marketDTO.getItems());
         marketRepository.save(market); // Save into db
         return marketDTO;
     }

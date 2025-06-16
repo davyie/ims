@@ -1,9 +1,7 @@
-package com.example.domain;
+package com.example.market.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.common.domain.ItemQuantity;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,8 +9,9 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class MarketDTO {
     private String name;
     private Float price;
-    private List<MarketItem> items;
+    private List<MarketItemQuantity> items;
 }

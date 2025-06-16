@@ -2,4 +2,5 @@
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/routes/WarehouseController.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/repository/WarehouseRepository.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/WarehouseItemQuantity.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/DecrementQuantity.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/WarehouseItem.java

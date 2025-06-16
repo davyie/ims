@@ -1,6 +1,5 @@
 package com.example.warehouse.domain;
 
-import com.example.common.domain.ItemQuantity;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

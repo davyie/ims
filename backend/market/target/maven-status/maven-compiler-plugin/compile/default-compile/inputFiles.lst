@@ -1,1 +1,12 @@
-/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/Main.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/routes/MarketQueryRoutes.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/MarketDTO.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/routes/MarketCommandRoutes.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/repository/MarketRepository.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/MarketItemQuantity.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/MarketItemQuantityDTO.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/queries/GetAllMarketsQuery.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/commands/DeleteMarketItemCommand.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/MarketItem.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/commands/CreateMarketCommand.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/Market.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/commands/AddMarketItemToMarketCommand.java

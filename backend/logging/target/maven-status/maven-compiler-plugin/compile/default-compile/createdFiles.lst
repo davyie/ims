@@ -1,4 +1,6 @@
 com/example/LoggingAspect.class
+com/example/ExceptionLogging.class
+com/example/LoggingMarket.class
 com/example/WarehouseLogging.class
 com/example/LoggingConfig.class
 com/example/CatalogueLogging.class

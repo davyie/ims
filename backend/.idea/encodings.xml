@@ -5,7 +5,9 @@
     <file url="file://$PROJECT_DIR$/catalogue/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common-cqrs/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/controller/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/exceptionHandlers/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/filters/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/logging/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/market/src/main/java" charset="UTF-8" />

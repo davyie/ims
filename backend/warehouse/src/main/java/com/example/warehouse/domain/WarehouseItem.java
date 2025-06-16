@@ -1,13 +1,12 @@
 package com.example.warehouse.domain;
 
 
-import com.example.common.domain.Item;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class WarehouseItem implements Item {
+public class WarehouseItem {
     private String name;
     private String description;
     private Integer itemId;

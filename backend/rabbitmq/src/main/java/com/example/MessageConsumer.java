@@ -1,8 +1,6 @@
 package com.example;
 
-import org.slf4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.boot.logging.LoggingSystemFactory;
 import org.springframework.stereotype.Service;
 
 

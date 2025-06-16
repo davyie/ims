@@ -1,1 +1,12 @@
-com/example/Main.class
+com/example/market/commands/DeleteMarketItemCommand.class
+com/example/market/domain/MarketDTO.class
+com/example/market/domain/MarketItem.class
+com/example/market/domain/MarketItemQuantityDTO.class
+com/example/market/routes/MarketQueryRoutes.class
+com/example/market/domain/Market.class
+com/example/market/queries/GetAllMarketsQuery.class
+com/example/market/commands/CreateMarketCommand.class
+com/example/market/domain/MarketItemQuantity.class
+com/example/market/routes/MarketCommandRoutes.class
+com/example/market/commands/AddMarketItemToMarketCommand.class
+com/example/market/repository/MarketRepository.class

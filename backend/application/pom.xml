@@ -15,7 +15,6 @@
     <description>This is a runnable submodule</description>
     <packaging>jar</packaging>
 
-
     <dependencies>
         <dependency>
             <groupId>com.example</groupId>
@@ -49,6 +48,22 @@
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>warehouse</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+
+            <artifactId>market</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>config</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>exceptionHandlers</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

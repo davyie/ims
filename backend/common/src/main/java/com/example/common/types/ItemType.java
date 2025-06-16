@@ -1,4 +1,6 @@
 package com.example.common.types;
 
-public class ItemType {
+public enum ItemType {
+    MARKET,
+    WAREHOUSE
 }

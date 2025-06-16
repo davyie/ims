@@ -10,17 +10,19 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.36/lombok-1.18.36.jar" />
         </processorPath>
-        <module name="market" />
+        <module name="exceptionHandlers" />
         <module name="controller" />
-        <module name="application" />
-        <module name="common" />
-        <module name="rateLimiting" />
-        <module name="logging" />
         <module name="filters" />
         <module name="warehouse" />
         <module name="rabbitmq" />
         <module name="catalogue" />
         <module name="common-cqrs" />
+        <module name="market" />
+        <module name="application" />
+        <module name="common" />
+        <module name="rateLimiting" />
+        <module name="logging" />
+        <module name="config" />
         <module name="order" />
       </profile>
     </annotationProcessing>
@@ -31,7 +33,9 @@
       <module name="catalogue" options="-parameters" />
       <module name="common" options="-parameters" />
       <module name="common-cqrs" options="-parameters" />
+      <module name="config" options="-parameters" />
       <module name="controller" options="-parameters" />
+      <module name="exceptionHandlers" options="-parameters" />
       <module name="filters" options="-parameters" />
       <module name="ims_v2" options="-parameters" />
       <module name="logging" options="-parameters" />

@@ -1,1 +1,5 @@
-/Users/davidyu/GitHub/ims/backend/common/src/main/java/com/example/dtos/WarehouseItemDTO.java
+/Users/davidyu/GitHub/ims/backend/common/src/main/java/com/example/common/domain/Item.java
+/Users/davidyu/GitHub/ims/backend/common/src/main/java/com/example/common/clients/WarehouseClient.java
+/Users/davidyu/GitHub/ims/backend/common/src/main/java/com/example/common/dtos/WarehouseItemDTO.java
+/Users/davidyu/GitHub/ims/backend/common/src/main/java/com/example/common/domain/ItemQuantity.java
+/Users/davidyu/GitHub/ims/backend/common/src/main/java/com/example/common/types/ItemType.java

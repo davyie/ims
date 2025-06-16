@@ -1,5 +1,6 @@
 com/example/warehouse/domain/WarehouseItem.class
 com/example/warehouse/repository/WarehouseRepository.class
+com/example/warehouse/domain/DecrementQuantity.class
 com/example/warehouse/domain/Warehouse.class
 com/example/warehouse/domain/WarehouseItemQuantity.class
 com/example/warehouse/routes/WarehouseController.class

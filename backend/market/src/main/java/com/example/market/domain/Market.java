@@ -1,5 +1,6 @@
-package com.example.domain;
+package com.example.market.domain;
 
+import com.example.common.domain.ItemQuantity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,6 +18,6 @@ public class Market {
     private String id;
     private String name;
     private Float price;
-    private List<MarketItem> items;
+    private List<MarketItemQuantity> items;
 
 }
