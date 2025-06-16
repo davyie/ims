@@ -31,7 +31,7 @@ Or you can run `./build.sh` from the terminal.
 - [] Add Item to Market 
 - [] Sync Market inventory to Warehouse Inventory 
 - [] Update market item 
-- [] Delete market item 
+- [x] Delete market item 
 - [] Decrement market item 
 - [] Increment market item 
 
