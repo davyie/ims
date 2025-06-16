@@ -28,7 +28,7 @@ Or you can run `./build.sh` from the terminal.
 ### Market 
 
 - [x] Open Market 
-- [] Add Item to Market 
+- [x] Add Item to Market 
 - [] Sync Market inventory to Warehouse Inventory 
 - [] Update market item 
 - [x] Delete market item 
@@ -47,10 +47,10 @@ Or you can run `./build.sh` from the terminal.
 - [] Add IllegalStateException Aspect 
 
 ### Logging
-- [] Add Logging Aspect 
+- [x] Add Logging Aspect 
 
 ### Pricing 
-- [] Open Warehouse 
+- [] Open 
 
 
 
