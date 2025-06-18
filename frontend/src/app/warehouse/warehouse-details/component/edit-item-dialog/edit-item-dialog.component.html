@@ -1,0 +1,21 @@
+<h1 mat-dialog-title>User Details</h1>
+<div mat-dialog-content>
+    <form (ngSubmit)="onSubmit()">
+        <div>
+            <label for="itemName">Item Name:</label>
+            <input type="text" id="itemName" [(ngModel)]="editFormData.item.name" name="itemName">
+        </div>
+        <div>
+            <label for="itemDescription">Item Description:</label>
+            <input type="text" id="itemDescription" [(ngModel)]="editFormData.item.description" name="itemDescription">
+        </div>
+        <div>
+            <label for="itemQuantity">Quantity</label>
+            <input id="itemQuantity" type="number" [(ngModel)]="editFormData.quantity" name="itemQuantity">
+        </div>
+        <button type="submit" mat-raised-button color="primary">Submit</button>
+    </form>
+</div>
+<div mat-dialog-actions>
+    <button mat-button mat-dialog-close>Close</button>
+</div>

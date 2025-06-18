@@ -1,0 +1,10 @@
+<app-header></app-header>
+<div class="warehouse">
+<h1>Warehouse</h1>
+<button>Add Warehouse</button>
+<ul *ngFor="let warehouse of warehouses">
+    <li>
+        warehouse: {{ warehouse.id }}
+    </li>
+<a [routerLink]="['/warehouse', warehouse.id]">View Details</a>
+</ul>

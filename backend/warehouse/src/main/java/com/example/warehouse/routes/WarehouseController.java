@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 @RestController
 @RequestMapping("/warehouse")
+@CrossOrigin(origins = "http://localhost:4200")
 public class WarehouseController {
 
     private final Logger logger = LoggerFactory.getLogger(WarehouseController.class);
@@ -33,10 +35,14 @@ public class WarehouseController {
         return new ResponseEntity<>("Hello from Warehouse Controller!", HttpStatus.OK);
     }
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/get/all")
     public ResponseEntity<List<Warehouse>> getAllWarehouses() {
         return new ResponseEntity<>(warehouseRepository.findAll(), HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/get")
+    public ResponseEntity<Warehouse> getWarehouseById(@RequestParam String warehouseId) {
+        return new ResponseEntity<>(warehouseRepository.findById(warehouseId).orElseThrow(), HttpStatus.OK);
     }
 
     @GetMapping("/inventory/get")
@@ -81,7 +87,7 @@ public class WarehouseController {
     }
 
     @DeleteMapping("/inventory/delete")
-    public ResponseEntity<Warehouse> DeleteItemFromWarehose(@RequestParam String warehouseId, @RequestBody Integer itemId) {
+    public ResponseEntity<Warehouse> DeleteItemFromWarehose(@RequestParam String warehouseId, @RequestParam Integer itemId) {
         if(warehouseRepository.findById(warehouseId) == null) {return new ResponseEntity<>(HttpStatus.NOT_FOUND);}
         Warehouse warehouse = warehouseRepository.findById(warehouseId).orElseThrow();
         List<WarehouseItemQuantity> warehouseItems = warehouse.getInventory().stream().filter(iq -> {
@@ -134,5 +140,23 @@ public class WarehouseController {
         warehouse.setInventory(list);
         warehouseRepository.save(warehouse);
         return new ResponseEntity<>(warehouse, HttpStatus.OK);
+    }
+
+    @PutMapping("inventory/update")
+    public ResponseEntity<Warehouse> updateItemQuantity(@RequestParam String warehouseId, @RequestBody WarehouseItemQuantity wiq) {
+        if (warehouseRepository.findById(warehouseId).isEmpty()) {new ResponseEntity<>(HttpStatus.NOT_FOUND);}
+        Warehouse warehouse = warehouseRepository.findById(warehouseId).orElseThrow();
+        List<WarehouseItemQuantity> list = warehouse.getInventory();
+        ListIterator<WarehouseItemQuantity> it = list.listIterator();
+        while (it.hasNext()) {
+            WarehouseItemQuantity iq = (WarehouseItemQuantity) it.next();
+            WarehouseItem item = iq.getItem();
+            if (item.getItemId() == wiq.getItem().getItemId()) {
+                it.set(wiq);
+            }
+        }
+        warehouse.setInventory(list);
+        warehouseRepository.save(warehouse);
+        return new ResponseEntity<>(warehouse, HttpStatus.ACCEPTED);
     }
 }

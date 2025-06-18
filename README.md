@@ -36,7 +36,7 @@ Or you can run `./build.sh` from the terminal.
 - [x] Decrement inventory 
 - [] Increment inventory
 - [x] Exception handling for stock under 0. Handling when trying to add item to market which has insufficient quantity. 
-- [] 
+- [x] Update items
 
 ### Exception handling 
 - [] Add IllegalStateException Aspect 
@@ -48,6 +48,10 @@ Or you can run `./build.sh` from the terminal.
 
 ### Pricing 
 - [] Open 
+
+### History 
+- [] Track changes 
+- [] 
 
 
 ## Application requirement (Frontend)
@@ -62,8 +66,9 @@ Or you can run `./build.sh` from the terminal.
 - [] Increment market item 
 
 ### Warehouse 
-- [] Open Warehouse 
-- [] Add Item to Warehouse
+- [x] Open Warehouse 
+- [x] Add Item to Warehouse
+- [x] Update warehouse item
 - [] Decrement inventory 
 - [] Increment inventory
 - [] 
