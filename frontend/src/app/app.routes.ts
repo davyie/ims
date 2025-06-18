@@ -4,7 +4,7 @@ import { CatalogueComponent } from './catalogue/catalogue.component';
 import { CatalogueFormComponent } from './catalogue-form/catalogue-form.component';
 import { WarehouseComponent } from './warehouse/warehouse.component';
 import { MarketComponent } from './market/market.component';
-import { WarehouseDetailsComponent } from './warehouse-details/warehouse-details.component';
+import { WarehouseDetailsComponent } from './warehouse/warehouse-details/warehouse-details.component';
 
 export const routes: Routes = [
     {path: "", component: HomeComponent},

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Warehouse, WarehouseItem } from '../warehouse/warehouse.service';
+import { Warehouse, WarehouseItem } from '../warehouse.service';
 import { Observable } from 'rxjs';
 
 export interface ChangeQuantity {

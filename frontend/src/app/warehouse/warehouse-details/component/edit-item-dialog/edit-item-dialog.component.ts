@@ -1,6 +1,6 @@
 import { Component, Inject, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { WarehouseItem } from '../../../warehouse/warehouse.service';
+import { WarehouseItem } from '../../../warehouse.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { WarehouseDetailsService } from '../../warehouse-details.service';
 

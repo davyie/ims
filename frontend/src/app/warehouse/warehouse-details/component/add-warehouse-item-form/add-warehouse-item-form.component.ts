@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { WarehouseDetailsService } from '../warehouse-details/warehouse-details.service';
+import { WarehouseDetailsService } from '../../warehouse-details.service';
 
 @Component({
   selector: 'app-add-warehouse-item-form',

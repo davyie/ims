@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { HeaderComponent } from '../header/header.component';
-import { Warehouse, WarehouseItem } from '../warehouse/warehouse.service';
+import { HeaderComponent } from '../../header/header.component';
+import { Warehouse, WarehouseItem } from '../warehouse.service';
 import { WarehouseDetailsService } from './warehouse-details.service';
 import { NgFor, NgIf } from '@angular/common';
-import { AddWarehouseItemFormComponent } from '../add-warehouse-item-form/add-warehouse-item-form.component';
+import { AddWarehouseItemFormComponent } from './component/add-warehouse-item-form/add-warehouse-item-form.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
 import { EditItemDialogComponent } from './component/edit-item-dialog/edit-item-dialog.component';
