@@ -1,0 +1,15 @@
+<form (ngSubmit)="onSubmit()">
+    <div>
+        <label for="itemName">Item Name:</label>
+        <input type="text" id="itemName" name="itemName" required [(ngModel)]="itemQuantity.item.name">
+    </div>
+    <div>
+        <label for="itemDescription">Item Description:</label>
+        <input type="text" id="itemDescription" name="itemDescription" [(ngModel)]="itemQuantity.item.description">
+    </div>
+    <div>
+        <label for="itemQuantity">Quantity</label>
+        <input id="itemQuantity" type="number" name="itemQuantity" [(ngModel)]="itemQuantity.quantity">
+    </div>
+    <button type="submit">Submit</button>
+</form>
