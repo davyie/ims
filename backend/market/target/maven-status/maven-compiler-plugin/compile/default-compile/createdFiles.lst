@@ -9,5 +9,6 @@ com/example/market/commands/AddMarketItemToMarketCommand.class
 com/example/market/repository/MarketRepository.class
 com/example/market/domain/MarketDTO.class
 com/example/market/domain/MarketItemQuantityDTO.class
+com/example/market/queries/GetInventoryByMarketQuery.class
 com/example/market/commands/CreateMarketCommand.class
 com/example/market/routes/MarketCommandRoutes.class

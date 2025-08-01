@@ -7,6 +7,7 @@
 /Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/MarketItem.java
 /Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/commands/CreateMarketCommand.java
 /Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/Market.java
+/Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/queries/GetInventoryByMarketQuery.java
 /Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/routes/MarketQueryRoutes.java
 /Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/repository/MarketRepository.java
 /Users/davidyu/GitHub/ims/backend/market/src/main/java/com/example/market/domain/MarketItemQuantityDTO.java

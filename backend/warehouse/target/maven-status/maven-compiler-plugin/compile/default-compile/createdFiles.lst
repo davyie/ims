@@ -1,6 +1,12 @@
+com/example/warehouse/queries/GetWarehouseItemByItemIdQuery.class
+com/example/warehouse/domain/WarehouseItemQuantity.class
+com/example/warehouse/commands/UpdateWarehouseItemCommand.class
 com/example/warehouse/domain/WarehouseItem.class
 com/example/warehouse/repository/WarehouseRepository.class
+com/example/warehouse/commands/DecrementWarehouseItemCommand.class
+com/example/warehouse/commands/DeleteWarehouseItemCommand.class
+com/example/warehouse/commands/IncrementWarehouseItemCommand.class
+com/example/warehouse/commands/AddWarehouseItemCommand.class
 com/example/warehouse/domain/Warehouse.class
 com/example/warehouse/domain/ChangeQuantity.class
-com/example/warehouse/domain/WarehouseItemQuantity.class
 com/example/warehouse/routes/WarehouseController.class
