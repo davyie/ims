@@ -21,6 +21,12 @@ public class MessageController {
         return "Message sent to server";
     }
 
+    @GetMapping("/send/other")
+    public String otherMessage(@RequestParam String message) {
+        messageProducer.sendOtherMessage(message);
+        return "Other message sent to server";
+    }
+
     @GetMapping("/hello")
     public String HelloWorld() {
         return "Hello world from Message Controller";

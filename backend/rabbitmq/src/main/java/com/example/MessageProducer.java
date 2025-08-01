@@ -19,4 +19,12 @@ public class MessageProducer {
                 message
         );
     }
+
+    public void sendOtherMessage(String message) {
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE_NAME,
+                RabbitMQConfig.OTHER_ROUTING_KEY,
+                message
+        );
+    }
 }

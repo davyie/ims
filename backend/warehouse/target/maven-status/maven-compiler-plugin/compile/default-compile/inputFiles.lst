@@ -1,6 +1,12 @@
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/Warehouse.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/routes/WarehouseController.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/repository/WarehouseRepository.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/commands/IncrementWarehouseItemCommand.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/ChangeQuantity.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/WarehouseItemQuantity.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/commands/AddWarehouseItemCommand.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/commands/UpdateWarehouseItemCommand.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/queries/GetWarehouseItemByItemIdQuery.java
 /Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/domain/WarehouseItem.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/commands/DecrementWarehouseItemCommand.java
+/Users/davidyu/GitHub/ims/backend/warehouse/src/main/java/com/example/warehouse/commands/DeleteWarehouseItemCommand.java

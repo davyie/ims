@@ -37,7 +37,7 @@ export class AddWarehouseItemFormComponent {
         // Optionally, you can show an error message here
       }
     );
-    window.location.reload(); // Reload the page to reflect changes    
+    // window.location.reload(); // Reload the page to reflect changes    
     // Logic to handle form submission will go here
   }
 }

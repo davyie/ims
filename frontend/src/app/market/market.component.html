@@ -1,2 +1,11 @@
 <app-header></app-header>
-<p>market works!</p>
+<h1>Market</h1>
+<button>Create Market</button>
+<ul *ngFor="let market of markets">
+    <div>
+        <span>{{ market.name }}</span>
+        <span>{{ market.price }}</span>
+        <button [routerLink]="['/market', market.name]">Details</button>
+        <button>Delete</button>
+    </div>
+</ul>

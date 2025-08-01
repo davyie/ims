@@ -70,6 +70,6 @@ export class WarehouseDetailsComponent {
         // Optionally, you can show an error message here
       }
     );
-    window.location.reload(); // Reload the page to reflect changes
+    // window.location.reload(); // Reload the page to reflect changes
   }
 }
