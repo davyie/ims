@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface WarehouseItem {
-  itemId?: number;
   item: Item;
   quantity: number;
 }
@@ -11,11 +10,11 @@ export interface WarehouseItem {
 export interface Item {
   name: string;
   description: string;
-  itemId?: number;
+  itemId?: number;  
 }
 
 export interface Warehouse {
-  id: number;
+  id: string;
   inventory: WarehouseItem[];
 }
 
