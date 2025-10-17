@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$APPLICATION_HOME_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/APIGateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/InventoryService/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/application/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/catalogue/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common-cqrs/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/config/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/controller/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/exceptionHandlers/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/filters/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/logging/src/main/java" charset="UTF-8" />

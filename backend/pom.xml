@@ -19,18 +19,13 @@
 	<modules>
 		<module>application</module>
 		<module>logging</module>
-		<module>controller</module>
-		<module>catalogue</module>
+		<module>APIGateway</module>
 		<module>rateLimiting</module>
         <module>filters</module>
-        <module>warehouse</module>
-		<module>order</module>
-		<module>common-cqrs</module>
 		<module>rabbitmq</module>
-		<module>common</module>
-		<module>market</module>
 		<module>config</module>
         <module>exceptionHandlers</module>
+        <module>InventoryService</module>
     </modules>
 	<url/>
 	<licenses>

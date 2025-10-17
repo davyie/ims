@@ -1,5 +1,5 @@
 # Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-jdk-slim AS app
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -11,4 +11,15 @@ COPY application/target/*.jar app.jar
 EXPOSE 8080
 
 # Run the Spring Boot app
+ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
+FROM openjdk:17-jdk-slim AS is
+
+WORKDIR /app
+
+COPY InventoryService/target/*.jar app.jar
+
+EXPOSE 8080
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
