@@ -1,0 +1,109 @@
+package com.ims.api.controller;
+
+import com.ims.api.dto.request.CreateMarketRequest;
+import com.ims.api.dto.response.*;
+import com.ims.application.command.CloseMarketCommand;
+import com.ims.application.command.CreateMarketCommand;
+import com.ims.application.command.OpenMarketCommand;
+import com.ims.application.dto.AllMarketsSummaryDto;
+import com.ims.application.dto.MarketItemSummaryDto;
+import com.ims.application.dto.MarketSummaryDto;
+import com.ims.application.port.inbound.MarketCommandPort;
+import com.ims.application.port.inbound.MarketQueryPort;
+import com.ims.application.query.GetAllMarketsSummaryQuery;
+import com.ims.application.query.GetMarketQuery;
+import com.ims.application.query.GetMarketSummaryQuery;
+import com.ims.application.query.ListMarketsQuery;
+import com.ims.domain.model.Market;
+import com.ims.domain.model.MarketStatus;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/markets")
+@Tag(name = "Markets", description = "Market management endpoints")
+public class MarketController {
+
+    private final MarketCommandPort marketCommandPort;
+    private final MarketQueryPort marketQueryPort;
+
+    public MarketController(MarketCommandPort marketCommandPort, MarketQueryPort marketQueryPort) {
+        this.marketCommandPort = marketCommandPort;
+        this.marketQueryPort = marketQueryPort;
+    }
+
+    @PostMapping
+    @Operation(summary = "Create a market")
+    public ResponseEntity<MarketResponse> createMarket(@Valid @RequestBody CreateMarketRequest request) {
+        Market market = marketCommandPort.createMarket(new CreateMarketCommand(
+            request.name(), request.place(), request.openDate(), request.closeDate()
+        ));
+        return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(market));
+    }
+
+    @GetMapping
+    @Operation(summary = "List markets")
+    public ResponseEntity<List<MarketResponse>> listMarkets(@RequestParam(required = false) MarketStatus status) {
+        return ResponseEntity.ok(marketQueryPort.listMarkets(new ListMarketsQuery(status))
+                .stream().map(this::toResponse).toList());
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get market by ID")
+    public ResponseEntity<MarketResponse> getMarket(@PathVariable UUID id) {
+        return ResponseEntity.ok(toResponse(marketQueryPort.getMarket(new GetMarketQuery(id))));
+    }
+
+    @PostMapping("/{id}/open")
+    @Operation(summary = "Open a market")
+    public ResponseEntity<MarketResponse> openMarket(@PathVariable UUID id) {
+        return ResponseEntity.ok(toResponse(marketCommandPort.openMarket(new OpenMarketCommand(id))));
+    }
+
+    @PostMapping("/{id}/close")
+    @Operation(summary = "Close a market")
+    public ResponseEntity<MarketResponse> closeMarket(@PathVariable UUID id,
+            @RequestParam(defaultValue = "system") String createdBy) {
+        return ResponseEntity.ok(toResponse(marketCommandPort.closeMarket(new CloseMarketCommand(id, createdBy))));
+    }
+
+    @GetMapping("/{id}/summary")
+    @Operation(summary = "Get market summary")
+    public ResponseEntity<MarketSummaryResponse> getMarketSummary(@PathVariable UUID id) {
+        MarketSummaryDto dto = marketQueryPort.getMarketSummary(new GetMarketSummaryQuery(id));
+        return ResponseEntity.ok(toSummaryResponse(dto));
+    }
+
+    @GetMapping("/summary")
+    @Operation(summary = "Get all markets summary")
+    public ResponseEntity<AllMarketsSummaryResponse> getAllMarketsSummary(
+            @RequestParam(required = false) MarketStatus status) {
+        AllMarketsSummaryDto dto = marketQueryPort.getAllMarketsSummary(new GetAllMarketsSummaryQuery(status));
+        List<MarketSummaryResponse> summaries = dto.markets().stream().map(this::toSummaryResponse).toList();
+        return ResponseEntity.ok(new AllMarketsSummaryResponse(
+            dto.totalMarkets(), dto.totalItemsSold(), dto.totalRevenue(), dto.currency(), summaries));
+    }
+
+    private MarketResponse toResponse(Market m) {
+        return new MarketResponse(m.getId(), m.getName(), m.getPlace(),
+            m.getOpenDate(), m.getCloseDate(), m.getStatus().name(), m.getCreatedAt());
+    }
+
+    private MarketSummaryResponse toSummaryResponse(MarketSummaryDto dto) {
+        List<MarketItemSummaryResponse> items = dto.items().stream()
+                .map(i -> new MarketItemSummaryResponse(
+                    i.itemId(), i.itemName(), i.sku(), i.allocatedStock(),
+                    i.currentStock(), i.sold(), i.revenue(), i.currency()))
+                .toList();
+        return new MarketSummaryResponse(dto.marketId(), dto.marketName(), dto.totalItemTypes(),
+            dto.totalAllocatedStock(), dto.totalCurrentStock(), dto.totalSold(),
+            dto.totalRevenue(), dto.currency(), items);
+    }
+}
