@@ -1,0 +1,57 @@
+.market-item-detail { }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.stock-metrics {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  .metric-value { font-size: 32px; font-weight: 700; color: var(--text-primary); }
+  .metric-label { font-size: 11px; text-transform: uppercase; color: var(--text-secondary); font-weight: 600; }
+  &.accent .metric-value { color: var(--primary); }
+  &.sold .metric-value { color: #2E7D32; }
+}
+
+.action-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.price-display {
+  margin-bottom: 12px;
+  .price-value { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+}
+
+.inline-form {
+  margin-top: 16px;
+  padding: 16px;
+  background: #F5F6FA;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-row { display: flex; gap: 8px; .price-field { flex: 3; } .currency-field { flex: 1; } }
+
+.inline-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.transactions-card { }
+.full-width { width: 100%; }
+.positive { color: #2E7D32; font-weight: 600; }
+.negative { color: #C62828; font-weight: 600; }
+.empty-msg { color: var(--text-secondary); text-align: center; padding: 24px; }

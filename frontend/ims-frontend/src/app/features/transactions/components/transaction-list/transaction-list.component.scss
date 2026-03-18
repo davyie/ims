@@ -1,0 +1,29 @@
+.transaction-list { }
+
+.filter-card { margin-bottom: 16px; }
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.full-width { width: 100%; }
+
+.table-scroll { overflow-x: auto; }
+
+.date-primary { font-size: 13px; }
+
+.delta-badge {
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  &.positive { background: #E8F5E9; color: #2E7D32; }
+  &.negative { background: #FFEBEE; color: #C62828; }
+}
+
+.link { color: var(--primary); text-decoration: none; &:hover { text-decoration: underline; } }
+
+.empty-msg { text-align: center; color: var(--text-secondary); padding: 32px; }

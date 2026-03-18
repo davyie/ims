@@ -1,0 +1,166 @@
+.shell-container {
+  height: 100vh;
+}
+
+.shell-sidenav {
+  width: 240px;
+  background: var(--sidenav-bg, #1B3A6B);
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+  .brand-icon {
+    color: #FFD54F;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: white;
+  }
+}
+
+.nav-list {
+  flex: 1;
+  padding-top: 8px;
+
+  a[mat-list-item] {
+    color: rgba(255, 255, 255, 0.75);
+    border-radius: 0 24px 24px 0;
+    margin-right: 12px;
+    margin-bottom: 2px;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    mat-icon {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    &.nav-active {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      font-weight: 600;
+
+      mat-icon {
+        color: #FFD54F;
+      }
+    }
+  }
+}
+
+.sidenav-footer {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  .version {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+.app-toolbar {
+  background: white !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  z-index: 100;
+
+  .toolbar-brand-icon {
+    color: var(--primary);
+    margin-right: 8px;
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .toolbar-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--primary);
+  }
+
+  .toolbar-spacer { flex: 1; }
+}
+
+.shell-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #F5F6FA;
+}
+
+.main-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+// Bottom navigation – hidden on desktop
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .main-content {
+    padding: 12px;
+    // leave room for the bottom nav bar
+    padding-bottom: 72px;
+  }
+
+  .app-toolbar {
+    .toolbar-brand-icon { display: none; }
+  }
+
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: white;
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+    z-index: 200;
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.15s;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    &.bottom-nav-active {
+      color: var(--primary);
+
+      mat-icon { color: var(--primary); }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+<mat-sidenav-container class="shell-container">
+  <mat-sidenav #sidenav
+    [mode]="sidenavMode"
+    [opened]="sidenavOpened"
+    class="shell-sidenav">
+
+    <div class="sidenav-header">
+      <mat-icon class="brand-icon">inventory</mat-icon>
+      <span class="brand-name">IMS</span>
+    </div>
+
+    <mat-nav-list class="nav-list">
+      <a mat-list-item
+        *ngFor="let item of navItems"
+        [routerLink]="item.route"
+        routerLinkActive="nav-active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+        (click)="isMobile && sidenav.close()">
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+    </mat-nav-list>
+
+    <div class="sidenav-footer">
+      <span class="version">v1.0.0</span>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell-content">
+    <mat-toolbar class="app-toolbar">
+      <mat-icon class="toolbar-brand-icon">inventory</mat-icon>
+      <span class="toolbar-title">{{ isMobile ? currentPageLabel : 'Inventory Management System' }}</span>
+      <span class="toolbar-spacer"></span>
+    </mat-toolbar>
+
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<!-- Bottom navigation – mobile only -->
+<nav class="bottom-nav">
+  <a *ngFor="let item of navItems"
+    [routerLink]="item.route"
+    routerLinkActive="bottom-nav-active"
+    [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+    class="bottom-nav-item">
+    <mat-icon>{{ item.icon }}</mat-icon>
+    <span>{{ item.shortLabel }}</span>
+  </a>
+</nav>
+
+<app-loading-overlay></app-loading-overlay>

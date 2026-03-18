@@ -1,0 +1,54 @@
+.market-list { }
+
+.tab-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  button { text-transform: uppercase; font-size: 12px; font-weight: 600; }
+  button.tab-active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+}
+
+.markets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.market-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.1s;
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+  }
+
+  mat-card-subtitle { display: flex; align-items: center; gap: 4px; }
+
+  .market-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+
+  mat-card-actions {
+    display: flex;
+    align-items: center;
+    .spacer { flex: 1; }
+  }
+}

@@ -1,0 +1,74 @@
+<div class="market-list">
+  <app-page-header title="Markets" [breadcrumbs]="[{label:'Markets'}]">
+    <button mat-flat-button color="primary" routerLink="/markets/new">
+      <mat-icon>add</mat-icon> Create Market
+    </button>
+  </app-page-header>
+
+  <!-- Status Tabs -->
+  <div class="tab-row">
+    <button *ngFor="let tab of tabs"
+      mat-stroked-button
+      [class.tab-active]="selectedTab() === tab"
+      (click)="selectTab(tab)">
+      {{ tab }}
+      <span class="tab-count" *ngIf="tab !== 'ALL'">
+        ({{ countByStatus(tab) }})
+      </span>
+    </button>
+  </div>
+
+  <!-- Markets Grid -->
+  <app-empty-state
+    *ngIf="filteredMarkets().length === 0 && !state.loading()"
+    icon="storefront"
+    title="No markets found"
+    subtitle="Create a new market to get started">
+  </app-empty-state>
+
+  <div class="markets-grid">
+    <mat-card *ngFor="let m of filteredMarkets()" class="market-card" [routerLink]="['/markets', m.id]">
+      <mat-card-header>
+        <mat-card-title>{{ m.name }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-icon inline>location_on</mat-icon> {{ m.place }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="market-meta">
+          <div class="meta-row">
+            <mat-icon>event</mat-icon>
+            <span>{{ m.openDate | dateFormat:'absolute' }}</span>
+          </div>
+          <div class="meta-row">
+            <mat-icon>event_busy</mat-icon>
+            <span>{{ m.closeDate | dateFormat:'absolute' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <app-status-badge [status]="m.status" type="market"></app-status-badge>
+        <span class="spacer"></span>
+        <button mat-icon-button color="primary"
+          *ngIf="m.status === 'SCHEDULED'"
+          (click)="openMarket(m, $event)"
+          matTooltip="Open Market">
+          <mat-icon>play_arrow</mat-icon>
+        </button>
+        <button mat-icon-button color="warn"
+          *ngIf="m.status === 'OPEN'"
+          (click)="closeMarket(m, $event)"
+          matTooltip="Close Market">
+          <mat-icon>stop</mat-icon>
+        </button>
+        <button mat-icon-button [routerLink]="['/markets', m.id, 'summary']"
+          (click)="$event.stopPropagation()"
+          matTooltip="View Summary">
+          <mat-icon>bar_chart</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

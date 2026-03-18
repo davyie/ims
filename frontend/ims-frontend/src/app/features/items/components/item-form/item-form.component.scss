@@ -1,0 +1,45 @@
+.item-form { }
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-section { }
+
+.section-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #E3F2FD;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.full-field { width: 100%; margin-bottom: 16px; }
+
+.price-row {
+  display: flex;
+  gap: 8px;
+  .price-field { flex: 3; }
+  .currency-field { flex: 1; }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #E0E0E0;
+}

@@ -1,0 +1,59 @@
+.detail-container { height: auto; }
+
+.item-detail { }
+
+.tab-content { padding-top: 20px; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  @media (max-width: 480px) { grid-template-columns: 1fr; }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.field-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.field-value {
+  font-size: 15px;
+  color: var(--text-primary);
+  &.sku {
+    font-family: monospace;
+    background: #E3F2FD;
+    color: #1565C0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+}
+
+.stock-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  .stock-number { font-size: 40px; font-weight: 700; color: var(--text-primary); }
+}
+
+.full-width { width: 100%; }
+
+.positive { color: #2E7D32; font-weight: 600; }
+.negative { color: #C62828; font-weight: 600; }
