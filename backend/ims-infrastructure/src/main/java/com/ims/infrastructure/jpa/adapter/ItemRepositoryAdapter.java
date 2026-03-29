@@ -47,6 +47,11 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
         return jpaRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
     private ItemJpaEntity toEntity(Item item) {
         ItemJpaEntity e = new ItemJpaEntity();
         e.setId(item.getId());

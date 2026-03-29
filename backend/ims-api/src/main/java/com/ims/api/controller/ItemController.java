@@ -34,6 +34,7 @@ public class ItemController {
     private final ItemCommandPort registerItemUseCase;
     private final ItemCommandPort updateItemUseCase;
     private final ItemCommandPort adjustStockUseCase;
+    private final ItemCommandPort deleteItemUseCase;
     private final ItemQueryPort itemQueryUseCase;
     private final TransactionQueryPort transactionQueryUseCase;
 
@@ -41,11 +42,13 @@ public class ItemController {
             com.ims.application.usecase.item.RegisterItemUseCase registerItemUseCase,
             com.ims.application.usecase.item.UpdateItemUseCase updateItemUseCase,
             com.ims.application.usecase.item.AdjustStorageStockUseCase adjustStockUseCase,
+            com.ims.application.usecase.item.DeleteItemUseCase deleteItemUseCase,
             ItemQueryPort itemQueryUseCase,
             TransactionQueryPort transactionQueryUseCase) {
         this.registerItemUseCase = registerItemUseCase;
         this.updateItemUseCase = updateItemUseCase;
         this.adjustStockUseCase = adjustStockUseCase;
+        this.deleteItemUseCase = deleteItemUseCase;
         this.itemQueryUseCase = itemQueryUseCase;
         this.transactionQueryUseCase = transactionQueryUseCase;
     }
@@ -94,6 +97,13 @@ public class ItemController {
             id, request.delta(), request.note(), request.createdBy()
         ));
         return ResponseEntity.ok(toResponse(item));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an item")
+    public ResponseEntity<Void> deleteItem(@PathVariable UUID id) {
+        deleteItemUseCase.deleteItem(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/transactions")

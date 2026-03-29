@@ -10,4 +10,5 @@ public interface TransactionJpaRepository extends JpaRepository<TransactionJpaEn
     List<TransactionJpaEntity> findByMarketId(UUID marketId);
     List<TransactionJpaEntity> findByItemId(UUID itemId);
     List<TransactionJpaEntity> findByMarketIdAndItemId(UUID marketId, UUID itemId);
+    void deleteByItemId(UUID itemId);
 }

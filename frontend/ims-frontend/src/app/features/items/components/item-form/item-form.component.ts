@@ -13,7 +13,7 @@ import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/p
 import { RegisterItemRequest, UpdateItemRequest } from '../../../../shared/models/models';
 
 const CATEGORIES = ['ELECTRONICS', 'CLOTHING', 'FOOD', 'BEVERAGES', 'ACCESSORIES', 'OTHER'];
-const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'];
+const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
 
 @Component({
   selector: 'app-item-form',

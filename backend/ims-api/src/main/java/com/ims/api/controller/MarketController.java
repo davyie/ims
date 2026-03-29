@@ -1,10 +1,12 @@
 package com.ims.api.controller;
 
 import com.ims.api.dto.request.CreateMarketRequest;
+import com.ims.api.dto.request.UpdateMarketRequest;
 import com.ims.api.dto.response.*;
 import com.ims.application.command.CloseMarketCommand;
 import com.ims.application.command.CreateMarketCommand;
 import com.ims.application.command.OpenMarketCommand;
+import com.ims.application.command.UpdateMarketCommand;
 import com.ims.application.dto.AllMarketsSummaryDto;
 import com.ims.application.dto.MarketItemSummaryDto;
 import com.ims.application.dto.MarketSummaryDto;
@@ -32,10 +34,18 @@ import java.util.UUID;
 public class MarketController {
 
     private final MarketCommandPort marketCommandPort;
+    private final MarketCommandPort updateMarketUseCase;
+    private final MarketCommandPort deleteMarketUseCase;
     private final MarketQueryPort marketQueryPort;
 
-    public MarketController(MarketCommandPort marketCommandPort, MarketQueryPort marketQueryPort) {
+    public MarketController(
+            com.ims.application.usecase.market.CreateMarketUseCase marketCommandPort,
+            com.ims.application.usecase.market.UpdateMarketUseCase updateMarketUseCase,
+            com.ims.application.usecase.market.DeleteMarketUseCase deleteMarketUseCase,
+            MarketQueryPort marketQueryPort) {
         this.marketCommandPort = marketCommandPort;
+        this.updateMarketUseCase = updateMarketUseCase;
+        this.deleteMarketUseCase = deleteMarketUseCase;
         this.marketQueryPort = marketQueryPort;
     }
 
@@ -59,6 +69,23 @@ public class MarketController {
     @Operation(summary = "Get market by ID")
     public ResponseEntity<MarketResponse> getMarket(@PathVariable UUID id) {
         return ResponseEntity.ok(toResponse(marketQueryPort.getMarket(new GetMarketQuery(id))));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a market (only in SCHEDULED state)")
+    public ResponseEntity<MarketResponse> updateMarket(@PathVariable UUID id,
+            @Valid @RequestBody UpdateMarketRequest request) {
+        Market market = updateMarketUseCase.updateMarket(new UpdateMarketCommand(
+            id, request.name(), request.place(), request.openDate(), request.closeDate()
+        ));
+        return ResponseEntity.ok(toResponse(market));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a market (not allowed when OPEN)")
+    public ResponseEntity<Void> deleteMarket(@PathVariable UUID id) {
+        deleteMarketUseCase.deleteMarket(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/open")

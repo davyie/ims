@@ -1,5 +1,5 @@
 <div class="market-form">
-  <app-page-header title="Create Market" [breadcrumbs]="breadcrumbs"></app-page-header>
+  <app-page-header [title]="title" [breadcrumbs]="breadcrumbs"></app-page-header>
 
   <mat-card>
     <mat-card-content>
@@ -42,7 +42,7 @@
           <button mat-stroked-button type="button" routerLink="/markets">Cancel</button>
           <button mat-flat-button color="primary" type="submit" [disabled]="saving">
             <mat-icon>save</mat-icon>
-            {{ saving ? 'Creating...' : 'Create Market' }}
+            {{ saving ? 'Saving...' : (isEdit ? 'Update Market' : 'Create Market') }}
           </button>
         </div>
       </form>

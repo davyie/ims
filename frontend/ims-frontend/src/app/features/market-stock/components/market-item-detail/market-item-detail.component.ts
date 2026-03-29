@@ -48,7 +48,7 @@ export class MarketItemDetailComponent implements OnInit {
   showPriceForm = signal(false);
   saving = signal(false);
 
-  currencies = ['EUR', 'USD', 'GBP', 'CHF'];
+  currencies = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
 
   incrementForm = this.fb.group({
     quantity: [1, [Validators.required, Validators.min(1)]],

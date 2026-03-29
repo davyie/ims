@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,7 +25,8 @@ type TabStatus = 'ALL' | 'SCHEDULED' | 'OPEN' | 'CLOSED';
     CommonModule, RouterModule,
     MatTabsModule, MatCardModule, MatButtonModule, MatIconModule,
     MatTableModule, MatTooltipModule,
-    StatusBadgeComponent, DateFormatPipe, PageHeaderComponent, EmptyStateComponent
+    StatusBadgeComponent, DateFormatPipe, PageHeaderComponent, EmptyStateComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './market-list.component.html',
   styleUrls: ['./market-list.component.scss']
@@ -33,6 +34,7 @@ type TabStatus = 'ALL' | 'SCHEDULED' | 'OPEN' | 'CLOSED';
 export class MarketListComponent implements OnInit {
   state = inject(MarketStateService);
   private dialog = inject(MatDialog);
+  private router = inject(Router);
 
   selectedTab = signal<TabStatus>('ALL');
   tabs: TabStatus[] = ['ALL', 'SCHEDULED', 'OPEN', 'CLOSED'];
@@ -66,6 +68,25 @@ export class MarketListComponent implements OnInit {
     });
     const confirmed = await ref.afterClosed().toPromise();
     if (confirmed) await this.state.openMarket(market.id);
+  }
+
+  editMarket(market: Market, event: Event): void {
+    event.stopPropagation();
+    this.router.navigate(['/markets', market.id, 'edit']);
+  }
+
+  async deleteMarket(market: Market, event: Event): Promise<void> {
+    event.stopPropagation();
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Market',
+        message: `Delete "${market.name}"? This cannot be undone.`,
+        confirmLabel: 'Delete',
+        confirmColor: 'warn'
+      }
+    });
+    const confirmed = await ref.afterClosed().toPromise();
+    if (confirmed) await this.state.deleteMarket(market.id);
   }
 
   async closeMarket(market: Market, event: Event): Promise<void> {

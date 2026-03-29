@@ -36,9 +36,13 @@ export interface Breadcrumb { label: string; link?: string; }
     .crumb a { color: var(--primary); text-decoration: none; }
     .crumb a:hover { text-decoration: underline; }
     .sep { font-size: 16px; width: 16px; height: 16px; color: #9E9E9E; }
-    .header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .header-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
     .page-title { margin: 0; font-size: 24px; font-weight: 600; color: var(--text-primary); }
-    .actions { display: flex; gap: 8px; align-items: center; }
+    .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    @media (max-width: 480px) {
+      .page-title { font-size: 20px; }
+      .header-row { gap: 8px; }
+    }
   `]
 })
 export class PageHeaderComponent {

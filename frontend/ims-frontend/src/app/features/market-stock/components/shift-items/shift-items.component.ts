@@ -17,7 +17,7 @@ import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/p
 import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { Item, ShiftItemRequest } from '../../../../shared/models/models';
 
-const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF'];
+const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
 
 @Component({
   selector: 'app-shift-items',

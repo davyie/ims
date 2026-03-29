@@ -10,4 +10,5 @@ public interface TransactionRepositoryPort {
     List<Transaction> findByMarketId(UUID marketId);
     List<Transaction> findByItemId(UUID itemId);
     List<Transaction> findByMarketIdAndItemId(UUID marketId, UUID itemId);
+    void deleteByItemId(UUID itemId);
 }

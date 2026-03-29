@@ -14,6 +14,10 @@ export const MARKETS_ROUTES: Routes = [
     loadComponent: () => import('./components/market-detail/market-detail.component').then(m => m.MarketDetailComponent)
   },
   {
+    path: ':id/edit',
+    loadComponent: () => import('./components/market-form/market-form.component').then(m => m.MarketFormComponent)
+  },
+  {
     path: ':id/items/add',
     loadComponent: () => import('../market-stock/components/shift-items/shift-items.component').then(m => m.ShiftItemsComponent)
   },

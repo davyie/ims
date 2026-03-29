@@ -10,11 +10,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { ItemStateService } from '../../services/item-state.service';
 import { StockLevelComponent } from '../../../../shared/components/stock-level/stock-level.component';
 import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Item } from '../../../../shared/models/models';
 
 const CATEGORIES = ['All', 'ELECTRONICS', 'CLOTHING', 'FOOD', 'BEVERAGES', 'ACCESSORIES', 'OTHER'];
@@ -26,13 +28,15 @@ const CATEGORIES = ['All', 'ELECTRONICS', 'CLOTHING', 'FOOD', 'BEVERAGES', 'ACCE
     CommonModule, RouterModule, FormsModule,
     MatTableModule, MatInputModule, MatButtonModule, MatIconModule,
     MatChipsModule, MatPaginatorModule, MatCardModule, MatTooltipModule,
-    StockLevelComponent, CurrencyFormatPipe, PageHeaderComponent, EmptyStateComponent
+    StockLevelComponent, CurrencyFormatPipe, PageHeaderComponent, EmptyStateComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './item-list.component.html',
   styleUrls: ['./item-list.component.scss']
 })
 export class ItemListComponent implements OnInit {
   state = inject(ItemStateService);
+  private dialog = inject(MatDialog);
 
   searchTerm = signal('');
   selectedCategory = signal('All');
@@ -81,6 +85,20 @@ export class ItemListComponent implements OnInit {
   onPage(e: PageEvent): void {
     this.pageIndex.set(e.pageIndex);
     this.pageSize.set(e.pageSize);
+  }
+
+  async deleteItem(item: Item, event: Event): Promise<void> {
+    event.stopPropagation();
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Item',
+        message: `Delete "${item.name}" (${item.sku})? This cannot be undone.`,
+        confirmLabel: 'Delete',
+        confirmColor: 'warn'
+      }
+    });
+    const confirmed = await ref.afterClosed().toPromise();
+    if (confirmed) await this.state.deleteItem(item.id);
   }
 
   exportCsv(): void {

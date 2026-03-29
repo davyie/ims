@@ -73,4 +73,9 @@ public class RegisterItemUseCase implements ItemCommandPort {
     public Item adjustStorageStock(AdjustStorageStockCommand command) {
         throw new UnsupportedOperationException("Handled by AdjustStorageStockUseCase");
     }
+
+    @Override
+    public void deleteItem(java.util.UUID id) {
+        throw new UnsupportedOperationException("Handled by DeleteItemUseCase");
+    }
 }

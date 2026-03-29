@@ -57,6 +57,20 @@ export class ItemStateService {
     });
   }
 
+  deleteItem(id: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.api.deleteItem(id).subscribe({
+        next: () => {
+          this.items.update(items => items.filter(i => i.id !== id));
+          if (this.selectedItem()?.id === id) this.selectedItem.set(null);
+          this.notify.success('Item deleted');
+          resolve();
+        },
+        error: err => { reject(err); }
+      });
+    });
+  }
+
   adjustStock(id: string, cmd: AdjustStockRequest): Promise<Item> {
     return new Promise((resolve, reject) => {
       this.api.adjustStock(id, cmd).subscribe({

@@ -10,4 +10,5 @@ public interface ItemRepositoryPort {
     Optional<Item> findById(UUID id);
     Optional<Item> findBySku(String sku);
     List<Item> findAll();
+    void deleteById(UUID id);
 }

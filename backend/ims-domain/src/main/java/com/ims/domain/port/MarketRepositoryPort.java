@@ -10,4 +10,5 @@ public interface MarketRepositoryPort {
     Market save(Market market);
     Optional<Market> findById(UUID id);
     List<Market> findAll(MarketStatus status);
+    void deleteById(UUID id);
 }

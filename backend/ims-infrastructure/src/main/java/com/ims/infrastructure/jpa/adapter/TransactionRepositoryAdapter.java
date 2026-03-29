@@ -45,6 +45,11 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
         return jpaRepository.findByMarketIdAndItemId(marketId, itemId).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteByItemId(UUID itemId) {
+        jpaRepository.deleteByItemId(itemId);
+    }
+
     private TransactionJpaEntity toEntity(Transaction tx) {
         TransactionJpaEntity e = new TransactionJpaEntity();
         e.setId(tx.getId());

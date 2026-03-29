@@ -32,6 +32,16 @@ public class Market {
         return new Market(UUID.randomUUID(), name, place, openDate, closeDate, MarketStatus.SCHEDULED, LocalDateTime.now());
     }
 
+    public void update(String name, String place, LocalDate openDate, LocalDate closeDate) {
+        if (this.status != MarketStatus.SCHEDULED) {
+            throw new InvalidMarketStateException("Market can only be edited in SCHEDULED state, current: " + status);
+        }
+        this.name = name;
+        this.place = place;
+        this.openDate = openDate;
+        this.closeDate = closeDate;
+    }
+
     public void open() {
         if (status != MarketStatus.SCHEDULED) {
             throw new InvalidMarketStateException("Market can only be opened from SCHEDULED state, current: " + status);

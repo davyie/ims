@@ -2,9 +2,14 @@
 
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
   margin-bottom: 32px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
 }
 
 .kpi-card {
@@ -40,6 +45,13 @@
   &.kpi-lowstock .kpi-icon { color: #E65100; }
   &.kpi-sold .kpi-icon { color: #2E7D32; }
   &.kpi-revenue .kpi-icon { color: #6A1B9A; }
+
+  @media (max-width: 480px) {
+    .kpi-value { font-size: 22px; }
+    .kpi-money { font-size: 16px; }
+    .kpi-icon { font-size: 28px; width: 28px; height: 28px; }
+    .kpi-label { font-size: 11px; }
+  }
 }
 
 .section { margin-bottom: 32px; }

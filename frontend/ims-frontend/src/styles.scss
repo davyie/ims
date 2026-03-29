@@ -52,6 +52,19 @@ h1, h2, h3, h4 { margin-top: 0; }
 // Utility
 .spacer { flex: 1; }
 
+// Mobile table scroll (prevent page-level overflow)
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+// Ensure tables never force the page wider than the viewport
+table { min-width: 0; }
+
+@media (max-width: 767px) {
+  // Tighter card padding on phones
+  mat-card mat-card-content { padding: 12px !important; }
+  mat-card mat-card-header { padding: 12px 12px 0 !important; }
+  mat-card mat-card-actions { padding: 4px 8px !important; }
+}
+
 // Scrollbar
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

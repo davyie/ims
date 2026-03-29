@@ -32,6 +32,11 @@ public class MarketRepositoryAdapter implements MarketRepositoryPort {
     }
 
     @Override
+    public void deleteById(UUID id) {
+        jpaRepository.deleteById(id);
+    }
+
+    @Override
     public List<Market> findAll(MarketStatus status) {
         if (status != null) {
             return jpaRepository.findByStatus(MarketJpaEntity.MarketStatusJpa.valueOf(status.name()))

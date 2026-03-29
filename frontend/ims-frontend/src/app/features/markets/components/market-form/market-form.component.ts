@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,8 +11,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MarketStateService } from '../../services/market-state.service';
 import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/page-header/page-header.component';
-import { CreateMarketRequest } from '../../../../shared/models/models';
-import { format } from 'date-fns';
+import { CreateMarketRequest, UpdateMarketRequest } from '../../../../shared/models/models';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-market-form',
@@ -26,17 +26,14 @@ import { format } from 'date-fns';
   templateUrl: './market-form.component.html',
   styleUrls: ['./market-form.component.scss']
 })
-export class MarketFormComponent {
+export class MarketFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private state = inject(MarketStateService);
 
+  isEdit = false;
   saving = false;
-
-  breadcrumbs: Breadcrumb[] = [
-    { label: 'Markets', link: '/markets' },
-    { label: 'New Market' }
-  ];
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -45,6 +42,38 @@ export class MarketFormComponent {
     closeDate: [null as Date | null, Validators.required],
   });
 
+  get id(): string | null { return this.route.snapshot.paramMap.get('id'); }
+
+  get breadcrumbs(): Breadcrumb[] {
+    return [
+      { label: 'Markets', link: '/markets' },
+      { label: this.isEdit ? 'Edit Market' : 'New Market' }
+    ];
+  }
+
+  get title(): string { return this.isEdit ? 'Edit Market' : 'Create Market'; }
+
+  ngOnInit(): void {
+    if (this.id) {
+      this.isEdit = true;
+      this.state.loadMarket(this.id);
+    }
+  }
+
+  ngDoCheck(): void {
+    if (this.isEdit && this.state.selectedMarket()) {
+      const m = this.state.selectedMarket()!;
+      if (this.form.get('name')?.value === '') {
+        this.form.patchValue({
+          name: m.name,
+          place: m.place,
+          openDate: parseISO(m.openDate),
+          closeDate: parseISO(m.closeDate),
+        });
+      }
+    }
+  }
+
   async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -52,15 +81,26 @@ export class MarketFormComponent {
     }
     this.saving = true;
     const v = this.form.getRawValue();
-    const req: CreateMarketRequest = {
-      name: v.name!,
-      place: v.place!,
-      openDate: format(v.openDate!, 'yyyy-MM-dd'),
-      closeDate: format(v.closeDate!, 'yyyy-MM-dd'),
-    };
     try {
-      const market = await this.state.createMarket(req);
-      this.router.navigate(['/markets', market.id]);
+      if (this.isEdit) {
+        const req: UpdateMarketRequest = {
+          name: v.name!,
+          place: v.place!,
+          openDate: format(v.openDate!, 'yyyy-MM-dd'),
+          closeDate: format(v.closeDate!, 'yyyy-MM-dd'),
+        };
+        await this.state.updateMarket(this.id!, req);
+        this.router.navigate(['/markets', this.id]);
+      } else {
+        const req: CreateMarketRequest = {
+          name: v.name!,
+          place: v.place!,
+          openDate: format(v.openDate!, 'yyyy-MM-dd'),
+          closeDate: format(v.closeDate!, 'yyyy-MM-dd'),
+        };
+        const market = await this.state.createMarket(req);
+        this.router.navigate(['/markets', market.id]);
+      }
     } finally {
       this.saving = false;
     }

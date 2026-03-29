@@ -150,6 +150,13 @@ export interface CreateMarketRequest {
   closeDate: string;
 }
 
+export interface UpdateMarketRequest {
+  name: string;
+  place: string;
+  openDate: string;
+  closeDate: string;
+}
+
 export interface ShiftItemRequest {
   itemId: string;
   quantity: number;

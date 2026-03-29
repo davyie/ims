@@ -16,7 +16,7 @@
 
 .markets-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -49,6 +49,11 @@
   mat-card-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     .spacer { flex: 1; }
   }
+}
+
+@media (max-width: 400px) {
+  .tab-row button { font-size: 11px; padding: 0 8px; }
 }

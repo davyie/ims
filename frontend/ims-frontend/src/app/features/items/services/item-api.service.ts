@@ -34,6 +34,10 @@ export class ItemApiService {
     return this.http.patch<Item>(`${this.base}/${id}/stock`, req);
   }
 
+  deleteItem(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
+  }
+
   getItemTransactions(id: string): Observable<Transaction[]> {
     return this.http.get<Transaction[]>(`${this.base}/${id}/transactions`);
   }

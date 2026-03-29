@@ -60,4 +60,9 @@ public class AdjustStorageStockUseCase implements ItemCommandPort {
     public Item updateItem(UpdateItemCommand command) {
         throw new UnsupportedOperationException("Handled by UpdateItemUseCase");
     }
+
+    @Override
+    public void deleteItem(java.util.UUID id) {
+        throw new UnsupportedOperationException("Handled by DeleteItemUseCase");
+    }
 }

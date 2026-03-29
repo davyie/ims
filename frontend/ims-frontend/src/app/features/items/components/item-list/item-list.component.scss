@@ -67,3 +67,13 @@
   .filter-row { flex-direction: column; align-items: stretch; }
   .search-field { width: 100%; }
 }
+
+// Hide less critical columns on phones (360-393px) so the table fits
+@media (max-width: 480px) {
+  // Angular Material adds mat-column-{name} to every th/td
+  .mat-column-category,
+  .mat-column-price { display: none; }
+
+  .sku-badge { font-size: 11px; padding: 1px 6px; }
+  .category-chip { font-size: 10px; }
+}

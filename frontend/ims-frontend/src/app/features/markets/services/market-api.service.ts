@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Market, MarketSummary, AllMarketsSummary, CreateMarketRequest } from '../../../shared/models/models';
+import { Market, MarketSummary, AllMarketsSummary, CreateMarketRequest, UpdateMarketRequest } from '../../../shared/models/models';
 
 @Injectable({ providedIn: 'root' })
 export class MarketApiService {
@@ -21,6 +21,14 @@ export class MarketApiService {
 
   createMarket(req: CreateMarketRequest): Observable<Market> {
     return this.http.post<Market>(this.base, req);
+  }
+
+  updateMarket(id: string, req: UpdateMarketRequest): Observable<Market> {
+    return this.http.put<Market>(`${this.base}/${id}`, req);
+  }
+
+  deleteMarket(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${id}`);
   }
 
   openMarket(id: string): Observable<Market> {

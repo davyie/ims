@@ -37,6 +37,11 @@ public class MarketItemRepositoryAdapter implements MarketItemRepositoryPort {
         return jpaRepository.findAllByMarketId(marketId).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteByItemId(UUID itemId) {
+        jpaRepository.deleteByItemId(itemId);
+    }
+
     private MarketItemJpaEntity toEntity(MarketItem mi) {
         MarketItemJpaEntity e = new MarketItemJpaEntity();
         e.setId(mi.getId());
