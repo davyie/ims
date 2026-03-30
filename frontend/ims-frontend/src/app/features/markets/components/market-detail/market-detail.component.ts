@@ -62,9 +62,6 @@ export class MarketDetailComponent implements OnInit {
   itemColumns = ['item', 'allocated', 'stock-control', 'price', 'actions'];
   txnColumns = ['occurred', 'type', 'delta', 'before', 'after', 'note'];
 
-  isSaleRow = (_index: number, row: MarketItem): boolean =>
-    this.activeSaleItemId() === row.itemId;
-
   get id(): string { return this.route.snapshot.paramMap.get('id')!; }
 
   get breadcrumbs(): Breadcrumb[] {

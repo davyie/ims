@@ -112,7 +112,8 @@
               <!-- Expandable sale form row -->
               <ng-container matColumnDef="sale-form">
                 <td mat-cell *matCellDef="let mi" [attr.colspan]="itemColumns.length" class="sale-form-cell">
-                  <form class="sale-form-panel" [formGroup]="saleForm" (ngSubmit)="confirmSale(mi)">
+                  <form *ngIf="activeSaleItemId() === mi.itemId"
+                    class="sale-form-panel" [formGroup]="saleForm" (ngSubmit)="confirmSale(mi)">
                     <span class="sale-form-label">Sale price for <strong>{{ getItemName(mi.itemId) }}</strong></span>
                     <mat-form-field appearance="outline" class="sale-price-field">
                       <mat-label>Price</mat-label>
@@ -137,7 +138,7 @@
 
               <tr mat-header-row *matHeaderRowDef="itemColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: itemColumns" class="clickable-row"></tr>
-              <tr mat-row *matRowDef="let row; columns: ['sale-form']; when: isSaleRow" class="sale-form-row"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['sale-form']" class="sale-form-row"></tr>
             </table>
           </mat-card-content>
         </mat-card>
