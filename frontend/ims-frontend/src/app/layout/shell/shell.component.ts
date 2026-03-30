@@ -45,6 +45,7 @@ export class ShellComponent implements OnInit {
     { label: 'Storage',   shortLabel: 'Storage', icon: 'warehouse',    route: '/storage' },
     { label: 'Reports',   shortLabel: 'Reports', icon: 'bar_chart',    route: '/reports' },
     { label: 'Txns',      shortLabel: 'Txns',    icon: 'receipt_long', route: '/transactions' },
+    { label: 'Categories', shortLabel: 'Cats',   icon: 'label',        route: '/categories' },
   ];
 
   ngOnInit(): void {

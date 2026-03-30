@@ -31,6 +31,10 @@ export const routes: Routes = [
         path: 'transactions',
         loadChildren: () => import('./features/transactions/transactions.routes').then(m => m.TRANSACTIONS_ROUTES)
       },
+      {
+        path: 'categories',
+        loadChildren: () => import('./features/categories/categories.routes').then(m => m.CATEGORIES_ROUTES)
+      },
     ]
   },
   { path: '**', redirectTo: 'dashboard' }

@@ -1,3 +1,13 @@
+export interface Category {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export interface CreateCategoryRequest {
+  name: string;
+}
+
 export interface Money { amount: number; currency: string; }
 export interface StoragePosition { zone: string; shelf: string; row: number; column: number; }
 

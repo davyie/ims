@@ -21,11 +21,14 @@
       </div>
 
       <div class="category-chips">
-        <button *ngFor="let cat of categories"
+        <button mat-stroked-button
+          [class.active-cat]="selectedCategory() === 'All'"
+          (click)="selectCategory('All')">All</button>
+        <button *ngFor="let cat of categoryState.categories()"
           mat-stroked-button
-          [class.active-cat]="selectedCategory() === cat"
-          (click)="selectCategory(cat)">
-          {{ cat }}
+          [class.active-cat]="selectedCategory() === cat.name"
+          (click)="selectCategory(cat.name)">
+          {{ cat.name }}
         </button>
       </div>
     </mat-card-content>

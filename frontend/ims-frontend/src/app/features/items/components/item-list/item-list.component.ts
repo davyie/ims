@@ -12,14 +12,13 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { ItemStateService } from '../../services/item-state.service';
+import { CategoryStateService } from '../../../categories/services/category-state.service';
 import { StockLevelComponent } from '../../../../shared/components/stock-level/stock-level.component';
 import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Item } from '../../../../shared/models/models';
-
-const CATEGORIES = ['All', 'ELECTRONICS', 'CLOTHING', 'FOOD', 'BEVERAGES', 'ACCESSORIES', 'OTHER'];
 
 @Component({
   selector: 'app-item-list',
@@ -36,6 +35,7 @@ const CATEGORIES = ['All', 'ELECTRONICS', 'CLOTHING', 'FOOD', 'BEVERAGES', 'ACCE
 })
 export class ItemListComponent implements OnInit {
   state = inject(ItemStateService);
+  categoryState = inject(CategoryStateService);
   private dialog = inject(MatDialog);
 
   searchTerm = signal('');
@@ -43,7 +43,6 @@ export class ItemListComponent implements OnInit {
   pageIndex = signal(0);
   pageSize = signal(10);
 
-  categories = CATEGORIES;
   displayedColumns = ['sku', 'name', 'category', 'price', 'stock', 'actions'];
 
   filteredItems = computed(() => {
@@ -70,6 +69,7 @@ export class ItemListComponent implements OnInit {
 
   ngOnInit(): void {
     this.state.loadItems();
+    this.categoryState.loadCategories();
   }
 
   onSearch(term: string): void {

@@ -9,10 +9,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ItemStateService } from '../../services/item-state.service';
+import { CategoryStateService } from '../../../categories/services/category-state.service';
 import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/page-header/page-header.component';
 import { RegisterItemRequest, UpdateItemRequest } from '../../../../shared/models/models';
 
-const CATEGORIES = ['ELECTRONICS', 'CLOTHING', 'FOOD', 'BEVERAGES', 'ACCESSORIES', 'OTHER'];
 const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
 
 @Component({
@@ -31,8 +31,8 @@ export class ItemFormComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private state = inject(ItemStateService);
+  categoryState = inject(CategoryStateService);
 
-  categories = CATEGORIES;
   currencies = CURRENCIES;
   isEdit = false;
   saving = false;
@@ -63,6 +63,7 @@ export class ItemFormComponent implements OnInit {
   get title(): string { return this.isEdit ? 'Edit Item' : 'Register Item'; }
 
   ngOnInit(): void {
+    this.categoryState.loadCategories();
     if (this.id) {
       this.isEdit = true;
       this.state.loadItem(this.id);

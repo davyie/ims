@@ -1,0 +1,33 @@
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-card {
+  h3 {
+    margin: 0 0 16px;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+}
+
+.add-form {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  .name-field {
+    flex: 1;
+  }
+
+  button {
+    margin-top: 4px;
+  }
+}
+
+.empty-msg {
+  color: var(--mat-sys-on-surface-variant, #666);
+  text-align: center;
+  padding: 24px 0;
+}
