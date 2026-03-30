@@ -42,9 +42,7 @@ services:
         condition: service_healthy
 
   frontend:
-    build:
-      context: ./frontend/ims-frontend
-      dockerfile: Dockerfile
+    image: ${FRONTEND_IMAGE}
     container_name: ims-frontend
     ports:
       - "${FRONTEND_PORT}:80"
