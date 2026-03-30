@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { filter } from 'rxjs/operators';
 import { LoadingOverlayComponent } from '../../shared/components/loading-overlay/loading-overlay.component';
+import { AuthService } from '../../core/services/auth.service';
 
 interface NavItem {
   label: string;
@@ -35,6 +36,7 @@ export class ShellComponent implements OnInit {
 
   private breakpoint = inject(BreakpointObserver);
   private router = inject(Router);
+  auth = inject(AuthService);
 
   currentUrl = signal(this.router.url);
 

@@ -59,6 +59,10 @@ logging:
     root: ${LOG_LEVEL:INFO}
     com.ims: ${LOG_LEVEL:DEBUG}
 
+jwt:
+  secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckpXVEF1dGhlbnRpY2F0aW9uMjAyNA==}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
 ims:
   outbox:
     poll-ms: ${OUTBOX_POLL_MS:500}

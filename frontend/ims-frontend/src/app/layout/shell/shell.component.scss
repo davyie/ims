@@ -94,6 +94,12 @@
   }
 
   .toolbar-spacer { flex: 1; }
+
+  .toolbar-user {
+    font-size: 0.85rem;
+    opacity: 0.85;
+    margin-right: 4px;
+  }
 }
 
 .shell-content {
