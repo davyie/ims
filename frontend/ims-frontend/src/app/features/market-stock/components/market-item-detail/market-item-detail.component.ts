@@ -48,7 +48,7 @@ export class MarketItemDetailComponent implements OnInit {
   showPriceForm = signal(false);
   saving = signal(false);
 
-  currencies = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
+  currencies = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
 
   incrementForm = this.fb.group({
     quantity: [1, [Validators.required, Validators.min(1)]],
@@ -61,12 +61,12 @@ export class MarketItemDetailComponent implements OnInit {
     note: [''],
     createdBy: ['system'],
     salePrice: [null as number | null, [Validators.min(0)]],
-    saleCurrency: ['EUR']
+    saleCurrency: ['SEK']
   });
 
   priceForm = this.fb.group({
     price: [0, [Validators.required, Validators.min(0)]],
-    currency: ['EUR', Validators.required]
+    currency: ['SEK', Validators.required]
   });
 
   txnColumns = ['occurred', 'type', 'delta', 'before', 'after', 'sale-price', 'note'];

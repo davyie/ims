@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,10 +22,10 @@ public class MarketJpaEntity {
     private String place;
 
     @Column(name = "open_date")
-    private LocalDate openDate;
+    private LocalDateTime openDate;
 
     @Column(name = "close_date")
-    private LocalDate closeDate;
+    private LocalDateTime closeDate;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

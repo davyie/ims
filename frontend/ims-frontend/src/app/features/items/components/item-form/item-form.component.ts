@@ -13,7 +13,7 @@ import { CategoryStateService } from '../../../categories/services/category-stat
 import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/page-header/page-header.component';
 import { RegisterItemRequest, UpdateItemRequest } from '../../../../shared/models/models';
 
-const CURRENCIES = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
+const CURRENCIES = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
 
 @Component({
   selector: 'app-item-form',
@@ -43,7 +43,7 @@ export class ItemFormComponent implements OnInit {
     description: [''],
     category: ['', Validators.required],
     defaultPrice: [0, [Validators.required, Validators.min(0)]],
-    currency: ['EUR', Validators.required],
+    currency: ['SEK', Validators.required],
     zone: ['', Validators.required],
     shelf: ['', Validators.required],
     row: [1, [Validators.required, Validators.min(1)]],

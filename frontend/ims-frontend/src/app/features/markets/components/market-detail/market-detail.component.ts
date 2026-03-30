@@ -55,10 +55,10 @@ export class MarketDetailComponent implements OnInit {
 
   saleForm = this.fb.group({
     price: [0 as number, [Validators.required, Validators.min(0)]],
-    currency: ['EUR', Validators.required]
+    currency: ['SEK', Validators.required]
   });
 
-  readonly currencies = ['EUR', 'USD', 'GBP', 'CHF', 'SEK'];
+  readonly currencies = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
   itemColumns = ['item', 'allocated', 'stock-control', 'price', 'actions'];
   txnColumns = ['occurred', 'type', 'delta', 'before', 'after', 'note'];
 
@@ -93,7 +93,7 @@ export class MarketDetailComponent implements OnInit {
   openSaleForm(mi: MarketItem): void {
     if (mi.currentStock <= 0) return;
     this.activeSaleItemId.set(mi.itemId);
-    this.saleForm.patchValue({ price: mi.marketPrice ?? 0, currency: mi.currency ?? 'EUR' });
+    this.saleForm.patchValue({ price: mi.marketPrice ?? 0, currency: mi.currency ?? 'SEK' });
   }
 
   cancelSale(): void {

@@ -9,6 +9,20 @@
   @media (max-width: 600px) { grid-template-columns: 1fr; }
 }
 
+.date-time-group {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+
+  .date-field { flex: 1; }
+  .time-field { width: 140px; }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    .time-field { width: 100%; }
+  }
+}
+
 .form-actions {
   display: flex;
   justify-content: flex-end;
