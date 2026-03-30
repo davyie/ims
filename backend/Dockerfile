@@ -26,4 +26,6 @@ WORKDIR /app
 COPY --from=builder /app/ims-bootstrap/target/ims-bootstrap-*.jar app.jar
 
 EXPOSE 8080
+# SPRING_PROFILES_ACTIVE is read automatically by Spring Boot.
+# Pass it at runtime via docker-compose or -e flag (e.g. prod, test).
 ENTRYPOINT ["java", "-jar", "app.jar"]
