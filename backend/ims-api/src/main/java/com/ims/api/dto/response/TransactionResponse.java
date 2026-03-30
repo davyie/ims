@@ -1,6 +1,7 @@
 package com.ims.api.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,5 +16,7 @@ public record TransactionResponse(
     int stockAfter,
     String note,
     LocalDateTime occurredAt,
-    String createdBy
+    String createdBy,
+    BigDecimal salePrice,
+    String saleCurrency
 ) {}

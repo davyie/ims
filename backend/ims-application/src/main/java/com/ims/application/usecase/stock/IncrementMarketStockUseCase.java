@@ -2,6 +2,7 @@ package com.ims.application.usecase.stock;
 
 import com.ims.application.command.IncrementStockCommand;
 import com.ims.domain.event.MarketStockIncrementedEvent;
+import com.ims.domain.exception.MarketItemNotFoundException;
 import com.ims.domain.exception.MarketNotFoundException;
 import com.ims.domain.model.MarketItem;
 import com.ims.domain.model.Transaction;
@@ -37,7 +38,7 @@ public class IncrementMarketStockUseCase {
                 .orElseThrow(() -> new MarketNotFoundException(command.marketId()));
 
         MarketItem marketItem = marketItemRepository.findByMarketIdAndItemId(command.marketId(), command.itemId())
-                .orElseThrow(() -> new RuntimeException("MarketItem not found for market " + command.marketId() + " and item " + command.itemId()));
+                .orElseThrow(() -> new MarketItemNotFoundException(command.marketId(), command.itemId()));
 
         int stockBefore = marketItem.getCurrentStock().quantity();
         marketItem.increment(command.quantity());

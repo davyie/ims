@@ -42,3 +42,47 @@
 .clickable-row { cursor: pointer; &:hover { background: #F5F6FA; } }
 
 .empty-msg { color: var(--text-secondary); text-align: center; padding: 24px; }
+
+.item-name { font-weight: 500; }
+
+.stock-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  .stock-num {
+    min-width: 32px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &.stock-zero {
+      color: var(--warn, #f44336);
+    }
+  }
+}
+
+.sale-form-row td { padding: 0 !important; border-bottom: none; }
+
+.sale-form-cell { padding: 0 !important; }
+
+.sale-form-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 12px;
+  background: #fff8f0;
+  border-left: 3px solid var(--warn, #f44336);
+
+  .sale-form-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .sale-price-field { width: 120px; }
+  .sale-currency-field { width: 100px; }
+
+  mat-form-field { margin-bottom: -1.25em; }
+}

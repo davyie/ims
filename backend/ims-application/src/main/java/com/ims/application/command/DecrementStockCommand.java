@@ -1,5 +1,6 @@
 package com.ims.application.command;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record DecrementStockCommand(
@@ -7,5 +8,7 @@ public record DecrementStockCommand(
     UUID itemId,
     int quantity,
     String note,
-    String createdBy
+    String createdBy,
+    BigDecimal salePrice,
+    String saleCurrency
 ) {}

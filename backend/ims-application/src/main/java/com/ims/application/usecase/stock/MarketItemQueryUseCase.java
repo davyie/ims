@@ -1,6 +1,7 @@
 package com.ims.application.usecase.stock;
 
 import com.ims.application.port.inbound.MarketItemQueryPort;
+import com.ims.domain.exception.MarketItemNotFoundException;
 import com.ims.domain.model.MarketItem;
 import com.ims.domain.port.MarketItemRepositoryPort;
 import org.springframework.stereotype.Service;
@@ -22,5 +23,11 @@ public class MarketItemQueryUseCase implements MarketItemQueryPort {
     @Override
     public List<MarketItem> getMarketItems(UUID marketId) {
         return marketItemRepository.findAllByMarketId(marketId);
+    }
+
+    @Override
+    public MarketItem getMarketItem(UUID marketId, UUID itemId) {
+        return marketItemRepository.findByMarketIdAndItemId(marketId, itemId)
+                .orElseThrow(() -> new MarketItemNotFoundException(marketId, itemId));
     }
 }

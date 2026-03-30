@@ -59,7 +59,9 @@ export class MarketItemDetailComponent implements OnInit {
   decrementForm = this.fb.group({
     quantity: [1, [Validators.required, Validators.min(1)]],
     note: [''],
-    createdBy: ['system']
+    createdBy: ['system'],
+    salePrice: [null as number | null, [Validators.min(0)]],
+    saleCurrency: ['EUR']
   });
 
   priceForm = this.fb.group({
@@ -67,7 +69,7 @@ export class MarketItemDetailComponent implements OnInit {
     currency: ['EUR', Validators.required]
   });
 
-  txnColumns = ['occurred', 'type', 'delta', 'before', 'after', 'note'];
+  txnColumns = ['occurred', 'type', 'delta', 'before', 'after', 'sale-price', 'note'];
 
   get marketId(): string { return this.route.snapshot.paramMap.get('id')!; }
   get itemId(): string { return this.route.snapshot.paramMap.get('itemId')!; }
@@ -90,6 +92,7 @@ export class MarketItemDetailComponent implements OnInit {
       next: item => {
         this.marketItem.set(item);
         this.priceForm.patchValue({ price: item.marketPrice, currency: item.currency });
+        this.decrementForm.patchValue({ salePrice: item.marketPrice, saleCurrency: item.currency });
       }
     });
   }
@@ -120,7 +123,11 @@ export class MarketItemDetailComponent implements OnInit {
     const v = this.decrementForm.getRawValue();
     try {
       await this.state.decrement(this.marketId, this.itemId, {
-        quantity: v.quantity!, note: v.note || undefined, createdBy: v.createdBy || undefined
+        quantity: v.quantity!,
+        note: v.note || undefined,
+        createdBy: v.createdBy || undefined,
+        salePrice: v.salePrice ?? undefined,
+        saleCurrency: v.saleCurrency || undefined
       });
       this.showDecrementForm.set(false);
       this.loadItem();

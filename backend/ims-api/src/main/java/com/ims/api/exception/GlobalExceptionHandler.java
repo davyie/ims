@@ -36,6 +36,14 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    @ExceptionHandler(MarketItemNotFoundException.class)
+    public ProblemDetail handleMarketItemNotFound(MarketItemNotFoundException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        problem.setType(URI.create("https://ims.api/errors/market-item-not-found"));
+        problem.setTitle("Market Item Not Found");
+        return problem;
+    }
+
     @ExceptionHandler(InsufficientStockException.class)
     public ProblemDetail handleInsufficientStock(InsufficientStockException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
