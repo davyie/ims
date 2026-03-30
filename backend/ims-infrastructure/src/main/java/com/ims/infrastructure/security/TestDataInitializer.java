@@ -11,25 +11,29 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("!prod")
-public class DataInitializer {
+@Profile("test")
+public class TestDataInitializer {
 
-    private static final Logger log = LoggerFactory.getLogger(DataInitializer.class);
+    private static final Logger log = LoggerFactory.getLogger(TestDataInitializer.class);
 
     private final UserRepositoryPort userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataInitializer(UserRepositoryPort userRepository, PasswordEncoder passwordEncoder) {
+    public TestDataInitializer(UserRepositoryPort userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void seedUsers() {
-        if (!userRepository.existsByEmail("admin@ims.com")) {
-            User admin = User.create("admin@ims.com", passwordEncoder.encode("Admin123!"), "ADMIN");
-            userRepository.save(admin);
-            log.info("Test user created: admin@ims.com / Admin123!");
+    public void seedTestUsers() {
+        createIfAbsent("test@ims.com",  "Test123!",  "USER");
+        createIfAbsent("tester@ims.com", "Tester123!", "ADMIN");
+    }
+
+    private void createIfAbsent(String email, String password, String role) {
+        if (!userRepository.existsByEmail(email)) {
+            userRepository.save(User.create(email, passwordEncoder.encode(password), role));
+            log.info("Test user created: {} / {} ({})", email, password, role);
         }
     }
 }

@@ -48,6 +48,8 @@ services:
     container_name: ims-frontend
     ports:
       - "${FRONTEND_PORT}:80"
+    environment:
+      API_URL: ${API_URL}
     depends_on:
       - application
 

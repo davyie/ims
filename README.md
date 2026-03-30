@@ -297,12 +297,15 @@ curl http://localhost:8080/api/v1/items \
   -H "Authorization: Bearer <token>"
 ```
 
-**Test user** (created automatically on first startup):
+**Seeded users by profile:**
 
-| Field | Value |
-|---|---|
-| Email | `admin@ims.com` |
-| Password | `Admin123!` |
+| Profile | Email | Password | Role |
+|---|---|---|---|
+| base / any non-prod | `admin@ims.com` | `Admin123!` | ADMIN |
+| `test` only | `test@ims.com` | `Test123!` | USER |
+| `test` only | `tester@ims.com` | `Tester123!` | ADMIN |
+
+> No users are auto-seeded in the `prod` profile — create them via `POST /api/v1/auth/register`.
 
 ---
 
