@@ -11,7 +11,7 @@
       <mat-icon>stop</mat-icon> Close Market
     </button>
     <button mat-flat-button color="primary"
-      *ngIf="market.status === 'OPEN'"
+      *ngIf="market.status === 'OPEN' || market.status === 'SCHEDULED'"
       [routerLink]="['/markets', market.id, 'items', 'add']">
       <mat-icon>add_shopping_cart</mat-icon> Shift Items
     </button>
@@ -52,6 +52,13 @@
         <mat-card *ngIf="stockState.marketItems().length === 0">
           <mat-card-content>
             <p class="empty-msg">No items have been shifted to this market yet.</p>
+            <div style="text-align: center; margin-top: 16px;"
+              *ngIf="market.status === 'OPEN' || market.status === 'SCHEDULED'">
+              <button mat-flat-button color="primary"
+                [routerLink]="['/markets', market.id, 'items', 'add']">
+                <mat-icon>add_shopping_cart</mat-icon> Add Items
+              </button>
+            </div>
           </mat-card-content>
         </mat-card>
 
