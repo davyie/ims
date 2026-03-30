@@ -1,0 +1,52 @@
+# Test stack — requires .env (copy from .env.example)
+# Usage: docker compose -f docker-compose.test.yml up
+
+services:
+  postgres-test:
+    image: postgres:16
+    container_name: ims-postgres-test
+    environment:
+      POSTGRES_DB: ${TEST_POSTGRES_DB}
+      POSTGRES_USER: ${TEST_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${TEST_POSTGRES_PASSWORD}
+    ports:
+      - "${TEST_DB_HOST_PORT}:5432"
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${TEST_POSTGRES_USER} -d ${TEST_POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  application-test:
+    image: ${APP_IMAGE}
+    container_name: ims-test
+    restart: on-failure
+    ports:
+      - "${TEST_APP_PORT}:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${TEST_SPRING_PROFILES_ACTIVE}
+      DB_HOST: ${TEST_DB_HOST}
+      DB_PORT: ${TEST_DB_PORT}
+      DB_NAME: ${TEST_DB_NAME}
+      DB_USERNAME: ${TEST_DB_USERNAME}
+      DB_PASSWORD: ${TEST_DB_PASSWORD}
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+
+  frontend-test:
+    build:
+      context: ./frontend/ims-frontend
+      dockerfile: Dockerfile
+    container_name: ims-frontend-test
+    ports:
+      - "${TEST_FRONTEND_PORT}:80"
+    environment:
+      API_URL: ${TEST_API_URL}
+    depends_on:
+      - application-test
+
+volumes:
+  postgres-test-data:

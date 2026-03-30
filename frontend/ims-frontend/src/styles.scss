@@ -1,0 +1,72 @@
+@use '@angular/material' as mat;
+@use '@angular/material/prebuilt-themes/indigo-pink' as theme;
+
+// CSS Variables
+:root {
+  --primary: #1B3A6B;
+  --primary-light: #2D5A9E;
+  --accent: #C0392B;
+  --text-primary: #1A1A2E;
+  --text-secondary: #6B7280;
+  --bg: #F5F6FA;
+  --surface: #FFFFFF;
+  --border: #E0E0E0;
+  --sidenav-bg: #1B3A6B;
+  --success: #2E7D32;
+  --warning: #F57F17;
+  --error: #C62828;
+}
+
+// Reset & Base
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  color: var(--text-primary);
+  background: var(--bg);
+}
+
+// Snackbar styles
+.snack-success .mdc-snackbar__surface {
+  background: #2E7D32 !important;
+  color: white !important;
+}
+.snack-warning .mdc-snackbar__surface {
+  background: #F57F17 !important;
+  color: white !important;
+}
+.snack-error .mdc-snackbar__surface {
+  background: #C62828 !important;
+  color: white !important;
+}
+
+// Global mat-card styles
+mat-card { border-radius: 12px !important; }
+
+// Typography
+h1, h2, h3, h4 { margin-top: 0; }
+
+// Utility
+.spacer { flex: 1; }
+
+// Mobile table scroll (prevent page-level overflow)
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+// Ensure tables never force the page wider than the viewport
+table { min-width: 0; }
+
+@media (max-width: 767px) {
+  // Tighter card padding on phones
+  mat-card mat-card-content { padding: 12px !important; }
+  mat-card mat-card-header { padding: 12px 12px 0 !important; }
+  mat-card mat-card-actions { padding: 4px 8px !important; }
+}
+
+// Scrollbar
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.35); }

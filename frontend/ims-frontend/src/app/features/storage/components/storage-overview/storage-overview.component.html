@@ -1,0 +1,74 @@
+<div class="storage-overview">
+  <app-page-header title="Storage Overview" [breadcrumbs]="[{label:'Storage'}]">
+  </app-page-header>
+
+  <!-- Low stock alert -->
+  <div *ngIf="state.lowStockItems().length > 0" class="alert-banner">
+    <mat-icon>warning</mat-icon>
+    <span>
+      <strong>{{ state.lowStockItems().length }} item(s)</strong> have zero stock.
+    </span>
+    <div class="alert-items">
+      <span *ngFor="let item of state.lowStockItems()" class="alert-item">{{ item.name }}</span>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <mat-card class="filter-card">
+    <mat-card-content>
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-label>Search storage</mat-label>
+        <input matInput [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Name, SKU, category...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <div class="stats-row">
+        <span class="stat">
+          <strong>{{ filteredItems().length }}</strong> items
+        </span>
+        <span class="stat">
+          <strong>{{ state.lowStockItems().length }}</strong> out of stock
+        </span>
+        <span class="stat">
+          Total: <strong>{{ filteredItems().length }}</strong>
+        </span>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Zone Groups -->
+  <mat-accordion multi>
+    <mat-expansion-panel *ngFor="let group of zones()" [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon class="zone-icon">category</mat-icon>
+          {{ group.zone }}
+        </mat-panel-title>
+        <mat-panel-description>
+          {{ group.items.length }} item(s)
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="items-table">
+        <div class="table-header">
+          <span>SKU</span>
+          <span>Name</span>
+          <span>Stock</span>
+          <span>Actions</span>
+        </div>
+        <div *ngFor="let item of group.items" class="item-row">
+          <span class="sku-badge">{{ item.sku }}</span>
+          <span class="item-name">{{ item.name }}</span>
+          <app-stock-level [stock]="item.currentStock"></app-stock-level>
+          <a mat-icon-button [routerLink]="['/items', item.itemId]">
+            <mat-icon>arrow_forward</mat-icon>
+          </a>
+        </div>
+      </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <div *ngIf="zones().length === 0 && !state.loading()" class="empty-msg">
+    No items found in storage.
+  </div>
+</div>

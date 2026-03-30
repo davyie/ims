@@ -1,0 +1,26 @@
+.market-summary { }
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kpi-card {
+  mat-card-content { display: flex; flex-direction: column; gap: 4px; }
+  .kpi-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; }
+  .kpi-value { font-size: 24px; font-weight: 700; color: var(--text-primary); }
+  .kpi-value.sold { color: #2E7D32; }
+  .kpi-value.revenue { font-size: 18px; color: var(--primary); }
+}
+
+.chart-card { margin-bottom: 20px; }
+
+.full-width { width: 100%; }
+
+.sku {
+  background: #E3F2FD; color: #1565C0;
+  padding: 2px 6px; border-radius: 4px;
+  font-size: 12px; font-family: monospace;
+}

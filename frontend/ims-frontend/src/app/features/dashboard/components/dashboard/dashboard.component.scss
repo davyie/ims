@@ -1,0 +1,88 @@
+.dashboard { }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+.kpi-card {
+  .kpi-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .kpi-label {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .kpi-money { font-size: 20px; }
+
+  .kpi-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.3;
+  }
+
+  &.kpi-markets .kpi-icon { color: #1565C0; }
+  &.kpi-lowstock .kpi-icon { color: #E65100; }
+  &.kpi-sold .kpi-icon { color: #2E7D32; }
+  &.kpi-revenue .kpi-icon { color: #6A1B9A; }
+
+  @media (max-width: 480px) {
+    .kpi-value { font-size: 22px; }
+    .kpi-money { font-size: 16px; }
+    .kpi-icon { font-size: 28px; width: 28px; height: 28px; }
+    .kpi-label { font-size: 11px; }
+  }
+}
+
+.section { margin-bottom: 32px; }
+
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary);
+}
+
+.markets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.market-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  &:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+  .market-dates {
+    display: flex; flex-direction: column; gap: 4px; font-size: 13px;
+    color: var(--text-secondary);
+    mat-icon { vertical-align: middle; font-size: 14px; margin-right: 4px; }
+  }
+  mat-card-actions { display: flex; align-items: center; }
+  .spacer { flex: 1; }
+}
+
+.full-width { width: 100%; }
+.table-scroll { overflow-x: auto; }
+.link { color: var(--primary); text-decoration: none; &:hover { text-decoration: underline; } }
+.empty-msg { color: var(--text-secondary); font-style: italic; margin-bottom: 16px; }

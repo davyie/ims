@@ -1,1 +1,0 @@
-curl -X DELETE http://localhost:8080/warehouse/delete?itemId=0

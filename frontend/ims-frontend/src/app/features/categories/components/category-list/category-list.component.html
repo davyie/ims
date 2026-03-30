@@ -1,0 +1,40 @@
+<div class="category-list">
+  <app-page-header title="Categories" [breadcrumbs]="[{label:'Categories'}]"></app-page-header>
+
+  <!-- Add Category -->
+  <mat-card class="add-card">
+    <mat-card-content>
+      <h3>Add Category</h3>
+      <form [formGroup]="form" (ngSubmit)="add()" class="add-form">
+        <mat-form-field appearance="outline" class="name-field">
+          <mat-label>Category name</mat-label>
+          <input matInput formControlName="name" placeholder="e.g. Furniture">
+          <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+          <mat-error *ngIf="form.get('name')?.hasError('minlength')">Min 2 characters</mat-error>
+        </mat-form-field>
+        <button mat-flat-button color="primary" type="submit" [disabled]="saving()">
+          <mat-icon>add</mat-icon>
+          {{ saving() ? 'Adding...' : 'Add' }}
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Category List -->
+  <mat-card>
+    <mat-card-content>
+      <p *ngIf="state.categories().length === 0 && !state.loading()" class="empty-msg">
+        No categories yet. Add one above.
+      </p>
+      <mat-list>
+        <mat-list-item *ngFor="let cat of state.categories()">
+          <mat-icon matListItemIcon>label</mat-icon>
+          <span matListItemTitle>{{ cat.name }}</span>
+          <button mat-icon-button color="warn" (click)="delete(cat)" matTooltip="Delete" matListItemMeta>
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-list-item>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</div>

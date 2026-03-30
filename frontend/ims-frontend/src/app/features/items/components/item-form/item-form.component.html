@@ -1,0 +1,104 @@
+<div class="item-form">
+  <app-page-header [title]="title" [breadcrumbs]="breadcrumbs"></app-page-header>
+
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-grid">
+
+        <div class="form-section">
+          <h3 class="section-label">Basic Information</h3>
+          <div class="field-row">
+            <mat-form-field appearance="outline">
+              <mat-label>SKU</mat-label>
+              <input matInput formControlName="sku" placeholder="e.g. ITEM-001" [readonly]="isEdit">
+              <mat-error *ngIf="form.get('sku')?.hasError('required')">SKU is required</mat-error>
+              <mat-error *ngIf="form.get('sku')?.hasError('pattern')">Only uppercase letters, numbers and hyphens</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" placeholder="Item name">
+              <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+              <mat-error *ngIf="form.get('name')?.hasError('minlength')">Min 2 characters</mat-error>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-field">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="3" placeholder="Optional description"></textarea>
+          </mat-form-field>
+
+          <div class="field-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="category">
+                <mat-option *ngFor="let c of categoryState.categories()" [value]="c.name">{{ c.name }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="form.get('category')?.hasError('required')">Category is required</mat-error>
+            </mat-form-field>
+
+            <div class="price-row">
+              <mat-form-field appearance="outline" class="price-field">
+                <mat-label>Default Price</mat-label>
+                <input matInput type="number" formControlName="defaultPrice" min="0" step="0.01">
+                <mat-error *ngIf="form.get('defaultPrice')?.hasError('required')">Price is required</mat-error>
+                <mat-error *ngIf="form.get('defaultPrice')?.hasError('min')">Must be >= 0</mat-error>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="currency-field">
+                <mat-label>Currency</mat-label>
+                <mat-select formControlName="currency">
+                  <mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3 class="section-label">Storage Location</h3>
+          <div class="field-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Zone</mat-label>
+              <input matInput formControlName="zone" placeholder="e.g. A">
+              <mat-error>Zone is required</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Shelf</mat-label>
+              <input matInput formControlName="shelf" placeholder="e.g. S1">
+              <mat-error>Shelf is required</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="field-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Row</mat-label>
+              <input matInput type="number" formControlName="row" min="1">
+              <mat-error>Row must be >= 1</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Column</mat-label>
+              <input matInput type="number" formControlName="column" min="1">
+              <mat-error>Column must be >= 1</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-section" *ngIf="!isEdit">
+          <h3 class="section-label">Initial Stock</h3>
+          <mat-form-field appearance="outline">
+            <mat-label>Initial Stock Quantity</mat-label>
+            <input matInput type="number" formControlName="initialStock" min="0">
+            <mat-error *ngIf="form.get('initialStock')?.hasError('min')">Must be >= 0</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+            <mat-icon>{{ saving ? 'hourglass_empty' : 'save' }}</mat-icon>
+            {{ saving ? 'Saving...' : (isEdit ? 'Update Item' : 'Register Item') }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

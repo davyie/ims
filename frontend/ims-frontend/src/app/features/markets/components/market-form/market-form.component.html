@@ -1,0 +1,51 @@
+<div class="market-form">
+  <app-page-header [title]="title" [breadcrumbs]="breadcrumbs"></app-page-header>
+
+  <mat-card>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="form-content">
+        <div class="field-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Market Name</mat-label>
+            <input matInput formControlName="name" placeholder="e.g. Summer Fair 2025">
+            <mat-error *ngIf="form.get('name')?.hasError('required')">Name is required</mat-error>
+            <mat-error *ngIf="form.get('name')?.hasError('minlength')">Min 2 characters</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Place / Location</mat-label>
+            <input matInput formControlName="place" placeholder="e.g. City Center">
+            <mat-icon matSuffix>location_on</mat-icon>
+            <mat-error>Location is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="field-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Open Date</mat-label>
+            <input matInput [matDatepicker]="openPicker" formControlName="openDate">
+            <mat-datepicker-toggle matSuffix [for]="openPicker"></mat-datepicker-toggle>
+            <mat-datepicker #openPicker></mat-datepicker>
+            <mat-error>Open date is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Close Date</mat-label>
+            <input matInput [matDatepicker]="closePicker" formControlName="closeDate">
+            <mat-datepicker-toggle matSuffix [for]="closePicker"></mat-datepicker-toggle>
+            <mat-datepicker #closePicker></mat-datepicker>
+            <mat-error>Close date is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" routerLink="/markets">Cancel</button>
+          <button mat-flat-button color="primary" type="submit" [disabled]="saving">
+            <mat-icon>save</mat-icon>
+            {{ saving ? 'Saving...' : (isEdit ? 'Update Market' : 'Create Market') }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

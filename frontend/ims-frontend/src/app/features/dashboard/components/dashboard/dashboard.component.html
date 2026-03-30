@@ -1,0 +1,114 @@
+<div class="dashboard">
+  <app-page-header title="Dashboard" [breadcrumbs]="[]"></app-page-header>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <mat-card class="kpi-card kpi-markets">
+      <mat-card-content>
+        <div class="kpi-content">
+          <div class="kpi-info">
+            <span class="kpi-label">Open Markets</span>
+            <span class="kpi-value">{{ state.openMarketCount() }}</span>
+          </div>
+          <mat-icon class="kpi-icon">storefront</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card kpi-lowstock">
+      <mat-card-content>
+        <div class="kpi-content">
+          <div class="kpi-info">
+            <span class="kpi-label">Low Stock Items</span>
+            <span class="kpi-value">{{ state.lowStockCount() }}</span>
+          </div>
+          <mat-icon class="kpi-icon">warning</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card kpi-sold">
+      <mat-card-content>
+        <div class="kpi-content">
+          <div class="kpi-info">
+            <span class="kpi-label">Total Items Sold</span>
+            <span class="kpi-value">{{ totalItemsSold }}</span>
+          </div>
+          <mat-icon class="kpi-icon">sell</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="kpi-card kpi-revenue">
+      <mat-card-content>
+        <div class="kpi-content">
+          <div class="kpi-info">
+            <span class="kpi-label">Total Revenue</span>
+            <span class="kpi-value kpi-money">{{ totalRevenue | currencyFormat:currency }}</span>
+          </div>
+          <mat-icon class="kpi-icon">payments</mat-icon>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Open Markets -->
+  <div class="section">
+    <h2 class="section-title">Open Markets</h2>
+    <div *ngIf="state.openMarkets().length === 0 && !state.loading()" class="empty-msg">
+      No markets are currently open.
+    </div>
+    <div class="markets-grid">
+      <mat-card *ngFor="let m of state.openMarkets()" class="market-card" [routerLink]="['/markets', m.id]">
+        <mat-card-header>
+          <mat-card-title>{{ m.name }}</mat-card-title>
+          <mat-card-subtitle>{{ m.place }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="market-dates">
+            <span><mat-icon inline>event</mat-icon> {{ m.openDate | dateFormat:'absolute' }}</span>
+            <span><mat-icon inline>event_busy</mat-icon> {{ m.closeDate | dateFormat:'absolute' }}</span>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <app-status-badge [status]="m.status" type="market"></app-status-badge>
+          <span class="spacer"></span>
+          <button mat-button color="primary" [routerLink]="['/markets', m.id, 'summary']">View Summary</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Markets Summary -->
+  <div class="section" *ngIf="state.allSummary() as summary">
+    <h2 class="section-title">Markets Performance</h2>
+    <mat-card>
+      <mat-card-content>
+        <div class="table-scroll">
+        <table mat-table [dataSource]="summary.markets" class="full-width">
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Market</th>
+            <td mat-cell *matCellDef="let m">
+              <a [routerLink]="['/markets', m.marketId]" class="link">{{ m.marketName }}</a>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="items">
+            <th mat-header-cell *matHeaderCellDef>Item Types</th>
+            <td mat-cell *matCellDef="let m">{{ m.totalItemTypes }}</td>
+          </ng-container>
+          <ng-container matColumnDef="sold">
+            <th mat-header-cell *matHeaderCellDef>Sold</th>
+            <td mat-cell *matCellDef="let m">{{ m.totalSold }}</td>
+          </ng-container>
+          <ng-container matColumnDef="revenue">
+            <th mat-header-cell *matHeaderCellDef>Revenue</th>
+            <td mat-cell *matCellDef="let m">{{ m.totalRevenue | currencyFormat:m.currency }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="['name','items','sold','revenue']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['name','items','sold','revenue']"></tr>
+        </table>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
