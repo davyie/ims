@@ -1,4 +1,4 @@
-# Render Blueprint — deploys TEST + PROD environments for backend, frontend, and PostgreSQL.
+# Render Blueprint — deploys TEST environment (backend, frontend, PostgreSQL).
 #
 # HOW TO USE:
 #   1. Push this repo to GitHub and connect it in the Render dashboard.
@@ -24,16 +24,7 @@ databases:
     databaseName: imsdb_test
     user: ims
 
-  - name: ims-db
-    plan: free
-    databaseName: imsdb
-    user: ims
-
 services:
-  # ═══════════════════════════════════════════════════════════════════════
-  # TEST ENVIRONMENT
-  # ═══════════════════════════════════════════════════════════════════════
-
   # ── Test Backend (Spring Boot) ─────────────────────────────────────────
   - type: web
     name: ims-backend-test
@@ -90,62 +81,3 @@ services:
     envVars:
       - key: API_URL
         sync: false  # e.g. https://ims-backend-test.onrender.com
-
-  # ═══════════════════════════════════════════════════════════════════════
-  # PRODUCTION ENVIRONMENT
-  # ═══════════════════════════════════════════════════════════════════════
-
-  # ── Prod Backend (Spring Boot) ─────────────────────────────────────────
-  - type: web
-    name: ims-backend
-    runtime: docker
-    repo: https://github.com/davyie/ims
-    dockerContext: ./backend
-    dockerfilePath: ./backend/Dockerfile
-    plan: free
-    region: oregon
-    healthCheckPath: /actuator/health
-    envVars:
-      - key: SPRING_PROFILES_ACTIVE
-        value: prod
-
-      # Database — free plan requires the EXTERNAL hostname.
-      # Get values from Render Dashboard → ims-db → Info → "External Database URL".
-      - key: DB_HOST
-        sync: false  # e.g. dpg-xxx-a.oregon-postgres.render.com
-      - key: DB_PORT
-        value: "5432"
-      - key: DB_NAME
-        sync: false  # e.g. imsdb_xxxx
-      - key: DB_USERNAME
-        sync: false  # e.g. ims
-      - key: DB_PASSWORD
-        sync: false  # from the External Database URL
-
-      - key: KAFKA_BOOTSTRAP
-        value: "localhost:9092"
-
-      - key: JWT_SECRET
-        generateValue: true
-      - key: JWT_EXPIRATION_MS
-        value: "86400000"
-
-      - key: OUTBOX_POLL_MS
-        value: "5000"
-
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false  # e.g. https://ims-frontend.onrender.com
-
-  # ── Prod Frontend (Angular + Nginx) ────────────────────────────────────
-  - type: web
-    name: ims-frontend
-    runtime: docker
-    repo: https://github.com/davyie/ims
-    dockerContext: ./frontend/ims-frontend
-    dockerfilePath: ./frontend/ims-frontend/Dockerfile
-    plan: free
-    region: oregon
-    healthCheckPath: /
-    envVars:
-      - key: API_URL
-        sync: false  # e.g. https://ims-backend.onrender.com
