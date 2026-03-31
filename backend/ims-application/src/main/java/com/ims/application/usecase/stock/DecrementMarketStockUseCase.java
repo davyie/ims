@@ -2,10 +2,10 @@ package com.ims.application.usecase.stock;
 
 import com.ims.application.command.DecrementStockCommand;
 import com.ims.domain.event.MarketStockDecrementedEvent;
+import com.ims.domain.exception.MarketItemNotFoundException;
 import com.ims.domain.exception.MarketNotFoundException;
 import com.ims.domain.model.MarketItem;
 import com.ims.domain.model.Transaction;
-import com.ims.domain.model.TransactionType;
 import com.ims.domain.port.DomainEventPublisherPort;
 import com.ims.domain.port.MarketItemRepositoryPort;
 import com.ims.domain.port.MarketRepositoryPort;
@@ -37,16 +37,17 @@ public class DecrementMarketStockUseCase {
                 .orElseThrow(() -> new MarketNotFoundException(command.marketId()));
 
         MarketItem marketItem = marketItemRepository.findByMarketIdAndItemId(command.marketId(), command.itemId())
-                .orElseThrow(() -> new RuntimeException("MarketItem not found for market " + command.marketId() + " and item " + command.itemId()));
+                .orElseThrow(() -> new MarketItemNotFoundException(command.marketId(), command.itemId()));
 
         int stockBefore = marketItem.getCurrentStock().quantity();
         marketItem.decrement(command.quantity());
         MarketItem saved = marketItemRepository.save(marketItem);
 
-        transactionRepository.save(Transaction.create(
-            command.marketId(), command.itemId(), TransactionType.SALE,
+        transactionRepository.save(Transaction.createSale(
+            command.marketId(), command.itemId(),
             -command.quantity(), stockBefore, saved.getCurrentStock().quantity(),
-            command.note(), command.createdBy()
+            command.note(), command.createdBy(),
+            command.salePrice(), command.saleCurrency()
         ));
 
         eventPublisher.publish(new MarketStockDecrementedEvent(command.marketId(), command.itemId(), command.quantity()));

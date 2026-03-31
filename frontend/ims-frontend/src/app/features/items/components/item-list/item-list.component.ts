@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
@@ -34,6 +34,7 @@ import { Item } from '../../../../shared/models/models';
   styleUrls: ['./item-list.component.scss']
 })
 export class ItemListComponent implements OnInit {
+  router = inject(Router);
   state = inject(ItemStateService);
   categoryState = inject(CategoryStateService);
   private dialog = inject(MatDialog);

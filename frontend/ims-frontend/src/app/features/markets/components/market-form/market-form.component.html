@@ -21,21 +21,37 @@
         </div>
 
         <div class="field-row">
-          <mat-form-field appearance="outline">
-            <mat-label>Open Date</mat-label>
-            <input matInput [matDatepicker]="openPicker" formControlName="openDate">
-            <mat-datepicker-toggle matSuffix [for]="openPicker"></mat-datepicker-toggle>
-            <mat-datepicker #openPicker></mat-datepicker>
-            <mat-error>Open date is required</mat-error>
-          </mat-form-field>
+          <div class="date-time-group">
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Open Date</mat-label>
+              <input matInput [matDatepicker]="openPicker" formControlName="openDate">
+              <mat-datepicker-toggle matSuffix [for]="openPicker"></mat-datepicker-toggle>
+              <mat-datepicker #openPicker></mat-datepicker>
+              <mat-error>Open date is required</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="time-field">
+              <mat-label>Open Time</mat-label>
+              <input matInput type="time" formControlName="openTime">
+              <mat-icon matSuffix>schedule</mat-icon>
+              <mat-error>Open time is required</mat-error>
+            </mat-form-field>
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Close Date</mat-label>
-            <input matInput [matDatepicker]="closePicker" formControlName="closeDate">
-            <mat-datepicker-toggle matSuffix [for]="closePicker"></mat-datepicker-toggle>
-            <mat-datepicker #closePicker></mat-datepicker>
-            <mat-error>Close date is required</mat-error>
-          </mat-form-field>
+          <div class="date-time-group">
+            <mat-form-field appearance="outline" class="date-field">
+              <mat-label>Close Date</mat-label>
+              <input matInput [matDatepicker]="closePicker" formControlName="closeDate">
+              <mat-datepicker-toggle matSuffix [for]="closePicker"></mat-datepicker-toggle>
+              <mat-datepicker #closePicker></mat-datepicker>
+              <mat-error>Close date is required</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="time-field">
+              <mat-label>Close Time</mat-label>
+              <input matInput type="time" formControlName="closeTime">
+              <mat-icon matSuffix>schedule</mat-icon>
+              <mat-error>Close time is required</mat-error>
+            </mat-form-field>
+          </div>
         </div>
 
         <div class="form-actions">

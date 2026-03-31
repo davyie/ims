@@ -1,6 +1,7 @@
 package com.ims.application.usecase.stock;
 
 import com.ims.application.command.SetPriceCommand;
+import com.ims.domain.exception.MarketItemNotFoundException;
 import com.ims.domain.model.MarketItem;
 import com.ims.domain.port.MarketItemRepositoryPort;
 import com.ims.domain.valueobject.Money;
@@ -19,7 +20,7 @@ public class SetMarketItemPriceUseCase {
     @Transactional
     public MarketItem setPrice(SetPriceCommand command) {
         MarketItem marketItem = marketItemRepository.findByMarketIdAndItemId(command.marketId(), command.itemId())
-                .orElseThrow(() -> new RuntimeException("MarketItem not found"));
+                .orElseThrow(() -> new MarketItemNotFoundException(command.marketId(), command.itemId()));
 
         marketItem.setMarketPrice(Money.of(command.price(), command.currency()));
         return marketItemRepository.save(marketItem);

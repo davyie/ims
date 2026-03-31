@@ -61,6 +61,13 @@ public class MarketStockController {
                 .stream().map(this::toResponse).toList());
     }
 
+    @GetMapping("/{id}/items/{itemId}")
+    @Operation(summary = "Get a single market item")
+    public ResponseEntity<MarketItemResponse> getMarketItem(@PathVariable UUID id,
+            @PathVariable UUID itemId) {
+        return ResponseEntity.ok(toResponse(marketItemQueryPort.getMarketItem(id, itemId)));
+    }
+
     @PatchMapping("/{id}/items/{itemId}/increment")
     @Operation(summary = "Increment market item stock")
     public ResponseEntity<MarketItemResponse> incrementStock(@PathVariable UUID id,
@@ -78,7 +85,8 @@ public class MarketStockController {
             @PathVariable UUID itemId, @Valid @RequestBody DecrementStockRequest request) {
         MarketItem mi = marketStockCommandPort.decrementStock(new DecrementStockCommand(
             id, itemId, request.quantity(), request.note(),
-            request.createdBy() != null ? request.createdBy() : "system"
+            request.createdBy() != null ? request.createdBy() : "system",
+            request.salePrice(), request.saleCurrency()
         ));
         return ResponseEntity.ok(toResponse(mi));
     }
@@ -111,6 +119,7 @@ public class MarketStockController {
     private TransactionResponse toTxResponse(Transaction tx) {
         return new TransactionResponse(tx.getId(), tx.getMarketId(), tx.getItemId(),
             tx.getType().name(), tx.getQuantityDelta(), tx.getStockBefore(), tx.getStockAfter(),
-            tx.getNote(), tx.getOccurredAt(), tx.getCreatedBy());
+            tx.getNote(), tx.getOccurredAt(), tx.getCreatedBy(),
+            tx.getSalePrice(), tx.getSaleCurrency());
     }
 }
