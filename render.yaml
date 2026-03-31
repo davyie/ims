@@ -1,56 +1,96 @@
-# Render Blueprint — deploys backend + frontend as two Web Services.
-# The PostgreSQL database is managed separately in the Render dashboard.
+# Render Blueprint — deploys backend + frontend + managed PostgreSQL.
 #
-# BEFORE deploying:
-#   1. Push this repo to GitHub/GitLab and connect it in the Render dashboard.
-#   2. After the Blueprint is created, set all env vars marked sync:false
+# HOW TO USE:
+#   1. Push this repo to GitHub and connect it in the Render dashboard.
+#   2. Go to https://dashboard.render.com → Blueprints → New Blueprint Instance.
+#   3. Select this repo — Render will auto-detect render.yaml.
+#   4. After the blueprint deploys, set the env vars marked sync: false
 #      in the Render dashboard (Environment tab of each service).
-#   3. DB vars: use the Internal Host from your Render Postgres dashboard.
 #
-# KAFKA: Render has no managed Kafka. Create a free broker at https://upstash.com
-# then set KAFKA_BOOTSTRAP on ims-backend to your Upstash bootstrap URL.
-# Upstash requires SASL/SSL — also set these on ims-backend:
-#   SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL=SASL_SSL
-#   SPRING_KAFKA_PROPERTIES_SASL_MECHANISM=SCRAM-SHA-256
-#   SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.scram.ScramLoginModule required username="..." password="...";
+# KAFKA (optional):
+#   Render has no managed Kafka. If you need event publishing:
+#   1. Create a free Kafka broker at https://upstash.com
+#   2. Set these env vars on ims-backend in the Render dashboard:
+#      - KAFKA_BOOTSTRAP = your Upstash bootstrap URL
+#      - SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL = SASL_SSL
+#      - SPRING_KAFKA_PROPERTIES_SASL_MECHANISM = SCRAM-SHA-256
+#      - SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG = org.apache.kafka.common.security.scram.ScramLoginModule required username="..." password="...";
+#   Without Kafka, the app still works — outbox events will be marked FAILED but
+#   all CRUD operations function normally.
+
+databases:
+  - name: ims-db
+    plan: free
+    databaseName: imsdb
+    user: ims
 
 services:
+  # ── Backend (Spring Boot) ──────────────────────────────────────────────
   - type: web
     name: ims-backend
     runtime: docker
-    dockerContext: backend
-    dockerfilePath: backend/Dockerfile
+    repo: https://github.com/davyie/ims  # Change to your repo URL
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
     plan: free
+    region: frankfurt
+    healthCheckPath: /actuator/health
     envVars:
+      # Spring profile
       - key: SPRING_PROFILES_ACTIVE
         value: prod
+
+      # Database — auto-linked from managed Render Postgres
       - key: DB_HOST
-        sync: false  # Internal hostname from Render Postgres dashboard
+        fromDatabase:
+          name: ims-db
+          property: host
       - key: DB_PORT
-        value: "5432"
+        fromDatabase:
+          name: ims-db
+          property: port
       - key: DB_NAME
-        sync: false  # Your Postgres database name
+        fromDatabase:
+          name: ims-db
+          property: database
       - key: DB_USERNAME
-        sync: false  # Your Postgres username
+        fromDatabase:
+          name: ims-db
+          property: user
       - key: DB_PASSWORD
-        sync: false  # Your Postgres password
+        fromDatabase:
+          name: ims-db
+          property: password
+
+      # Kafka — disabled by default (set manually if needed)
       - key: KAFKA_BOOTSTRAP
-        sync: false  # Upstash (or other) Kafka bootstrap URL
+        value: "localhost:9092"
+
+      # JWT
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION_MS
         value: "86400000"
-      - key: OUTBOX_POLL_MS
-        value: "500"
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false  # Set to your frontend URL, e.g. https://ims-frontend.onrender.com
 
+      # Outbox poller
+      - key: OUTBOX_POLL_MS
+        value: "5000"
+
+      # CORS — set to your frontend URL after first deploy
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false  # e.g. https://ims-frontend.onrender.com
+
+  # ── Frontend (Angular + Nginx) ─────────────────────────────────────────
   - type: web
     name: ims-frontend
     runtime: docker
-    dockerContext: frontend/ims-frontend
-    dockerfilePath: frontend/ims-frontend/Dockerfile
+    repo: https://github.com/davyie/ims  # Change to your repo URL
+    dockerContext: ./frontend/ims-frontend
+    dockerfilePath: ./frontend/ims-frontend/Dockerfile
     plan: free
+    region: frankfurt
+    healthCheckPath: /
     envVars:
+      # Backend URL — set to your backend's Render URL after first deploy
       - key: API_URL
-        sync: false  # Set to your backend URL, e.g. https://ims-backend.onrender.com
+        sync: false  # e.g. https://ims-backend.onrender.com
