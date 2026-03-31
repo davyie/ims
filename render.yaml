@@ -1,23 +1,18 @@
-# Render Blueprint — deploys backend + frontend as two Web Services
-# with a managed PostgreSQL database.
+# Render Blueprint — deploys backend + frontend as two Web Services.
+# The PostgreSQL database is managed separately in the Render dashboard.
 #
 # BEFORE deploying:
 #   1. Push this repo to GitHub/GitLab and connect it in the Render dashboard.
-#   2. Set KAFKA_BOOTSTRAP manually (see notes below).
-#   3. Deploy — Render auto-wires DB credentials and cross-service URLs.
+#   2. After the Blueprint is created, set all env vars marked sync:false
+#      in the Render dashboard (Environment tab of each service).
+#   3. DB vars: use the Internal Host from your Render Postgres dashboard.
 #
 # KAFKA: Render has no managed Kafka. Create a free broker at https://upstash.com
-# then set the KAFKA_BOOTSTRAP env var on ims-backend to your Upstash bootstrap URL
-# (e.g. your-cluster.upstash.io:9092). Upstash requires SASL/SSL — also set:
+# then set KAFKA_BOOTSTRAP on ims-backend to your Upstash bootstrap URL.
+# Upstash requires SASL/SSL — also set these on ims-backend:
 #   SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL=SASL_SSL
 #   SPRING_KAFKA_PROPERTIES_SASL_MECHANISM=SCRAM-SHA-256
 #   SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.scram.ScramLoginModule required username="..." password="...";
-
-databases:
-  - name: ims-db
-    databaseName: imsdb
-    user: ims
-    plan: free
 
 services:
   - type: web
@@ -30,27 +25,17 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: DB_HOST
-        fromDatabase:
-          name: ims-db
-          property: host
+        sync: false  # Internal hostname from Render Postgres dashboard
       - key: DB_PORT
-        fromDatabase:
-          name: ims-db
-          property: port
+        value: "5432"
       - key: DB_NAME
-        fromDatabase:
-          name: ims-db
-          property: database
+        sync: false  # Your Postgres database name
       - key: DB_USERNAME
-        fromDatabase:
-          name: ims-db
-          property: user
+        sync: false  # Your Postgres username
       - key: DB_PASSWORD
-        fromDatabase:
-          name: ims-db
-          property: password
+        sync: false  # Your Postgres password
       - key: KAFKA_BOOTSTRAP
-        sync: false  # Set manually to your Upstash (or other) Kafka bootstrap URL
+        sync: false  # Upstash (or other) Kafka bootstrap URL
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION_MS
