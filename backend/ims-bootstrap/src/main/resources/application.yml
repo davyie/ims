@@ -55,6 +55,9 @@ springdoc:
     path: /swagger-ui.html
     enabled: true
 
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+
 logging:
   level:
     root: INFO

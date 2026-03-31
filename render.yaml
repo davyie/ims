@@ -1,0 +1,77 @@
+# Render Blueprint — deploys backend + frontend as two Web Services
+# with a managed PostgreSQL database.
+#
+# BEFORE deploying:
+#   1. Push this repo to GitHub/GitLab and connect it in the Render dashboard.
+#   2. Set KAFKA_BOOTSTRAP manually (see notes below).
+#   3. Deploy — Render auto-wires DB credentials and cross-service URLs.
+#
+# KAFKA: Render has no managed Kafka. Create a free broker at https://upstash.com
+# then set the KAFKA_BOOTSTRAP env var on ims-backend to your Upstash bootstrap URL
+# (e.g. your-cluster.upstash.io:9092). Upstash requires SASL/SSL — also set:
+#   SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL=SASL_SSL
+#   SPRING_KAFKA_PROPERTIES_SASL_MECHANISM=SCRAM-SHA-256
+#   SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.scram.ScramLoginModule required username="..." password="...";
+
+databases:
+  - name: ims-db
+    databaseName: imsdb
+    user: ims
+    plan: free
+
+services:
+  - type: web
+    name: ims-backend
+    runtime: docker
+    dockerContext: backend
+    dockerfilePath: backend/Dockerfile
+    plan: free
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_HOST
+        fromDatabase:
+          name: ims-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: ims-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: ims-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: ims-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: ims-db
+          property: password
+      - key: KAFKA_BOOTSTRAP
+        sync: false  # Set manually to your Upstash (or other) Kafka bootstrap URL
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: "86400000"
+      - key: OUTBOX_POLL_MS
+        value: "500"
+      - key: CORS_ALLOWED_ORIGINS
+        fromService:
+          type: web
+          name: ims-frontend
+          property: url
+
+  - type: web
+    name: ims-frontend
+    runtime: docker
+    dockerContext: frontend/ims-frontend
+    dockerfilePath: frontend/ims-frontend/Dockerfile
+    plan: free
+    envVars:
+      - key: API_URL
+        fromService:
+          type: web
+          name: ims-backend
+          property: url
