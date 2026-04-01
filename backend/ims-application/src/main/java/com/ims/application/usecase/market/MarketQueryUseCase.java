@@ -53,7 +53,7 @@ public class MarketQueryUseCase implements MarketQueryPort {
 
     @Override
     public List<Market> listMarkets(ListMarketsQuery query) {
-        return marketRepository.findAll(query.status());
+        return marketRepository.findAllByUserId(query.userId(), query.status());
     }
 
     @Override
@@ -105,9 +105,9 @@ public class MarketQueryUseCase implements MarketQueryPort {
 
     @Override
     public AllMarketsSummaryDto getAllMarketsSummary(GetAllMarketsSummaryQuery query) {
-        List<Market> markets = marketRepository.findAll(query.status());
+        List<Market> markets = marketRepository.findAllByUserId(query.userId(), query.status());
         List<MarketSummaryDto> summaries = markets.stream()
-                .map(m -> getMarketSummary(new GetMarketSummaryQuery(m.getId())))
+                .map(m -> getMarketSummary(new GetMarketSummaryQuery(query.userId(), m.getId())))
                 .toList();
 
         BigDecimal totalRevenue = summaries.stream()

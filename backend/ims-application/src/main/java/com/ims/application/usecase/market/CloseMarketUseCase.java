@@ -55,7 +55,7 @@ public class CloseMarketUseCase {
                     item.adjustStock(remaining);
                     itemRepository.save(item);
                     transactionRepository.save(Transaction.create(
-                        market.getId(), item.getId(), TransactionType.RETURN_FROM_MARKET,
+                        command.userId(), market.getId(), item.getId(), TransactionType.RETURN_FROM_MARKET,
                         remaining, stockBefore, item.getTotalStorageStock().quantity(),
                         "Stock returned on market close", command.createdBy()
                     ));

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
 export interface LoginRequest { email: string; password: string; }
+export interface RegisterRequest { email: string; password: string; registrationCode: string; }
 export interface AuthResponse { token: string; tokenType: string; expiresIn: number; email: string; }
 
 @Injectable({ providedIn: 'root' })
@@ -18,6 +19,21 @@ export class AuthService {
   login(email: string, password: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http.post<AuthResponse>(`${this.base}/login`, { email, password }).subscribe({
+        next: res => {
+          localStorage.setItem('auth_token', res.token);
+          localStorage.setItem('auth_email', res.email);
+          this.currentEmail.set(res.email);
+          this.isAuthenticated.set(true);
+          resolve();
+        },
+        error: err => reject(err)
+      });
+    });
+  }
+
+  register(email: string, password: string, registrationCode: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http.post<AuthResponse>(`${this.base}/register`, { email, password, registrationCode }).subscribe({
         next: res => {
           localStorage.setItem('auth_token', res.token);
           localStorage.setItem('auth_email', res.email);

@@ -2,6 +2,7 @@ package com.ims.api.controller;
 
 import com.ims.api.dto.request.CreateCategoryRequest;
 import com.ims.api.dto.response.CategoryResponse;
+import com.ims.api.security.CurrentUserService;
 import com.ims.application.command.CreateCategoryCommand;
 import com.ims.application.port.inbound.CategoryCommandPort;
 import com.ims.application.port.inbound.CategoryQueryPort;
@@ -23,16 +24,20 @@ public class CategoryController {
 
     private final CategoryCommandPort categoryCommandPort;
     private final CategoryQueryPort categoryQueryPort;
+    private final CurrentUserService currentUserService;
 
-    public CategoryController(CategoryCommandPort categoryCommandPort, CategoryQueryPort categoryQueryPort) {
+    public CategoryController(CategoryCommandPort categoryCommandPort, CategoryQueryPort categoryQueryPort,
+            CurrentUserService currentUserService) {
         this.categoryCommandPort = categoryCommandPort;
         this.categoryQueryPort = categoryQueryPort;
+        this.currentUserService = currentUserService;
     }
 
     @GetMapping
     @Operation(summary = "List all categories")
     public ResponseEntity<List<CategoryResponse>> listCategories() {
-        List<CategoryResponse> categories = categoryQueryPort.listCategories()
+        UUID userId = currentUserService.getCurrentUserId();
+        List<CategoryResponse> categories = categoryQueryPort.listCategories(userId)
                 .stream().map(this::toResponse).toList();
         return ResponseEntity.ok(categories);
     }
@@ -40,7 +45,8 @@ public class CategoryController {
     @PostMapping
     @Operation(summary = "Create a new category")
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
-        Category category = categoryCommandPort.createCategory(new CreateCategoryCommand(request.name()));
+        UUID userId = currentUserService.getCurrentUserId();
+        Category category = categoryCommandPort.createCategory(new CreateCategoryCommand(userId, request.name()));
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(category));
     }
 

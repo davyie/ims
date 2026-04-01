@@ -90,7 +90,7 @@ public class ShiftItemToMarketUseCase implements MarketStockCommandPort {
         MarketItem saved = marketItemRepository.save(marketItem);
 
         transactionRepository.save(Transaction.create(
-            command.marketId(), command.itemId(), TransactionType.SHIFT_TO_MARKET,
+            command.userId(), command.marketId(), command.itemId(), TransactionType.SHIFT_TO_MARKET,
             -command.quantity(), stockBefore, item.getTotalStorageStock().quantity(),
             "Shifted to market", command.createdBy()
         ));

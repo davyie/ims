@@ -1,6 +1,7 @@
 package com.ims.api.controller;
 
 import com.ims.api.dto.response.TransactionResponse;
+import com.ims.api.security.CurrentUserService;
 import com.ims.application.port.inbound.TransactionQueryPort;
 import com.ims.application.query.GetTransactionHistoryQuery;
 import com.ims.domain.model.Transaction;
@@ -18,9 +19,11 @@ import java.util.UUID;
 public class TransactionController {
 
     private final TransactionQueryPort transactionQueryUseCase;
+    private final CurrentUserService currentUserService;
 
-    public TransactionController(TransactionQueryPort transactionQueryUseCase) {
+    public TransactionController(TransactionQueryPort transactionQueryUseCase, CurrentUserService currentUserService) {
         this.transactionQueryUseCase = transactionQueryUseCase;
+        this.currentUserService = currentUserService;
     }
 
     @GetMapping
@@ -28,8 +31,9 @@ public class TransactionController {
     public ResponseEntity<List<TransactionResponse>> getTransactions(
             @RequestParam(required = false) UUID marketId,
             @RequestParam(required = false) UUID itemId) {
+        UUID userId = currentUserService.getCurrentUserId();
         List<TransactionResponse> result = transactionQueryUseCase
-                .getTransactionHistory(new GetTransactionHistoryQuery(marketId, itemId, 0, Integer.MAX_VALUE))
+                .getTransactionHistory(new GetTransactionHistoryQuery(userId, marketId, itemId, 0, Integer.MAX_VALUE))
                 .stream()
                 .map(this::toResponse)
                 .toList();

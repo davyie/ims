@@ -44,7 +44,7 @@ public class DecrementMarketStockUseCase {
         MarketItem saved = marketItemRepository.save(marketItem);
 
         transactionRepository.save(Transaction.createSale(
-            command.marketId(), command.itemId(),
+            command.userId(), command.marketId(), command.itemId(),
             -command.quantity(), stockBefore, saved.getCurrentStock().quantity(),
             command.note(), command.createdBy(),
             command.salePrice(), command.saleCurrency()

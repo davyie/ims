@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public class Market {
     private UUID id;
+    private UUID userId;
     private String name;
     private String place;
     private LocalDateTime openDate;
@@ -16,9 +17,10 @@ public class Market {
 
     public Market() {}
 
-    public Market(UUID id, String name, String place, LocalDateTime openDate, LocalDateTime closeDate,
+    public Market(UUID id, UUID userId, String name, String place, LocalDateTime openDate, LocalDateTime closeDate,
                   MarketStatus status, LocalDateTime createdAt) {
         this.id = id;
+        this.userId = userId;
         this.name = name;
         this.place = place;
         this.openDate = openDate;
@@ -27,8 +29,8 @@ public class Market {
         this.createdAt = createdAt;
     }
 
-    public static Market create(String name, String place, LocalDateTime openDate, LocalDateTime closeDate) {
-        return new Market(UUID.randomUUID(), name, place, openDate, closeDate, MarketStatus.SCHEDULED, LocalDateTime.now());
+    public static Market create(UUID userId, String name, String place, LocalDateTime openDate, LocalDateTime closeDate) {
+        return new Market(UUID.randomUUID(), userId, name, place, openDate, closeDate, MarketStatus.SCHEDULED, LocalDateTime.now());
     }
 
     public void update(String name, String place, LocalDateTime openDate, LocalDateTime closeDate) {
@@ -60,6 +62,7 @@ public class Market {
     public boolean isClosed() { return status == MarketStatus.CLOSED; }
 
     public UUID getId() { return id; }
+    public UUID getUserId() { return userId; }
     public String getName() { return name; }
     public String getPlace() { return place; }
     public LocalDateTime getOpenDate() { return openDate; }
@@ -67,6 +70,7 @@ public class Market {
     public MarketStatus getStatus() { return status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setId(UUID id) { this.id = id; }
+    public void setUserId(UUID userId) { this.userId = userId; }
     public void setName(String name) { this.name = name; }
     public void setPlace(String place) { this.place = place; }
     public void setOpenDate(LocalDateTime openDate) { this.openDate = openDate; }

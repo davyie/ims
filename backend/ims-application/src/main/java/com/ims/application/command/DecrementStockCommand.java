@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record DecrementStockCommand(
+    UUID userId,
     UUID marketId,
     UUID itemId,
     int quantity,

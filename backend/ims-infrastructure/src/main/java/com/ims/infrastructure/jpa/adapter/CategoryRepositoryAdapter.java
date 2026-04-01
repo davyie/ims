@@ -22,18 +22,17 @@ public class CategoryRepositoryAdapter implements CategoryRepositoryPort {
 
     @Override
     public Category save(Category category) {
-        CategoryJpaEntity entity = toEntity(category);
-        return toDomain(jpaRepository.save(entity));
+        return toDomain(jpaRepository.save(toEntity(category)));
     }
 
     @Override
-    public List<Category> findAll() {
-        return jpaRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+    public List<Category> findAllByUserId(UUID userId) {
+        return jpaRepository.findByUserId(userId).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<Category> findByName(String name) {
-        return jpaRepository.findByName(name).map(this::toDomain);
+    public Optional<Category> findByNameAndUserId(String name, UUID userId) {
+        return jpaRepository.findByNameAndUserId(name, userId).map(this::toDomain);
     }
 
     @Override
@@ -49,12 +48,13 @@ public class CategoryRepositoryAdapter implements CategoryRepositoryPort {
     private CategoryJpaEntity toEntity(Category category) {
         CategoryJpaEntity e = new CategoryJpaEntity();
         e.setId(category.getId());
+        e.setUserId(category.getUserId());
         e.setName(category.getName());
         e.setCreatedAt(category.getCreatedAt());
         return e;
     }
 
     private Category toDomain(CategoryJpaEntity e) {
-        return new Category(e.getId(), e.getName(), e.getCreatedAt());
+        return new Category(e.getId(), e.getUserId(), e.getName(), e.getCreatedAt());
     }
 }

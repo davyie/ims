@@ -8,8 +8,8 @@ import java.util.UUID;
 
 public interface CategoryRepositoryPort {
     Category save(Category category);
-    List<Category> findAll();
-    Optional<Category> findByName(String name);
+    List<Category> findAllByUserId(UUID userId);
+    Optional<Category> findByNameAndUserId(String name, UUID userId);
     boolean existsById(UUID id);
     void deleteById(UUID id);
 }

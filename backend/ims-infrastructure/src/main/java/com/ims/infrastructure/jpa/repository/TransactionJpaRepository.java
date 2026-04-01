@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TransactionJpaRepository extends JpaRepository<TransactionJpaEntity, UUID> {
+    List<TransactionJpaEntity> findByUserId(UUID userId);
     List<TransactionJpaEntity> findByMarketId(UUID marketId);
     List<TransactionJpaEntity> findByItemId(UUID itemId);
     List<TransactionJpaEntity> findByMarketIdAndItemId(UUID marketId, UUID itemId);

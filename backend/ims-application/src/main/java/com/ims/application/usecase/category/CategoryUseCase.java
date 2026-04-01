@@ -23,10 +23,10 @@ public class CategoryUseCase implements CategoryCommandPort, CategoryQueryPort {
     @Override
     @Transactional
     public Category createCategory(CreateCategoryCommand command) {
-        categoryRepository.findByName(command.name()).ifPresent(existing -> {
+        categoryRepository.findByNameAndUserId(command.name(), command.userId()).ifPresent(existing -> {
             throw new IllegalArgumentException("Category already exists: " + command.name());
         });
-        return categoryRepository.save(Category.create(command.name()));
+        return categoryRepository.save(Category.create(command.userId(), command.name()));
     }
 
     @Override
@@ -40,7 +40,7 @@ public class CategoryUseCase implements CategoryCommandPort, CategoryQueryPort {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Category> listCategories() {
-        return categoryRepository.findAll();
+    public List<Category> listCategories(UUID userId) {
+        return categoryRepository.findAllByUserId(userId);
     }
 }

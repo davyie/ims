@@ -28,6 +28,6 @@ public class TransactionQueryUseCase implements TransactionQueryPort {
         } else if (query.itemId() != null) {
             return transactionRepository.findByItemId(query.itemId());
         }
-        return transactionRepository.findAll();
+        return transactionRepository.findAllByUserId(query.userId());
     }
 }

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface TransactionRepositoryPort {
     Transaction save(Transaction transaction);
-    List<Transaction> findAll();
+    List<Transaction> findAllByUserId(UUID userId);
     List<Transaction> findByMarketId(UUID marketId);
     List<Transaction> findByItemId(UUID itemId);
     List<Transaction> findByMarketIdAndItemId(UUID marketId, UUID itemId);

@@ -43,7 +43,7 @@ public class AdjustStorageStockUseCase implements ItemCommandPort {
         Item saved = itemRepository.save(item);
 
         transactionRepository.save(Transaction.create(
-            null, item.getId(), TransactionType.STOCK_ADJUSTMENT,
+            command.userId(), null, item.getId(), TransactionType.STOCK_ADJUSTMENT,
             command.delta(), stockBefore, stockAfter, command.note(), command.createdBy()
         ));
 

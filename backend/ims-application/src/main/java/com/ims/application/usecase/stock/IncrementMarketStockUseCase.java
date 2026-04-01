@@ -45,7 +45,7 @@ public class IncrementMarketStockUseCase {
         MarketItem saved = marketItemRepository.save(marketItem);
 
         transactionRepository.save(Transaction.create(
-            command.marketId(), command.itemId(), TransactionType.INCREMENT,
+            command.userId(), command.marketId(), command.itemId(), TransactionType.INCREMENT,
             command.quantity(), stockBefore, saved.getCurrentStock().quantity(),
             command.note(), command.createdBy()
         ));

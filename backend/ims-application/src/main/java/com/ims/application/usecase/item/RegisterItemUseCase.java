@@ -35,13 +35,13 @@ public class RegisterItemUseCase implements ItemCommandPort {
     @Override
     @Transactional
     public Item registerItem(RegisterItemCommand command) {
-        itemRepository.findBySku(command.sku()).ifPresent(existing -> {
+        itemRepository.findBySkuAndUserId(command.sku(), command.userId()).ifPresent(existing -> {
             throw new DuplicateSkuException(command.sku());
         });
 
         Money price = Money.of(command.defaultPrice(), command.currency());
         StoragePosition position = new StoragePosition(command.zone(), command.shelf(), command.row(), command.column());
-        Item item = Item.create(command.sku(), command.name(), command.description(),
+        Item item = Item.create(command.userId(), command.sku(), command.name(), command.description(),
                 command.category(), price, position);
 
         if (command.initialStock() > 0) {
@@ -52,7 +52,7 @@ public class RegisterItemUseCase implements ItemCommandPort {
 
         if (command.initialStock() > 0) {
             transactionRepository.save(Transaction.create(
-                null, saved.getId(), TransactionType.STOCK_ADJUSTMENT,
+                command.userId(), null, saved.getId(), TransactionType.STOCK_ADJUSTMENT,
                 command.initialStock(), 0, command.initialStock(),
                 "Initial stock on registration", "system"
             ));

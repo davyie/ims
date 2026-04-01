@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record ShiftItemCommand(
+    UUID userId,
     UUID marketId,
     UUID itemId,
     int quantity,

@@ -37,17 +37,18 @@ public class MarketRepositoryAdapter implements MarketRepositoryPort {
     }
 
     @Override
-    public List<Market> findAll(MarketStatus status) {
+    public List<Market> findAllByUserId(UUID userId, MarketStatus status) {
         if (status != null) {
-            return jpaRepository.findByStatus(MarketJpaEntity.MarketStatusJpa.valueOf(status.name()))
+            return jpaRepository.findByUserIdAndStatus(userId, MarketJpaEntity.MarketStatusJpa.valueOf(status.name()))
                     .stream().map(this::toDomain).collect(Collectors.toList());
         }
-        return jpaRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+        return jpaRepository.findByUserId(userId).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     private MarketJpaEntity toEntity(Market m) {
         MarketJpaEntity e = new MarketJpaEntity();
         e.setId(m.getId());
+        e.setUserId(m.getUserId());
         e.setName(m.getName());
         e.setPlace(m.getPlace());
         e.setOpenDate(m.getOpenDate());
@@ -58,7 +59,7 @@ public class MarketRepositoryAdapter implements MarketRepositoryPort {
     }
 
     private Market toDomain(MarketJpaEntity e) {
-        return new Market(e.getId(), e.getName(), e.getPlace(), e.getOpenDate(), e.getCloseDate(),
+        return new Market(e.getId(), e.getUserId(), e.getName(), e.getPlace(), e.getOpenDate(), e.getCloseDate(),
             MarketStatus.valueOf(e.getStatus().name()), e.getCreatedAt());
     }
 }

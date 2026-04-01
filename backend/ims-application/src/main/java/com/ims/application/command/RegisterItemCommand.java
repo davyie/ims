@@ -1,8 +1,10 @@
 package com.ims.application.command;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record RegisterItemCommand(
+    UUID userId,
     String sku,
     String name,
     String description,
