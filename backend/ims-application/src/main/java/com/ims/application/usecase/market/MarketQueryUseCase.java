@@ -67,7 +67,7 @@ public class MarketQueryUseCase implements MarketQueryPort {
         int totalAllocated = 0;
         int totalCurrent = 0;
         int totalSold = 0;
-        String currency = "EUR";
+        String currency = "SEK";
 
         for (MarketItem mi : marketItems) {
             Optional<Item> optItem = itemRepository.findById(mi.getItemId());
@@ -114,7 +114,7 @@ public class MarketQueryUseCase implements MarketQueryPort {
                 .map(MarketSummaryDto::totalRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         int totalSold = summaries.stream().mapToInt(MarketSummaryDto::totalSold).sum();
-        String currency = summaries.isEmpty() ? "EUR" : summaries.get(0).currency();
+        String currency = summaries.isEmpty() ? "SEK" : summaries.get(0).currency();
 
         return new AllMarketsSummaryDto(markets.size(), totalSold, totalRevenue, currency, summaries);
     }

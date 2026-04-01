@@ -132,6 +132,7 @@ public class ItemController {
     private TransactionResponse toTransactionResponse(Transaction tx) {
         return new TransactionResponse(tx.getId(), tx.getMarketId(), tx.getItemId(),
             tx.getType().name(), tx.getQuantityDelta(), tx.getStockBefore(), tx.getStockAfter(),
-            tx.getNote(), tx.getOccurredAt(), tx.getCreatedBy());
+            tx.getNote(), tx.getOccurredAt(), tx.getCreatedBy(),
+            tx.getSalePrice(), tx.getSaleCurrency());
     }
 }

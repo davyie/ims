@@ -39,7 +39,9 @@ export class MarketFormComponent implements OnInit {
     name: ['', [Validators.required, Validators.minLength(2)]],
     place: ['', [Validators.required]],
     openDate: [null as Date | null, Validators.required],
+    openTime: ['09:00', Validators.required],
     closeDate: [null as Date | null, Validators.required],
+    closeTime: ['18:00', Validators.required],
   });
 
   get id(): string | null { return this.route.snapshot.paramMap.get('id'); }
@@ -64,11 +66,15 @@ export class MarketFormComponent implements OnInit {
     if (this.isEdit && this.state.selectedMarket()) {
       const m = this.state.selectedMarket()!;
       if (this.form.get('name')?.value === '') {
+        const openDt = parseISO(m.openDate);
+        const closeDt = parseISO(m.closeDate);
         this.form.patchValue({
           name: m.name,
           place: m.place,
-          openDate: parseISO(m.openDate),
-          closeDate: parseISO(m.closeDate),
+          openDate: openDt,
+          openTime: format(openDt, 'HH:mm'),
+          closeDate: closeDt,
+          closeTime: format(closeDt, 'HH:mm'),
         });
       }
     }
@@ -81,13 +87,15 @@ export class MarketFormComponent implements OnInit {
     }
     this.saving = true;
     const v = this.form.getRawValue();
+    const openDateTime = `${format(v.openDate!, 'yyyy-MM-dd')}T${v.openTime}:00`;
+    const closeDateTime = `${format(v.closeDate!, 'yyyy-MM-dd')}T${v.closeTime}:00`;
     try {
       if (this.isEdit) {
         const req: UpdateMarketRequest = {
           name: v.name!,
           place: v.place!,
-          openDate: format(v.openDate!, 'yyyy-MM-dd'),
-          closeDate: format(v.closeDate!, 'yyyy-MM-dd'),
+          openDate: openDateTime,
+          closeDate: closeDateTime,
         };
         await this.state.updateMarket(this.id!, req);
         this.router.navigate(['/markets', this.id]);
@@ -95,8 +103,8 @@ export class MarketFormComponent implements OnInit {
         const req: CreateMarketRequest = {
           name: v.name!,
           place: v.place!,
-          openDate: format(v.openDate!, 'yyyy-MM-dd'),
-          closeDate: format(v.closeDate!, 'yyyy-MM-dd'),
+          openDate: openDateTime,
+          closeDate: closeDateTime,
         };
         const market = await this.state.createMarket(req);
         this.router.navigate(['/markets', market.id]);

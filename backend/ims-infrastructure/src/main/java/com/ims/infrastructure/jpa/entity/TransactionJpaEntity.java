@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -49,6 +50,12 @@ public class TransactionJpaEntity {
 
     @Column(name = "created_by")
     private String createdBy;
+
+    @Column(name = "sale_price", precision = 19, scale = 4)
+    private BigDecimal salePrice;
+
+    @Column(name = "sale_currency", length = 10)
+    private String saleCurrency;
 
     public enum TransactionTypeJpa {
         STOCK_ADJUSTMENT, SHIFT_TO_MARKET, RETURN_FROM_MARKET, SALE, INCREMENT

@@ -11,7 +11,7 @@ public record RegisterItemRequest(
     @Schema(description = "Item description") String description,
     @Schema(description = "Category", example = "Furniture") String category,
     @NotNull @DecimalMin("0.0") @Schema(description = "Default price", example = "29.99") BigDecimal defaultPrice,
-    @NotBlank @Size(min=3, max=3) @Schema(description = "ISO 4217 currency code", example = "EUR") String currency,
+    @NotBlank @Size(min=3, max=3) @Schema(description = "ISO 4217 currency code", example = "SEK") String currency,
     @NotBlank @Schema(description = "Storage zone", example = "A1") String zone,
     @NotBlank @Schema(description = "Storage shelf", example = "S01") String shelf,
     @Min(0) @Schema(description = "Row number", example = "1") int row,

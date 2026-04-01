@@ -62,6 +62,8 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
         e.setNote(tx.getNote());
         e.setOccurredAt(tx.getOccurredAt());
         e.setCreatedBy(tx.getCreatedBy());
+        e.setSalePrice(tx.getSalePrice());
+        e.setSaleCurrency(tx.getSaleCurrency());
         return e;
     }
 
@@ -69,6 +71,7 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
         return new Transaction(e.getId(), e.getMarketId(), e.getItemId(),
             TransactionType.valueOf(e.getType().name()),
             e.getQuantityDelta(), e.getStockBefore(), e.getStockAfter(),
-            e.getNote(), e.getOccurredAt(), e.getCreatedBy());
+            e.getNote(), e.getOccurredAt(), e.getCreatedBy(),
+            e.getSalePrice(), e.getSaleCurrency());
     }
 }

@@ -25,6 +25,8 @@ spring:
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
+    admin:
+      fail-fast: false
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -37,7 +39,7 @@ spring:
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 management:
   endpoints:
@@ -54,6 +56,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
 
 logging:
   level:

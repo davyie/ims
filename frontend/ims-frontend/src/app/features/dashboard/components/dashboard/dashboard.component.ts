@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit {
   }
 
   get currency(): string {
-    return this.state.allSummary()?.currency ?? 'EUR';
+    return this.state.allSummary()?.currency ?? 'SEK';
   }
 
   get totalItemsSold(): number {

@@ -39,9 +39,8 @@ log/
 .spring-boot-devtools.properties
 spring-devtools.properties
 
-# Application secrets — never commit real values
+# Application secrets — never commit real values (prod.yml is safe — uses env vars only)
 application-prod.properties
-application-prod.yml
 *.env
 secrets/
 

@@ -62,8 +62,8 @@ public class ShiftItemToMarketUseCase implements MarketStockCommandPort {
         Market market = marketRepository.findById(command.marketId())
                 .orElseThrow(() -> new MarketNotFoundException(command.marketId()));
 
-        if (!market.isOpen()) {
-            throw new InvalidMarketStateException("Can only shift items to OPEN markets, current status: " + market.getStatus());
+        if (!market.isOpen() && !market.isScheduled()) {
+            throw new InvalidMarketStateException("Can only shift items to OPEN or SCHEDULED markets, current status: " + market.getStatus());
         }
 
         Item item = itemRepository.findById(command.itemId())

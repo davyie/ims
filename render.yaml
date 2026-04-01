@@ -1,0 +1,83 @@
+# Render Blueprint — deploys TEST environment (backend, frontend, PostgreSQL).
+#
+# HOW TO USE:
+#   1. Push this repo to GitHub and connect it in the Render dashboard.
+#   2. Go to https://dashboard.render.com → Blueprints → New Blueprint Instance.
+#   3. Select this repo — Render will auto-detect render.yaml.
+#   4. After the blueprint deploys, set the env vars marked sync: false
+#      in the Render dashboard (Environment tab of each service).
+#
+# KAFKA (optional):
+#   Render has no managed Kafka. If you need event publishing:
+#   1. Create a free Kafka broker at https://upstash.com
+#   2. Set these env vars on the backend service:
+#      - KAFKA_BOOTSTRAP = your Upstash bootstrap URL
+#      - SPRING_KAFKA_PROPERTIES_SECURITY_PROTOCOL = SASL_SSL
+#      - SPRING_KAFKA_PROPERTIES_SASL_MECHANISM = SCRAM-SHA-256
+#      - SPRING_KAFKA_PROPERTIES_SASL_JAAS_CONFIG = org.apache.kafka.common.security.scram.ScramLoginModule required username="..." password="...";
+#   Without Kafka, the app still works — outbox events will be marked FAILED but
+#   all CRUD operations function normally.
+
+databases:
+  - name: ims-db-test
+    plan: free
+    databaseName: imsdb_test
+    user: ims
+
+services:
+  # ── Test Backend (Spring Boot) ─────────────────────────────────────────
+  - type: web
+    name: ims-backend-test
+    runtime: docker
+    repo: https://github.com/davyie/ims
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: test
+
+      # Database — free plan requires the EXTERNAL hostname.
+      # Get values from Render Dashboard → ims-db-test → Info → "External Database URL".
+      - key: DB_HOST
+        sync: false  # e.g. dpg-xxx-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_NAME
+        sync: false  # e.g. imsdb_test_xxxx
+      - key: DB_USERNAME
+        sync: false  # e.g. ims
+      - key: DB_PASSWORD
+        sync: false  # from the External Database URL
+      - key: DB_SSL
+        value: "?sslmode=require"
+
+      - key: KAFKA_BOOTSTRAP
+        value: "localhost:9092"
+
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MS
+        value: "86400000"
+
+      - key: OUTBOX_POLL_MS
+        value: "3600000"
+
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false  # e.g. https://ims-frontend-test.onrender.com
+
+  # ── Test Frontend (Angular + Nginx) ────────────────────────────────────
+  - type: web
+    name: ims-frontend-test
+    runtime: docker
+    repo: https://github.com/davyie/ims
+    dockerContext: ./frontend/ims-frontend
+    dockerfilePath: ./frontend/ims-frontend/Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    envVars:
+      - key: API_URL
+        sync: false  # e.g. https://ims-backend-test.onrender.com

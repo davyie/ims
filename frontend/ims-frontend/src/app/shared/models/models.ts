@@ -66,6 +66,8 @@ export interface Transaction {
   note?: string;
   occurredAt: string;
   createdBy: string;
+  salePrice?: number;
+  saleCurrency?: string;
 }
 
 export interface MarketItemSummary {
@@ -185,6 +187,8 @@ export interface DecrementStockRequest {
   quantity: number;
   note?: string;
   createdBy?: string;
+  salePrice?: number;
+  saleCurrency?: string;
 }
 
 export interface SetPriceRequest {

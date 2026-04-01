@@ -10,5 +10,5 @@ import { CurrencyFormatPipe } from '../../pipes/currency-format.pipe';
 })
 export class MoneyDisplayComponent {
   @Input() amount: number = 0;
-  @Input() currency: string = 'EUR';
+  @Input() currency: string = 'SEK';
 }

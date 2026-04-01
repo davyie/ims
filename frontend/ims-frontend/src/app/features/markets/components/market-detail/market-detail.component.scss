@@ -42,3 +42,135 @@
 .clickable-row { cursor: pointer; &:hover { background: #F5F6FA; } }
 
 .empty-msg { color: var(--text-secondary); text-align: center; padding: 24px; }
+
+.item-name { font-weight: 500; }
+
+.stock-control {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  .stock-num {
+    min-width: 32px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+
+    &.stock-zero {
+      color: var(--warn, #f44336);
+    }
+  }
+}
+
+.sale-form-row td { padding: 0 !important; border-bottom: none; }
+
+.sale-form-cell { padding: 0 !important; }
+
+.sale-form-panel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px 12px;
+  background: #fff8f0;
+  border-left: 3px solid var(--warn, #f44336);
+
+  .sale-form-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .sale-price-field { width: 120px; }
+  .sale-currency-field { width: 100px; }
+
+  mat-form-field { margin-bottom: -1.25em; }
+}
+
+// ── Responsive: desktop shows table, mobile shows cards ──────────────────────
+
+.items-card-list { display: none; }
+
+@media (max-width: 639px) {
+  .items-table-card { display: none; }
+  .items-card-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .item-mobile-card {
+    .item-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+
+      .item-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+    }
+
+    .item-card-meta {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+
+      .meta-chip {
+        display: flex;
+        flex-direction: column;
+        font-size: 13px;
+        color: var(--text-primary);
+
+        .meta-label {
+          font-size: 10px;
+          text-transform: uppercase;
+          font-weight: 600;
+          letter-spacing: 0.4px;
+          color: var(--text-secondary);
+          margin-bottom: 1px;
+        }
+      }
+    }
+
+    .item-card-stock {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .stock-num {
+        min-width: 36px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+
+        &.stock-zero { color: var(--warn, #f44336); }
+      }
+    }
+
+    .sale-form-mobile {
+      flex-direction: column;
+      align-items: stretch;
+      border-left: 3px solid var(--warn, #f44336);
+      margin-top: 12px;
+
+      .sale-form-fields {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .sale-price-field { flex: 1; min-width: 100px; }
+        .sale-currency-field { width: 110px; }
+
+        mat-form-field { margin-bottom: -1.25em; }
+      }
+
+      .sale-form-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+
+        button { flex: 1; }
+      }
+    }
+  }
+}
