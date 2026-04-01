@@ -29,6 +29,9 @@ public class AuthController {
     @Value("${jwt.expiration-ms}")
     private long expirationMs;
 
+    @Value("${registration.code}")
+    private String registrationCode;
+
     public AuthController(AuthenticationManager authManager,
                           JwtService jwtService,
                           UserRepositoryPort userRepository,
@@ -51,6 +54,9 @@ public class AuthController {
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        if (!registrationCode.equals(request.registrationCode())) {
+            throw new IllegalArgumentException("Invalid registration code");
+        }
         if (userRepository.existsByEmail(request.email())) {
             throw new IllegalArgumentException("Email already registered: " + request.email());
         }

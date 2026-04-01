@@ -23,7 +23,7 @@ public class StorageSummaryUseCase implements StorageSummaryPort {
 
     @Override
     public StorageSummaryDto getStorageSummary(GetStorageSummaryQuery query) {
-        List<StorageItemDto> items = itemRepository.findAll().stream()
+        List<StorageItemDto> items = itemRepository.findAllByUserId(query.userId()).stream()
                 .map(item -> new StorageItemDto(
                     item.getId(), item.getSku(), item.getName(),
                     item.getCategory(), item.getTotalStorageStock().quantity()

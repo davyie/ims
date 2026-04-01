@@ -5,6 +5,7 @@ import com.ims.api.dto.request.RegisterItemRequest;
 import com.ims.api.dto.request.UpdateItemRequest;
 import com.ims.api.dto.response.ItemResponse;
 import com.ims.api.dto.response.TransactionResponse;
+import com.ims.api.security.CurrentUserService;
 import com.ims.application.command.AdjustStorageStockCommand;
 import com.ims.application.command.RegisterItemCommand;
 import com.ims.application.command.UpdateItemCommand;
@@ -37,6 +38,7 @@ public class ItemController {
     private final ItemCommandPort deleteItemUseCase;
     private final ItemQueryPort itemQueryUseCase;
     private final TransactionQueryPort transactionQueryUseCase;
+    private final CurrentUserService currentUserService;
 
     public ItemController(
             com.ims.application.usecase.item.RegisterItemUseCase registerItemUseCase,
@@ -44,20 +46,23 @@ public class ItemController {
             com.ims.application.usecase.item.AdjustStorageStockUseCase adjustStockUseCase,
             com.ims.application.usecase.item.DeleteItemUseCase deleteItemUseCase,
             ItemQueryPort itemQueryUseCase,
-            TransactionQueryPort transactionQueryUseCase) {
+            TransactionQueryPort transactionQueryUseCase,
+            CurrentUserService currentUserService) {
         this.registerItemUseCase = registerItemUseCase;
         this.updateItemUseCase = updateItemUseCase;
         this.adjustStockUseCase = adjustStockUseCase;
         this.deleteItemUseCase = deleteItemUseCase;
         this.itemQueryUseCase = itemQueryUseCase;
         this.transactionQueryUseCase = transactionQueryUseCase;
+        this.currentUserService = currentUserService;
     }
 
     @PostMapping
     @Operation(summary = "Register a new item")
     public ResponseEntity<ItemResponse> registerItem(@Valid @RequestBody RegisterItemRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         Item item = registerItemUseCase.registerItem(new RegisterItemCommand(
-            request.sku(), request.name(), request.description(), request.category(),
+            userId, request.sku(), request.name(), request.description(), request.category(),
             request.defaultPrice(), request.currency(),
             request.zone(), request.shelf(), request.row(), request.column(),
             request.initialStock()
@@ -68,7 +73,8 @@ public class ItemController {
     @GetMapping
     @Operation(summary = "List all items")
     public ResponseEntity<List<ItemResponse>> listItems(@RequestParam(required = false) String category) {
-        List<ItemResponse> items = itemQueryUseCase.listItems(new ListItemsQuery(category))
+        UUID userId = currentUserService.getCurrentUserId();
+        List<ItemResponse> items = itemQueryUseCase.listItems(new ListItemsQuery(userId, category))
                 .stream().map(this::toResponse).toList();
         return ResponseEntity.ok(items);
     }
@@ -76,14 +82,16 @@ public class ItemController {
     @GetMapping("/{id}")
     @Operation(summary = "Get item by ID")
     public ResponseEntity<ItemResponse> getItem(@PathVariable UUID id) {
-        return ResponseEntity.ok(toResponse(itemQueryUseCase.getItem(new GetItemQuery(id))));
+        UUID userId = currentUserService.getCurrentUserId();
+        return ResponseEntity.ok(toResponse(itemQueryUseCase.getItem(new GetItemQuery(userId, id))));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an item")
     public ResponseEntity<ItemResponse> updateItem(@PathVariable UUID id, @Valid @RequestBody UpdateItemRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         Item item = updateItemUseCase.updateItem(new UpdateItemCommand(
-            id, request.name(), request.description(), request.category(),
+            userId, id, request.name(), request.description(), request.category(),
             request.defaultPrice(), request.currency(),
             request.zone(), request.shelf(), request.row(), request.column()
         ));
@@ -93,8 +101,9 @@ public class ItemController {
     @PatchMapping("/{id}/stock")
     @Operation(summary = "Adjust storage stock")
     public ResponseEntity<ItemResponse> adjustStock(@PathVariable UUID id, @Valid @RequestBody AdjustStockRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         Item item = adjustStockUseCase.adjustStorageStock(new AdjustStorageStockCommand(
-            id, request.delta(), request.note(), request.createdBy()
+            userId, id, request.delta(), request.note(), request.createdBy()
         ));
         return ResponseEntity.ok(toResponse(item));
     }
@@ -109,8 +118,9 @@ public class ItemController {
     @GetMapping("/{id}/transactions")
     @Operation(summary = "Get transaction history for an item")
     public ResponseEntity<List<TransactionResponse>> getItemTransactions(@PathVariable UUID id) {
+        UUID userId = currentUserService.getCurrentUserId();
         List<TransactionResponse> txs = transactionQueryUseCase.getTransactionHistory(
-                new GetTransactionHistoryQuery(null, id, 0, 100))
+                new GetTransactionHistoryQuery(userId, null, id, 0, 100))
                 .stream().map(this::toTransactionResponse).toList();
         return ResponseEntity.ok(txs);
     }

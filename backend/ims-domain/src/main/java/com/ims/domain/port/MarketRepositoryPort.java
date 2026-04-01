@@ -9,6 +9,6 @@ import java.util.UUID;
 public interface MarketRepositoryPort {
     Market save(Market market);
     Optional<Market> findById(UUID id);
-    List<Market> findAll(MarketStatus status);
+    List<Market> findAllByUserId(UUID userId, MarketStatus status);
     void deleteById(UUID id);
 }

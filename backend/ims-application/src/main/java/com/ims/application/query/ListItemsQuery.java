@@ -1,3 +1,5 @@
 package com.ims.application.query;
 
-public record ListItemsQuery(String category) {}
+import java.util.UUID;
+
+public record ListItemsQuery(UUID userId, String category) {}

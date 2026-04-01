@@ -1,20 +1,18 @@
 package com.ims.infrastructure.jpa.adapter;
 
 import com.ims.domain.model.Item;
-import com.ims.domain.model.MarketStatus;
 import com.ims.domain.port.ItemRepositoryPort;
 import com.ims.infrastructure.jpa.entity.ItemJpaEntity;
 import com.ims.infrastructure.jpa.repository.ItemJpaRepository;
+import com.ims.domain.valueobject.Money;
+import com.ims.domain.valueobject.StoragePosition;
+import com.ims.domain.valueobject.StockLevel;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.ims.domain.valueobject.Money;
-import com.ims.domain.valueobject.StoragePosition;
-import com.ims.domain.valueobject.StockLevel;
 
 @Component
 public class ItemRepositoryAdapter implements ItemRepositoryPort {
@@ -27,9 +25,7 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
 
     @Override
     public Item save(Item item) {
-        ItemJpaEntity entity = toEntity(item);
-        ItemJpaEntity saved = jpaRepository.save(entity);
-        return toDomain(saved);
+        return toDomain(jpaRepository.save(toEntity(item)));
     }
 
     @Override
@@ -38,13 +34,13 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
     }
 
     @Override
-    public Optional<Item> findBySku(String sku) {
-        return jpaRepository.findBySku(sku).map(this::toDomain);
+    public Optional<Item> findBySkuAndUserId(String sku, UUID userId) {
+        return jpaRepository.findBySkuAndUserId(sku, userId).map(this::toDomain);
     }
 
     @Override
-    public List<Item> findAll() {
-        return jpaRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+    public List<Item> findAllByUserId(UUID userId) {
+        return jpaRepository.findAllByUserId(userId).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     @Override
@@ -55,6 +51,7 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
     private ItemJpaEntity toEntity(Item item) {
         ItemJpaEntity e = new ItemJpaEntity();
         e.setId(item.getId());
+        e.setUserId(item.getUserId());
         e.setSku(item.getSku());
         e.setName(item.getName());
         e.setDescription(item.getDescription());
@@ -80,7 +77,7 @@ public class ItemRepositoryAdapter implements ItemRepositoryPort {
             ? Money.of(e.getDefaultPrice(), e.getDefaultCurrency()) : null;
         StoragePosition pos = (e.getStorageZone() != null)
             ? new StoragePosition(e.getStorageZone(), e.getStorageShelf(), e.getStorageRow(), e.getStorageColumn()) : null;
-        return new Item(e.getId(), e.getSku(), e.getName(), e.getDescription(), e.getCategory(),
+        return new Item(e.getId(), e.getUserId(), e.getSku(), e.getName(), e.getDescription(), e.getCategory(),
             price, pos, StockLevel.of(e.getTotalStorageStock()), e.getCreatedAt(), e.getUpdatedAt());
     }
 }

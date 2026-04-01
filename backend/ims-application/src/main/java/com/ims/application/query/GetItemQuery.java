@@ -2,4 +2,4 @@ package com.ims.application.query;
 
 import java.util.UUID;
 
-public record GetItemQuery(UUID itemId) {}
+public record GetItemQuery(UUID userId, UUID itemId) {}

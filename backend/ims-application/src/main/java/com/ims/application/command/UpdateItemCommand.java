@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record UpdateItemCommand(
+    UUID userId,
     UUID itemId,
     String name,
     String description,

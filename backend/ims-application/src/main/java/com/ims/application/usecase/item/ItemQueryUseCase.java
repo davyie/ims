@@ -30,7 +30,7 @@ public class ItemQueryUseCase implements ItemQueryPort {
 
     @Override
     public List<Item> listItems(ListItemsQuery query) {
-        List<Item> all = itemRepository.findAll();
+        List<Item> all = itemRepository.findAllByUserId(query.userId());
         if (query.category() != null && !query.category().isBlank()) {
             return all.stream()
                     .filter(i -> query.category().equalsIgnoreCase(i.getCategory()))

@@ -13,7 +13,8 @@ import java.util.UUID;
     indexes = {
         @Index(name = "idx_tx_market_id", columnList = "market_id"),
         @Index(name = "idx_tx_item_id", columnList = "item_id"),
-        @Index(name = "idx_tx_occurred_at", columnList = "occurred_at")
+        @Index(name = "idx_tx_occurred_at", columnList = "occurred_at"),
+        @Index(name = "idx_tx_user_id", columnList = "user_id")
     }
 )
 @Getter @Setter
@@ -22,6 +23,9 @@ public class TransactionJpaEntity {
     @Id
     @Column(columnDefinition = "uuid")
     private UUID id;
+
+    @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
+    private UUID userId;
 
     @Column(name = "market_id", columnDefinition = "uuid")
     private UUID marketId;

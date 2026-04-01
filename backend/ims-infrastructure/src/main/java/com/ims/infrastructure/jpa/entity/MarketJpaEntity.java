@@ -16,6 +16,9 @@ public class MarketJpaEntity {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
+    @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
+    private UUID userId;
+
     @Column(nullable = false)
     private String name;
 

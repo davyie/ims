@@ -1,3 +1,5 @@
 package com.ims.application.query;
 
-public record GetStorageSummaryQuery() {}
+import java.util.UUID;
+
+public record GetStorageSummaryQuery(UUID userId) {}

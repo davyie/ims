@@ -26,8 +26,8 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
     }
 
     @Override
-    public List<Transaction> findAll() {
-        return jpaRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+    public List<Transaction> findAllByUserId(UUID userId) {
+        return jpaRepository.findByUserId(userId).stream().map(this::toDomain).collect(Collectors.toList());
     }
 
     @Override
@@ -53,6 +53,7 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
     private TransactionJpaEntity toEntity(Transaction tx) {
         TransactionJpaEntity e = new TransactionJpaEntity();
         e.setId(tx.getId());
+        e.setUserId(tx.getUserId());
         e.setMarketId(tx.getMarketId());
         e.setItemId(tx.getItemId());
         e.setType(TransactionJpaEntity.TransactionTypeJpa.valueOf(tx.getType().name()));
@@ -68,7 +69,7 @@ public class TransactionRepositoryAdapter implements TransactionRepositoryPort {
     }
 
     private Transaction toDomain(TransactionJpaEntity e) {
-        return new Transaction(e.getId(), e.getMarketId(), e.getItemId(),
+        return new Transaction(e.getId(), e.getUserId(), e.getMarketId(), e.getItemId(),
             TransactionType.valueOf(e.getType().name()),
             e.getQuantityDelta(), e.getStockBefore(), e.getStockAfter(),
             e.getNote(), e.getOccurredAt(), e.getCreatedBy(),

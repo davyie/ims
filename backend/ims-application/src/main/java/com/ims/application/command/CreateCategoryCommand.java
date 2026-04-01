@@ -1,3 +1,5 @@
 package com.ims.application.command;
 
-public record CreateCategoryCommand(String name) {}
+import java.util.UUID;
+
+public record CreateCategoryCommand(UUID userId, String name) {}

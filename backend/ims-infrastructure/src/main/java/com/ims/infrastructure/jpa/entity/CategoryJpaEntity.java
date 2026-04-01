@@ -16,7 +16,10 @@ public class CategoryJpaEntity {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
+    private UUID userId;
+
+    @Column(nullable = false)
     private String name;
 
     @Column(name = "created_at", nullable = false, updatable = false)

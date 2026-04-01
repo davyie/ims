@@ -3,6 +3,7 @@ package com.ims.api.controller;
 import com.ims.api.dto.request.CreateMarketRequest;
 import com.ims.api.dto.request.UpdateMarketRequest;
 import com.ims.api.dto.response.*;
+import com.ims.api.security.CurrentUserService;
 import com.ims.application.command.CloseMarketCommand;
 import com.ims.application.command.CreateMarketCommand;
 import com.ims.application.command.OpenMarketCommand;
@@ -37,23 +38,27 @@ public class MarketController {
     private final MarketCommandPort updateMarketUseCase;
     private final MarketCommandPort deleteMarketUseCase;
     private final MarketQueryPort marketQueryPort;
+    private final CurrentUserService currentUserService;
 
     public MarketController(
             com.ims.application.usecase.market.CreateMarketUseCase marketCommandPort,
             com.ims.application.usecase.market.UpdateMarketUseCase updateMarketUseCase,
             com.ims.application.usecase.market.DeleteMarketUseCase deleteMarketUseCase,
-            MarketQueryPort marketQueryPort) {
+            MarketQueryPort marketQueryPort,
+            CurrentUserService currentUserService) {
         this.marketCommandPort = marketCommandPort;
         this.updateMarketUseCase = updateMarketUseCase;
         this.deleteMarketUseCase = deleteMarketUseCase;
         this.marketQueryPort = marketQueryPort;
+        this.currentUserService = currentUserService;
     }
 
     @PostMapping
     @Operation(summary = "Create a market")
     public ResponseEntity<MarketResponse> createMarket(@Valid @RequestBody CreateMarketRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         Market market = marketCommandPort.createMarket(new CreateMarketCommand(
-            request.name(), request.place(), request.openDate(), request.closeDate()
+            userId, request.name(), request.place(), request.openDate(), request.closeDate()
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(market));
     }
@@ -61,22 +66,25 @@ public class MarketController {
     @GetMapping
     @Operation(summary = "List markets")
     public ResponseEntity<List<MarketResponse>> listMarkets(@RequestParam(required = false) MarketStatus status) {
-        return ResponseEntity.ok(marketQueryPort.listMarkets(new ListMarketsQuery(status))
+        UUID userId = currentUserService.getCurrentUserId();
+        return ResponseEntity.ok(marketQueryPort.listMarkets(new ListMarketsQuery(userId, status))
                 .stream().map(this::toResponse).toList());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get market by ID")
     public ResponseEntity<MarketResponse> getMarket(@PathVariable UUID id) {
-        return ResponseEntity.ok(toResponse(marketQueryPort.getMarket(new GetMarketQuery(id))));
+        UUID userId = currentUserService.getCurrentUserId();
+        return ResponseEntity.ok(toResponse(marketQueryPort.getMarket(new GetMarketQuery(userId, id))));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a market (only in SCHEDULED state)")
     public ResponseEntity<MarketResponse> updateMarket(@PathVariable UUID id,
             @Valid @RequestBody UpdateMarketRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         Market market = updateMarketUseCase.updateMarket(new UpdateMarketCommand(
-            id, request.name(), request.place(), request.openDate(), request.closeDate()
+            userId, id, request.name(), request.place(), request.openDate(), request.closeDate()
         ));
         return ResponseEntity.ok(toResponse(market));
     }
@@ -91,20 +99,23 @@ public class MarketController {
     @PostMapping("/{id}/open")
     @Operation(summary = "Open a market")
     public ResponseEntity<MarketResponse> openMarket(@PathVariable UUID id) {
-        return ResponseEntity.ok(toResponse(marketCommandPort.openMarket(new OpenMarketCommand(id))));
+        UUID userId = currentUserService.getCurrentUserId();
+        return ResponseEntity.ok(toResponse(marketCommandPort.openMarket(new OpenMarketCommand(userId, id))));
     }
 
     @PostMapping("/{id}/close")
     @Operation(summary = "Close a market")
     public ResponseEntity<MarketResponse> closeMarket(@PathVariable UUID id,
             @RequestParam(defaultValue = "system") String createdBy) {
-        return ResponseEntity.ok(toResponse(marketCommandPort.closeMarket(new CloseMarketCommand(id, createdBy))));
+        UUID userId = currentUserService.getCurrentUserId();
+        return ResponseEntity.ok(toResponse(marketCommandPort.closeMarket(new CloseMarketCommand(userId, id, createdBy))));
     }
 
     @GetMapping("/{id}/summary")
     @Operation(summary = "Get market summary")
     public ResponseEntity<MarketSummaryResponse> getMarketSummary(@PathVariable UUID id) {
-        MarketSummaryDto dto = marketQueryPort.getMarketSummary(new GetMarketSummaryQuery(id));
+        UUID userId = currentUserService.getCurrentUserId();
+        MarketSummaryDto dto = marketQueryPort.getMarketSummary(new GetMarketSummaryQuery(userId, id));
         return ResponseEntity.ok(toSummaryResponse(dto));
     }
 
@@ -112,7 +123,8 @@ public class MarketController {
     @Operation(summary = "Get all markets summary")
     public ResponseEntity<AllMarketsSummaryResponse> getAllMarketsSummary(
             @RequestParam(required = false) MarketStatus status) {
-        AllMarketsSummaryDto dto = marketQueryPort.getAllMarketsSummary(new GetAllMarketsSummaryQuery(status));
+        UUID userId = currentUserService.getCurrentUserId();
+        AllMarketsSummaryDto dto = marketQueryPort.getAllMarketsSummary(new GetAllMarketsSummaryQuery(userId, status));
         List<MarketSummaryResponse> summaries = dto.markets().stream().map(this::toSummaryResponse).toList();
         return ResponseEntity.ok(new AllMarketsSummaryResponse(
             dto.totalMarkets(), dto.totalItemsSold(), dto.totalRevenue(), dto.currency(), summaries));

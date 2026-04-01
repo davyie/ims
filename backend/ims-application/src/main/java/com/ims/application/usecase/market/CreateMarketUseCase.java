@@ -28,7 +28,7 @@ public class CreateMarketUseCase implements MarketCommandPort {
     @Override
     @Transactional
     public Market createMarket(CreateMarketCommand command) {
-        Market market = Market.create(command.name(), command.place(), command.openDate(), command.closeDate());
+        Market market = Market.create(command.userId(), command.name(), command.place(), command.openDate(), command.closeDate());
         return marketRepository.save(market);
     }
 

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public class Item {
     private UUID id;
+    private UUID userId;
     private String sku;
     private String name;
     private String description;
@@ -21,10 +22,11 @@ public class Item {
 
     public Item() {}
 
-    public Item(UUID id, String sku, String name, String description, String category,
+    public Item(UUID id, UUID userId, String sku, String name, String description, String category,
                 Money defaultPrice, StoragePosition storagePosition, StockLevel totalStorageStock,
                 LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.userId = userId;
         this.sku = sku;
         this.name = name;
         this.description = description;
@@ -36,10 +38,10 @@ public class Item {
         this.updatedAt = updatedAt;
     }
 
-    public static Item create(String sku, String name, String description, String category,
+    public static Item create(UUID userId, String sku, String name, String description, String category,
                                Money defaultPrice, StoragePosition storagePosition) {
         return new Item(
-            UUID.randomUUID(), sku, name, description, category,
+            UUID.randomUUID(), userId, sku, name, description, category,
             defaultPrice, storagePosition, StockLevel.zero(),
             LocalDateTime.now(), LocalDateTime.now()
         );
@@ -64,6 +66,7 @@ public class Item {
     }
 
     public UUID getId() { return id; }
+    public UUID getUserId() { return userId; }
     public String getSku() { return sku; }
     public String getName() { return name; }
     public String getDescription() { return description; }
@@ -74,6 +77,7 @@ public class Item {
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setId(UUID id) { this.id = id; }
+    public void setUserId(UUID userId) { this.userId = userId; }
     public void setSku(String sku) { this.sku = sku; }
     public void setName(String name) { this.name = name; }
     public void setDescription(String description) { this.description = description; }

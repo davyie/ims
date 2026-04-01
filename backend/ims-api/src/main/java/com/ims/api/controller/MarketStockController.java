@@ -6,6 +6,7 @@ import com.ims.api.dto.request.SetPriceRequest;
 import com.ims.api.dto.request.ShiftItemRequest;
 import com.ims.api.dto.response.MarketItemResponse;
 import com.ims.api.dto.response.TransactionResponse;
+import com.ims.api.security.CurrentUserService;
 import com.ims.application.command.DecrementStockCommand;
 import com.ims.application.command.IncrementStockCommand;
 import com.ims.application.command.SetPriceCommand;
@@ -34,21 +35,25 @@ public class MarketStockController {
     private final MarketStockCommandPort marketStockCommandPort;
     private final TransactionQueryPort transactionQueryPort;
     private final MarketItemQueryPort marketItemQueryPort;
+    private final CurrentUserService currentUserService;
 
     public MarketStockController(MarketStockCommandPort marketStockCommandPort,
                                   TransactionQueryPort transactionQueryPort,
-                                  MarketItemQueryPort marketItemQueryPort) {
+                                  MarketItemQueryPort marketItemQueryPort,
+                                  CurrentUserService currentUserService) {
         this.marketStockCommandPort = marketStockCommandPort;
         this.transactionQueryPort = transactionQueryPort;
         this.marketItemQueryPort = marketItemQueryPort;
+        this.currentUserService = currentUserService;
     }
 
     @PostMapping("/{id}/items")
     @Operation(summary = "Shift item to market")
     public ResponseEntity<MarketItemResponse> shiftItem(@PathVariable UUID id,
             @Valid @RequestBody ShiftItemRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         MarketItem mi = marketStockCommandPort.shiftItem(new ShiftItemCommand(
-            id, request.itemId(), request.quantity(), request.marketPrice(), request.currency(),
+            userId, id, request.itemId(), request.quantity(), request.marketPrice(), request.currency(),
             request.createdBy() != null ? request.createdBy() : "system"
         ));
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(mi));
@@ -72,8 +77,9 @@ public class MarketStockController {
     @Operation(summary = "Increment market item stock")
     public ResponseEntity<MarketItemResponse> incrementStock(@PathVariable UUID id,
             @PathVariable UUID itemId, @Valid @RequestBody IncrementStockRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         MarketItem mi = marketStockCommandPort.incrementStock(new IncrementStockCommand(
-            id, itemId, request.quantity(), request.note(),
+            userId, id, itemId, request.quantity(), request.note(),
             request.createdBy() != null ? request.createdBy() : "system"
         ));
         return ResponseEntity.ok(toResponse(mi));
@@ -83,8 +89,9 @@ public class MarketStockController {
     @Operation(summary = "Decrement market item stock (record sale)")
     public ResponseEntity<MarketItemResponse> decrementStock(@PathVariable UUID id,
             @PathVariable UUID itemId, @Valid @RequestBody DecrementStockRequest request) {
+        UUID userId = currentUserService.getCurrentUserId();
         MarketItem mi = marketStockCommandPort.decrementStock(new DecrementStockCommand(
-            id, itemId, request.quantity(), request.note(),
+            userId, id, itemId, request.quantity(), request.note(),
             request.createdBy() != null ? request.createdBy() : "system",
             request.salePrice(), request.saleCurrency()
         ));
@@ -95,7 +102,8 @@ public class MarketStockController {
     @Operation(summary = "Set market item price")
     public ResponseEntity<MarketItemResponse> setPrice(@PathVariable UUID id,
             @PathVariable UUID itemId, @Valid @RequestBody SetPriceRequest request) {
-        MarketItem mi = marketStockCommandPort.setPrice(new SetPriceCommand(id, itemId, request.price(), request.currency()));
+        UUID userId = currentUserService.getCurrentUserId();
+        MarketItem mi = marketStockCommandPort.setPrice(new SetPriceCommand(userId, id, itemId, request.price(), request.currency()));
         return ResponseEntity.ok(toResponse(mi));
     }
 
@@ -103,8 +111,9 @@ public class MarketStockController {
     @Operation(summary = "Get transaction history for a market item")
     public ResponseEntity<List<TransactionResponse>> getTransactions(@PathVariable UUID id,
             @PathVariable UUID itemId) {
+        UUID userId = currentUserService.getCurrentUserId();
         List<TransactionResponse> txs = transactionQueryPort.getTransactionHistory(
-                new GetTransactionHistoryQuery(id, itemId, 0, 100))
+                new GetTransactionHistoryQuery(userId, id, itemId, 0, 100))
                 .stream().map(this::toTxResponse).toList();
         return ResponseEntity.ok(txs);
     }
