@@ -1,0 +1,52 @@
+<div class="signup-wrapper">
+  <mat-card class="signup-card">
+    <mat-card-content>
+      <div class="signup-header">
+        <mat-icon class="brand-icon">inventory</mat-icon>
+        <h1 class="brand-title">IMS</h1>
+        <p class="brand-subtitle">Create your account</p>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="signup-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="you@example.com" autocomplete="email">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="form.get('email')?.hasError('email')">Enter a valid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password"
+            [type]="hidePassword() ? 'password' : 'text'"
+            autocomplete="new-password">
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword.set(!hidePassword())">
+            <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          <mat-error *ngIf="form.get('password')?.hasError('required')">Password is required</mat-error>
+          <mat-error *ngIf="form.get('password')?.hasError('minlength')">Password must be at least 8 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Registration Code</mat-label>
+          <input matInput formControlName="registrationCode" placeholder="6-character code" autocomplete="off" maxlength="6">
+          <mat-icon matSuffix>vpn_key</mat-icon>
+          <mat-error *ngIf="form.get('registrationCode')?.hasError('required')">Registration code is required</mat-error>
+          <mat-error *ngIf="form.get('registrationCode')?.hasError('minlength') || form.get('registrationCode')?.hasError('maxlength')">
+            Code must be exactly 6 characters
+          </mat-error>
+        </mat-form-field>
+
+        <button mat-flat-button color="primary" type="submit" class="signup-btn" [disabled]="loading()">
+          <mat-spinner *ngIf="loading()" diameter="20" class="spinner"></mat-spinner>
+          <span *ngIf="!loading()">Create Account</span>
+        </button>
+      </form>
+
+      <div class="login-link">
+        Already have an account? <a routerLink="/login">Sign in</a>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

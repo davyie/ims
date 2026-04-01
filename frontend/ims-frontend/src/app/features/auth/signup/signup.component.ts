@@ -12,17 +12,17 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-signup',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, RouterLink,
     MatCardModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatIconModule, MatProgressSpinnerModule
   ],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.scss']
 })
-export class LoginComponent {
+export class SignupComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
@@ -33,7 +33,8 @@ export class LoginComponent {
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(8)]]
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    registrationCode: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
   });
 
   async submit(): Promise<void> {
@@ -42,12 +43,12 @@ export class LoginComponent {
       return;
     }
     this.loading.set(true);
-    const { email, password } = this.form.getRawValue();
+    const { email, password, registrationCode } = this.form.getRawValue();
     try {
-      await this.auth.login(email!, password!);
+      await this.auth.register(email!, password!, registrationCode!);
       this.router.navigate(['/dashboard']);
     } catch {
-      this.notify.error('Login failed', 'Invalid email or password');
+      this.notify.error('Registration failed', 'Invalid registration code or email already in use');
     } finally {
       this.loading.set(false);
     }
