@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ims-notification-service
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USER:}
+    password: ${SMTP_PASS:}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    consumer:
+      group-id: ims-notification-service
+      auto-offset-reset: earliest
+
+server:
+  port: 8088
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+ims:
+  notification:
+    from-email: ${NOTIFICATION_FROM_EMAIL:noreply@ims.local}
+    email-enabled: ${NOTIFICATION_EMAIL_ENABLED:true}
+    max-retries: 3
+    retry-backoff-ms: 1000
+    idempotency-ttl-seconds: 86400
+  logging:
+    operation-enabled: true
+    exception-enabled: true

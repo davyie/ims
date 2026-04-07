@@ -1,0 +1,9 @@
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/ReportingServiceApplication.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/adapter/in/kafka/ReportingEventConsumer.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/adapter/in/rest/ReportingController.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/adapter/out/mongodb/EventProjectionRepository.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/application/service/ReportingService.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/domain/model/EventProjectionDocument.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/infrastructure/config/JwtValidationFilter.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/infrastructure/config/KafkaConfig.java
+/Users/davidyu/GitHub/java/ims/backend/ims-reporting-service/src/main/java/com/ims/reporting/infrastructure/config/SecurityConfig.java

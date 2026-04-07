@@ -1,0 +1,4 @@
+/Users/davidyu/GitHub/java/ims/backend/ims-logging-starter/src/main/java/com/ims/logging/aspect/ExceptionLoggingAspect.java
+/Users/davidyu/GitHub/java/ims/backend/ims-logging-starter/src/main/java/com/ims/logging/aspect/OperationLoggingAspect.java
+/Users/davidyu/GitHub/java/ims/backend/ims-logging-starter/src/main/java/com/ims/logging/config/LoggingAutoConfiguration.java
+/Users/davidyu/GitHub/java/ims/backend/ims-logging-starter/src/main/java/com/ims/logging/config/LoggingProperties.java

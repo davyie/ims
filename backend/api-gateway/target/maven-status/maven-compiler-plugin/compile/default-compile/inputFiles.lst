@@ -1,0 +1,4 @@
+/Users/davidyu/GitHub/java/ims/backend/api-gateway/src/main/java/com/ims/gateway/ApiGatewayApplication.java
+/Users/davidyu/GitHub/java/ims/backend/api-gateway/src/main/java/com/ims/gateway/infrastructure/config/GatewayProperties.java
+/Users/davidyu/GitHub/java/ims/backend/api-gateway/src/main/java/com/ims/gateway/infrastructure/config/SecurityConfig.java
+/Users/davidyu/GitHub/java/ims/backend/api-gateway/src/main/java/com/ims/gateway/infrastructure/filter/JwtValidationFilter.java

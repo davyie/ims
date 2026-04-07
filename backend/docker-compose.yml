@@ -1,0 +1,408 @@
+version: '3.9'
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  IMS — Warehouse & Market Management System
+#  Local development Docker Compose
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ims-postgres
+    environment:
+      POSTGRES_USER: ims
+      POSTGRES_PASSWORD: ims
+      POSTGRES_DB: ims_user
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ims -d ims_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  mongodb:
+    image: mongo:7.0
+    container_name: ims-mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ims
+      MONGO_INITDB_ROOT_PASSWORD: ims
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok", "--username", "ims", "--password", "ims", "--authenticationDatabase", "admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: ims-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: ims-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    networks:
+      - ims-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: ims-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 168
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "kafka:29092"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    networks:
+      - ims-net
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: ims-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    command: >
+      bash -c "
+        echo 'Creating IMS Kafka topics...' &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.user.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 6  --replication-factor 1 --topic ims.warehouse.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 6  --replication-factor 1 --topic ims.warehouse.commands &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 6  --replication-factor 1 --topic ims.market.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 6  --replication-factor 1 --topic ims.market.commands &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 6  --replication-factor 1 --topic ims.transfer.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.scheduling.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.reporting.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.notification.events &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.user.events.dlq &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.warehouse.events.dlq &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.market.events.dlq &&
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.transfer.events.dlq &&
+        echo 'All topics created successfully.'
+      "
+    restart: on-failure
+    networks:
+      - ims-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: ims-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "9090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: ims-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+    networks:
+      - ims-net
+
+  # ── Application Services ─────────────────────────────────────────────────────
+
+  ims-user-service:
+    build:
+      context: .
+      dockerfile: ims-user-service/Dockerfile
+    container_name: ims-user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/ims_user
+      DB_USER: ims
+      DB_PASS: ims
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-warehouse-service:
+    build:
+      context: .
+      dockerfile: ims-warehouse-service/Dockerfile
+    container_name: ims-warehouse-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/ims_warehouse
+      DB_USER: ims
+      DB_PASS: ims
+      MONGO_URI: mongodb://ims:ims@mongodb:27017/ims_warehouse?authSource=admin
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8082/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-market-service:
+    build:
+      context: .
+      dockerfile: ims-market-service/Dockerfile
+    container_name: ims-market-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/ims_market
+      DB_USER: ims
+      DB_PASS: ims
+      MONGO_URI: mongodb://ims:ims@mongodb:27017/ims_market?authSource=admin
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8083/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-transfer-service:
+    build:
+      context: .
+      dockerfile: ims-transfer-service/Dockerfile
+    container_name: ims-transfer-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/ims_transfer
+      DB_USER: ims
+      DB_PASS: ims
+      MONGO_URI: mongodb://ims:ims@mongodb:27017/ims_transfer?authSource=admin
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8084/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-scheduling-service:
+    build:
+      context: .
+      dockerfile: ims-scheduling-service/Dockerfile
+    container_name: ims-scheduling-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/ims_scheduling
+      DB_USER: ims
+      DB_PASS: ims
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8085/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-reporting-service:
+    build:
+      context: .
+      dockerfile: ims-reporting-service/Dockerfile
+    container_name: ims-reporting-service
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MONGO_URI: mongodb://ims:ims@mongodb:27017/ims_reporting?authSource=admin
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8086/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-transaction-service:
+    build:
+      context: .
+      dockerfile: ims-transaction-service/Dockerfile
+    container_name: ims-transaction-service
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/ims_transaction
+      DB_USER: ims
+      DB_PASS: ims
+      KAFKA_SERVERS: kafka:29092
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health/readiness || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  ims-notification-service:
+    build:
+      context: .
+      dockerfile: ims-notification-service/Dockerfile
+    container_name: ims-notification-service
+    ports:
+      - "8088:8088"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_SERVERS: kafka:29092
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+    depends_on:
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    networks:
+      - ims-net
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: ims-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JWT_SECRET: ims-super-secret-jwt-key-change-in-production-32chars
+      USER_SERVICE_URL: http://ims-user-service:8081
+      WAREHOUSE_SERVICE_URL: http://ims-warehouse-service:8082
+      MARKET_SERVICE_URL: http://ims-market-service:8083
+      TRANSFER_SERVICE_URL: http://ims-transfer-service:8084
+      SCHEDULING_SERVICE_URL: http://ims-scheduling-service:8085
+      REPORTING_SERVICE_URL: http://ims-reporting-service:8086
+      TRANSACTION_SERVICE_URL: http://ims-transaction-service:8087
+    depends_on:
+      - ims-user-service
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ims-net
+
+  # ── Dev tooling (local only) ─────────────────────────────────────────────────
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: ims-mailhog
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+    networks:
+      - ims-net
+
+volumes:
+  postgres_data:
+  mongo_data:
+  zookeeper_data:
+
+networks:
+  ims-net:
+    driver: bridge

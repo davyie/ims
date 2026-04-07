@@ -1,0 +1,10 @@
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/TransactionServiceApplication.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/adapter/in/kafka/TransactionLedgerConsumer.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/adapter/in/rest/TransactionController.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/adapter/out/persistence/TransactionJpaRepository.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/application/service/TransactionQueryService.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/domain/model/TransactionRecord.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/infrastructure/GlobalExceptionHandler.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/infrastructure/config/JwtValidationFilter.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/infrastructure/config/KafkaConfig.java
+/Users/davidyu/GitHub/java/ims/backend/ims-transaction-service/src/main/java/com/ims/transaction/infrastructure/config/SecurityConfig.java

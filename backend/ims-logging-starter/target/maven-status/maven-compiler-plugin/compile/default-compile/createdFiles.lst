@@ -1,0 +1,4 @@
+com/ims/logging/config/LoggingAutoConfiguration.class
+com/ims/logging/aspect/OperationLoggingAspect.class
+com/ims/logging/config/LoggingProperties.class
+com/ims/logging/aspect/ExceptionLoggingAspect.class

@@ -1,3 +1,0 @@
-ALTER TABLE markets
-    ALTER COLUMN open_date TYPE TIMESTAMP USING open_date::TIMESTAMP,
-    ALTER COLUMN close_date TYPE TIMESTAMP USING close_date::TIMESTAMP;

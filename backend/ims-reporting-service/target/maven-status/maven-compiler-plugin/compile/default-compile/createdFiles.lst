@@ -1,0 +1,10 @@
+com/ims/reporting/domain/model/EventProjectionDocument$EventProjectionDocumentBuilder.class
+com/ims/reporting/adapter/out/mongodb/EventProjectionRepository.class
+com/ims/reporting/infrastructure/config/SecurityConfig.class
+com/ims/reporting/application/service/ReportingService.class
+com/ims/reporting/infrastructure/config/JwtValidationFilter.class
+com/ims/reporting/ReportingServiceApplication.class
+com/ims/reporting/domain/model/EventProjectionDocument.class
+com/ims/reporting/infrastructure/config/KafkaConfig.class
+com/ims/reporting/adapter/in/kafka/ReportingEventConsumer.class
+com/ims/reporting/adapter/in/rest/ReportingController.class

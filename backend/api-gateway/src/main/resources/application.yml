@@ -1,0 +1,79 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: ${USER_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/users/**
+
+        - id: warehouse-service-warehouses
+          uri: ${WAREHOUSE_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/warehouses/**
+
+        - id: warehouse-service-items
+          uri: ${WAREHOUSE_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/items/**
+
+        - id: market-service
+          uri: ${MARKET_SERVICE_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/v1/markets/**
+
+        - id: transfer-service
+          uri: ${TRANSFER_SERVICE_URL:http://localhost:8084}
+          predicates:
+            - Path=/api/v1/transfers/**
+
+        - id: scheduling-service
+          uri: ${SCHEDULING_SERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/v1/schedules/**
+
+        - id: reporting-service
+          uri: ${REPORTING_SERVICE_URL:http://localhost:8086}
+          predicates:
+            - Path=/api/v1/reports/**
+
+        - id: transaction-service
+          uri: ${TRANSACTION_SERVICE_URL:http://localhost:8087}
+          predicates:
+            - Path=/api/v1/transactions/**
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+ims:
+  gateway:
+    jwt-secret: ${JWT_SECRET:change-me-in-production-minimum-32-chars}
+    user-service-url: ${USER_SERVICE_URL:http://localhost:8081}
+    warehouse-service-url: ${WAREHOUSE_SERVICE_URL:http://localhost:8082}
+    market-service-url: ${MARKET_SERVICE_URL:http://localhost:8083}
+    transfer-service-url: ${TRANSFER_SERVICE_URL:http://localhost:8084}
+    scheduling-service-url: ${SCHEDULING_SERVICE_URL:http://localhost:8085}
+    reporting-service-url: ${REPORTING_SERVICE_URL:http://localhost:8086}
+    transaction-service-url: ${TRANSACTION_SERVICE_URL:http://localhost:8087}

@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: ims-warehouse-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/ims_warehouse}
+    username: ${DB_USER:ims}
+    password: ${DB_PASS:ims}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://ims:ims@localhost:27017/ims_warehouse?authSource=admin}
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ims-warehouse-service
+      auto-offset-reset: earliest
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+ims:
+  jwt-secret: ${JWT_SECRET:change-me-in-production-minimum-32-chars}
+  logging:
+    operation-enabled: true
+    exception-enabled: true
