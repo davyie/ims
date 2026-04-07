@@ -3,25 +3,28 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 
-export interface LoginRequest { email: string; password: string; }
-export interface AuthResponse { token: string; tokenType: string; expiresIn: number; email: string; }
+export interface LoginRequest { username: string; password: string; }
+export interface AuthResponse { token: string; userId: string; role: string; expiresAt: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private base = `${environment.apiBaseUrl}/auth`;
+  private base = `${environment.apiBaseUrl}/users`;
 
-  readonly currentEmail = signal<string | null>(localStorage.getItem('auth_email'));
+  readonly currentUsername = signal<string | null>(localStorage.getItem('auth_username'));
+  readonly currentUserId = signal<string | null>(localStorage.getItem('auth_user_id'));
   readonly isAuthenticated = signal<boolean>(this.hasValidToken());
 
-  login(email: string, password: string): Promise<void> {
+  login(username: string, password: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http.post<AuthResponse>(`${this.base}/login`, { email, password }).subscribe({
+      this.http.post<AuthResponse>(`${this.base}/login`, { username, password }).subscribe({
         next: res => {
           localStorage.setItem('auth_token', res.token);
-          localStorage.setItem('auth_email', res.email);
-          this.currentEmail.set(res.email);
+          localStorage.setItem('auth_username', username);
+          localStorage.setItem('auth_user_id', res.userId);
+          this.currentUsername.set(username);
+          this.currentUserId.set(res.userId);
           this.isAuthenticated.set(true);
           resolve();
         },
@@ -32,8 +35,10 @@ export class AuthService {
 
   logout(): void {
     localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_email');
-    this.currentEmail.set(null);
+    localStorage.removeItem('auth_username');
+    localStorage.removeItem('auth_user_id');
+    this.currentUsername.set(null);
+    this.currentUserId.set(null);
     this.isAuthenticated.set(false);
     this.router.navigate(['/login']);
   }

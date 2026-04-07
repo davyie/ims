@@ -1,42 +1,30 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import {
-  MarketItem, Transaction,
-  ShiftItemRequest, IncrementStockRequest, DecrementStockRequest, SetPriceRequest
-} from '../../../shared/models/models';
+import { MarketStock, Page, StockOperationRequest, Transfer, CreateTransferRequest } from '../../../shared/models/models';
 
 @Injectable({ providedIn: 'root' })
 export class MarketStockApiService {
   private http = inject(HttpClient);
-  private base = `${environment.apiBaseUrl}/markets`;
+  private marketsBase = `${environment.apiBaseUrl}/markets`;
+  private transfersBase = `${environment.apiBaseUrl}/transfers`;
 
-  getMarketItems(marketId: string): Observable<MarketItem[]> {
-    return this.http.get<MarketItem[]>(`${this.base}/${marketId}/items`);
+  getMarketStock(marketId: string, page = 0, size = 100): Observable<Page<MarketStock>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<Page<MarketStock>>(`${this.marketsBase}/${marketId}/stock`, { params });
   }
 
-  shiftItem(marketId: string, req: ShiftItemRequest): Observable<MarketItem> {
-    return this.http.post<MarketItem>(`${this.base}/${marketId}/items`, req);
+  /** Shift items from a warehouse to a market via the transfer service. */
+  shiftToMarket(req: CreateTransferRequest): Observable<Transfer> {
+    return this.http.post<Transfer>(this.transfersBase, req);
   }
 
-  getMarketItem(marketId: string, itemId: string): Observable<MarketItem> {
-    return this.http.get<MarketItem>(`${this.base}/${marketId}/items/${itemId}`);
+  incrementStock(marketId: string, req: StockOperationRequest): Observable<MarketStock> {
+    return this.http.post<MarketStock>(`${this.marketsBase}/${marketId}/stock/increment`, req);
   }
 
-  incrementStock(marketId: string, itemId: string, req: IncrementStockRequest): Observable<MarketItem> {
-    return this.http.patch<MarketItem>(`${this.base}/${marketId}/items/${itemId}/increment`, req);
-  }
-
-  decrementStock(marketId: string, itemId: string, req: DecrementStockRequest): Observable<MarketItem> {
-    return this.http.patch<MarketItem>(`${this.base}/${marketId}/items/${itemId}/decrement`, req);
-  }
-
-  setMarketItemPrice(marketId: string, itemId: string, req: SetPriceRequest): Observable<MarketItem> {
-    return this.http.put<MarketItem>(`${this.base}/${marketId}/items/${itemId}/price`, req);
-  }
-
-  getMarketItemTransactions(marketId: string, itemId: string): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(`${this.base}/${marketId}/items/${itemId}/transactions`);
+  decrementStock(marketId: string, req: StockOperationRequest): Observable<MarketStock> {
+    return this.http.post<MarketStock>(`${this.marketsBase}/${marketId}/stock/decrement`, req);
   }
 }

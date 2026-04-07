@@ -2,7 +2,7 @@
   <mat-sidenav-content>
     <div class="item-detail" *ngIf="state.selectedItem() as item">
       <app-page-header [title]="item.name" [breadcrumbs]="breadcrumbs">
-        <button mat-stroked-button [routerLink]="['/items', item.id, 'edit']">
+        <button mat-stroked-button [routerLink]="['/items', item.itemId, 'edit']">
           <mat-icon>edit</mat-icon> Edit
         </button>
         <button mat-flat-button color="primary" (click)="openAdjustPanel()">
@@ -10,131 +10,45 @@
         </button>
       </app-page-header>
 
-      <mat-tab-group>
-        <!-- Overview Tab -->
-        <mat-tab label="Overview">
-          <div class="tab-content">
-            <div class="detail-grid">
-              <mat-card class="info-card">
-                <mat-card-header>
-                  <mat-card-title>Item Information</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                  <div class="field-grid">
-                    <div class="field">
-                      <span class="field-label">SKU</span>
-                      <span class="field-value sku">{{ item.sku }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Category</span>
-                      <span class="field-value">{{ item.category }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Default Price</span>
-                      <span class="field-value">{{ item.defaultPrice | currencyFormat:item.currency }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Currency</span>
-                      <span class="field-value">{{ item.currency }}</span>
-                    </div>
-                    <div class="field" *ngIf="item.description">
-                      <span class="field-label">Description</span>
-                      <span class="field-value">{{ item.description }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Created</span>
-                      <span class="field-value">{{ item.createdAt | dateFormat:'absolute' }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Updated</span>
-                      <span class="field-value">{{ item.updatedAt | dateFormat:'relative' }}</span>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
-
-              <mat-card class="stock-card">
-                <mat-card-header>
-                  <mat-card-title>Stock & Location</mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                  <div class="stock-display">
-                    <span class="stock-number">{{ item.totalStorageStock }}</span>
-                    <app-stock-level [stock]="item.totalStorageStock"></app-stock-level>
-                  </div>
-                  <mat-divider></mat-divider>
-                  <div class="field-grid" style="margin-top: 16px">
-                    <div class="field">
-                      <span class="field-label">Zone</span>
-                      <span class="field-value">{{ item.zone }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Shelf</span>
-                      <span class="field-value">{{ item.shelf }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Row</span>
-                      <span class="field-value">{{ item.row }}</span>
-                    </div>
-                    <div class="field">
-                      <span class="field-label">Column</span>
-                      <span class="field-value">{{ item.column }}</span>
-                    </div>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+      <div class="detail-grid">
+        <mat-card class="info-card">
+          <mat-card-header>
+            <mat-card-title>Item Information</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="field-grid">
+              <div class="field">
+                <span class="field-label">SKU</span>
+                <span class="field-value sku">{{ item.sku }}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Category</span>
+                <span class="field-value">{{ item.category || '—' }}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Unit Price</span>
+                <span class="field-value">{{ item.unitPrice != null ? (item.unitPrice | number:'1.2-2') : '—' }}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Unit of Measure</span>
+                <span class="field-value">{{ item.unitOfMeasure || '—' }}</span>
+              </div>
+              <div class="field" *ngIf="item.description">
+                <span class="field-label">Description</span>
+                <span class="field-value">{{ item.description }}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Created</span>
+                <span class="field-value">{{ item.createdAt | dateFormat:'absolute' }}</span>
+              </div>
+              <div class="field">
+                <span class="field-label">Updated</span>
+                <span class="field-value">{{ item.updatedAt | dateFormat:'relative' }}</span>
+              </div>
             </div>
-          </div>
-        </mat-tab>
-
-        <!-- Transactions Tab -->
-        <mat-tab label="Transactions">
-          <div class="tab-content">
-            <mat-card>
-              <mat-card-content>
-                <table mat-table [dataSource]="transactions()" class="full-width">
-                  <ng-container matColumnDef="occurred">
-                    <th mat-header-cell *matHeaderCellDef>Date</th>
-                    <td mat-cell *matCellDef="let t">{{ t.occurredAt | dateFormat:'absolute' }}</td>
-                  </ng-container>
-                  <ng-container matColumnDef="type">
-                    <th mat-header-cell *matHeaderCellDef>Type</th>
-                    <td mat-cell *matCellDef="let t">
-                      <app-status-badge [status]="t.type" type="transaction"></app-status-badge>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="delta">
-                    <th mat-header-cell *matHeaderCellDef>Delta</th>
-                    <td mat-cell *matCellDef="let t">
-                      <span [class.positive]="t.quantityDelta > 0" [class.negative]="t.quantityDelta < 0">
-                        {{ t.quantityDelta > 0 ? '+' : '' }}{{ t.quantityDelta }}
-                      </span>
-                    </td>
-                  </ng-container>
-                  <ng-container matColumnDef="before">
-                    <th mat-header-cell *matHeaderCellDef>Before</th>
-                    <td mat-cell *matCellDef="let t">{{ t.stockBefore }}</td>
-                  </ng-container>
-                  <ng-container matColumnDef="after">
-                    <th mat-header-cell *matHeaderCellDef>After</th>
-                    <td mat-cell *matCellDef="let t">{{ t.stockAfter }}</td>
-                  </ng-container>
-                  <ng-container matColumnDef="note">
-                    <th mat-header-cell *matHeaderCellDef>Note</th>
-                    <td mat-cell *matCellDef="let t">{{ t.note || '-' }}</td>
-                  </ng-container>
-                  <ng-container matColumnDef="createdBy">
-                    <th mat-header-cell *matHeaderCellDef>By</th>
-                    <td mat-cell *matCellDef="let t">{{ t.createdBy }}</td>
-                  </ng-container>
-                  <tr mat-header-row *matHeaderRowDef="txnColumns"></tr>
-                  <tr mat-row *matRowDef="let row; columns: txnColumns"></tr>
-                </table>
-              </mat-card-content>
-            </mat-card>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+      </div>
     </div>
   </mat-sidenav-content>
 

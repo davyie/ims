@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -15,7 +15,7 @@ import { NotificationService } from '../../../core/services/notification.service
   selector: 'app-login',
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule,
+    CommonModule, ReactiveFormsModule, RouterModule,
     MatCardModule, MatFormFieldModule, MatInputModule,
     MatButtonModule, MatIconModule, MatProgressSpinnerModule
   ],
@@ -32,7 +32,7 @@ export class LoginComponent {
   hidePassword = signal(true);
 
   form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required, Validators.minLength(3)]],
     password: ['', [Validators.required, Validators.minLength(8)]]
   });
 
@@ -42,12 +42,12 @@ export class LoginComponent {
       return;
     }
     this.loading.set(true);
-    const { email, password } = this.form.getRawValue();
+    const { username, password } = this.form.getRawValue();
     try {
-      await this.auth.login(email!, password!);
+      await this.auth.login(username!, password!);
       this.router.navigate(['/dashboard']);
     } catch {
-      this.notify.error('Login failed', 'Invalid email or password');
+      this.notify.error('Login failed', 'Invalid username or password');
     } finally {
       this.loading.set(false);
     }

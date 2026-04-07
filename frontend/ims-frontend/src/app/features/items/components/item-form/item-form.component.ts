@@ -10,10 +10,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ItemStateService } from '../../services/item-state.service';
 import { CategoryStateService } from '../../../categories/services/category-state.service';
+import { WarehouseStateService } from '../../../storage/services/warehouse-state.service';
+import { WarehouseApiService } from '../../../storage/services/warehouse-api.service';
 import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/page-header/page-header.component';
-import { RegisterItemRequest, UpdateItemRequest } from '../../../../shared/models/models';
+import { CreateItemRequest, UpdateItemRequest } from '../../../../shared/models/models';
+import { NotificationService } from '../../../../core/services/notification.service';
 
-const CURRENCIES = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
+const UNIT_OF_MEASURES = ['pcs', 'kg', 'g', 'L', 'mL', 'box', 'pack', 'pair', 'set', 'unit'];
 
 @Component({
   selector: 'app-item-form',
@@ -31,9 +34,12 @@ export class ItemFormComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private state = inject(ItemStateService);
+  private notify = inject(NotificationService);
   categoryState = inject(CategoryStateService);
+  private warehouseState = inject(WarehouseStateService);
+  private warehouseApi = inject(WarehouseApiService);
 
-  currencies = CURRENCIES;
+  unitOfMeasures = UNIT_OF_MEASURES;
   isEdit = false;
   saving = false;
 
@@ -41,13 +47,9 @@ export class ItemFormComponent implements OnInit {
     sku: ['', [Validators.required, Validators.pattern(/^[A-Z0-9\-]+$/)]],
     name: ['', [Validators.required, Validators.minLength(2)]],
     description: [''],
-    category: ['', Validators.required],
-    defaultPrice: [0, [Validators.required, Validators.min(0)]],
-    currency: ['SEK', Validators.required],
-    zone: ['', Validators.required],
-    shelf: ['', Validators.required],
-    row: [1, [Validators.required, Validators.min(1)]],
-    column: [1, [Validators.required, Validators.min(1)]],
+    category: [''],
+    unitOfMeasure: ['pcs'],
+    unitPrice: [null as number | null, [Validators.min(0)]],
     initialStock: [0, [Validators.required, Validators.min(0)]],
   });
 
@@ -64,10 +66,10 @@ export class ItemFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.categoryState.loadCategories();
+    this.warehouseState.loadWarehouses();
     if (this.id) {
       this.isEdit = true;
       this.state.loadItem(this.id);
-      // Remove initialStock for edit mode
       this.form.get('initialStock')?.disable();
       this.form.get('sku')?.disable();
     }
@@ -80,13 +82,9 @@ export class ItemFormComponent implements OnInit {
         this.form.patchValue({
           name: item.name,
           description: item.description ?? '',
-          category: item.category,
-          defaultPrice: item.defaultPrice,
-          currency: item.currency,
-          zone: item.zone,
-          shelf: item.shelf,
-          row: item.row,
-          column: item.column,
+          category: item.category ?? '',
+          unitOfMeasure: item.unitOfMeasure ?? 'pcs',
+          unitPrice: item.unitPrice ?? null,
         });
       }
     }
@@ -102,21 +100,40 @@ export class ItemFormComponent implements OnInit {
     try {
       if (this.isEdit) {
         const req: UpdateItemRequest = {
-          name: v.name, description: v.description || undefined,
-          category: v.category, defaultPrice: v.defaultPrice, currency: v.currency,
-          zone: v.zone, shelf: v.shelf, row: v.row, column: v.column
+          name: v.name,
+          description: v.description || undefined,
+          category: v.category || undefined,
+          unitOfMeasure: v.unitOfMeasure || undefined,
+          unitPrice: v.unitPrice ?? undefined,
         };
         await this.state.updateItem(this.id!, req);
         this.router.navigate(['/items', this.id]);
       } else {
-        const req: RegisterItemRequest = {
-          sku: v.sku, name: v.name, description: v.description || undefined,
-          category: v.category, defaultPrice: v.defaultPrice, currency: v.currency,
-          zone: v.zone, shelf: v.shelf, row: v.row, column: v.column,
-          initialStock: v.initialStock
+        const req: CreateItemRequest = {
+          sku: v.sku,
+          name: v.name,
+          description: v.description || undefined,
+          category: v.category || undefined,
+          unitOfMeasure: v.unitOfMeasure || undefined,
+          unitPrice: v.unitPrice ?? undefined,
         };
-        const item = await this.state.registerItem(req);
-        this.router.navigate(['/items', item.id]);
+        const item = await this.state.createItem(req);
+
+        // If initial stock > 0, add to default warehouse
+        const initialStock = v.initialStock ?? 0;
+        if (initialStock > 0) {
+          const warehouseId = this.warehouseState.defaultWarehouseId();
+          if (warehouseId) {
+            await this.warehouseApi.addStock(warehouseId, {
+              itemId: item.itemId,
+              quantity: initialStock
+            }).toPromise();
+          } else {
+            this.notify.error('No warehouse', 'Create a warehouse first to add stock');
+          }
+        }
+
+        this.router.navigate(['/items', item.itemId]);
       }
     } finally {
       this.saving = false;

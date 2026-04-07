@@ -13,11 +13,11 @@ export class MarketStateService {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  loadMarkets(status?: string): void {
+  loadMarkets(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.api.getMarkets(status).subscribe({
-      next: markets => { this.markets.set(markets); this.loading.set(false); },
+    this.api.getMarkets().subscribe({
+      next: page => { this.markets.set(page.content); this.loading.set(false); },
       error: err => { this.error.set(err.message); this.loading.set(false); }
     });
   }
@@ -38,7 +38,7 @@ export class MarketStateService {
           this.notify.success(`Market "${market.name}" created`);
           resolve(market);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
@@ -47,12 +47,12 @@ export class MarketStateService {
     return new Promise((resolve, reject) => {
       this.api.updateMarket(id, cmd).subscribe({
         next: market => {
-          this.markets.update(ms => ms.map(m => m.id === id ? market : m));
+          this.markets.update(ms => ms.map(m => m.marketId === id ? market : m));
           this.selectedMarket.set(market);
           this.notify.success(`Market "${market.name}" updated`);
           resolve(market);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
@@ -61,12 +61,12 @@ export class MarketStateService {
     return new Promise((resolve, reject) => {
       this.api.deleteMarket(id).subscribe({
         next: () => {
-          this.markets.update(ms => ms.filter(m => m.id !== id));
-          if (this.selectedMarket()?.id === id) this.selectedMarket.set(null);
+          this.markets.update(ms => ms.filter(m => m.marketId !== id));
+          if (this.selectedMarket()?.marketId === id) this.selectedMarket.set(null);
           this.notify.success('Market deleted');
           resolve();
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
@@ -75,26 +75,26 @@ export class MarketStateService {
     return new Promise((resolve, reject) => {
       this.api.openMarket(id).subscribe({
         next: market => {
-          this.markets.update(ms => ms.map(m => m.id === id ? market : m));
+          this.markets.update(ms => ms.map(m => m.marketId === id ? market : m));
           this.selectedMarket.set(market);
           this.notify.success(`Market "${market.name}" opened`);
           resolve(market);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
 
-  closeMarket(id: string, createdBy?: string): Promise<Market> {
+  closeMarket(id: string): Promise<Market> {
     return new Promise((resolve, reject) => {
-      this.api.closeMarket(id, createdBy).subscribe({
+      this.api.closeMarket(id).subscribe({
         next: market => {
-          this.markets.update(ms => ms.map(m => m.id === id ? market : m));
+          this.markets.update(ms => ms.map(m => m.marketId === id ? market : m));
           this.selectedMarket.set(market);
           this.notify.success(`Market "${market.name}" closed`);
           resolve(market);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }

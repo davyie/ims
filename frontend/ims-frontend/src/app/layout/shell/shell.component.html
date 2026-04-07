@@ -31,7 +31,7 @@
       <mat-icon class="toolbar-brand-icon">inventory</mat-icon>
       <span class="toolbar-title">{{ isMobile ? currentPageLabel : 'Inventory Management System' }}</span>
       <span class="toolbar-spacer"></span>
-      <span class="toolbar-user">{{ auth.currentEmail() }}</span>
+      <span class="toolbar-user">{{ auth.currentUsername() }}</span>
       <button mat-icon-button (click)="auth.logout()" matTooltip="Sign out">
         <mat-icon>logout</mat-icon>
       </button>

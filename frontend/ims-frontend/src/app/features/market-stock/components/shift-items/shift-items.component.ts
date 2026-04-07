@@ -13,11 +13,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { ItemStateService } from '../../../items/services/item-state.service';
 import { MarketStockStateService } from '../../services/market-stock-state.service';
+import { WarehouseStateService } from '../../../storage/services/warehouse-state.service';
 import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/page-header/page-header.component';
-import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
-import { Item, ShiftItemRequest } from '../../../../shared/models/models';
-
-const CURRENCIES = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
+import { Item } from '../../../../shared/models/models';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-shift-items',
@@ -27,7 +26,7 @@ const CURRENCIES = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
     MatStepperModule, MatCardModule, MatCheckboxModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatButtonModule, MatIconModule, MatTableModule,
-    PageHeaderComponent, CurrencyFormatPipe
+    PageHeaderComponent
   ],
   templateUrl: './shift-items.component.html',
   styleUrls: ['./shift-items.component.scss']
@@ -37,9 +36,10 @@ export class ShiftItemsComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private itemState = inject(ItemStateService);
-  stockState = inject(MarketStockStateService);
+  private stockState = inject(MarketStockStateService);
+  warehouseState = inject(WarehouseStateService);
+  private notify = inject(NotificationService);
 
-  currencies = CURRENCIES;
   selectedItems = signal<Item[]>([]);
   saving = signal(false);
 
@@ -56,23 +56,24 @@ export class ShiftItemsComponent implements OnInit {
   }
 
   get availableItems(): Item[] {
-    return this.itemState.items().filter(i => i.totalStorageStock > 0);
+    return this.itemState.items();
   }
 
   get itemsArray(): FormArray { return this.quantityForm.get('items') as FormArray; }
 
   ngOnInit(): void {
     this.itemState.loadItems();
+    this.warehouseState.loadWarehouses();
   }
 
   isSelected(item: Item): boolean {
-    return this.selectedItems().some(i => i.id === item.id);
+    return this.selectedItems().some(i => i.itemId === item.itemId);
   }
 
   toggleItem(item: Item): void {
     const current = this.selectedItems();
     if (this.isSelected(item)) {
-      this.selectedItems.set(current.filter(i => i.id !== item.id));
+      this.selectedItems.set(current.filter(i => i.itemId !== item.itemId));
     } else {
       this.selectedItems.set([...current, item]);
     }
@@ -83,27 +84,32 @@ export class ShiftItemsComponent implements OnInit {
     while (fa.length) fa.removeAt(0);
     this.selectedItems().forEach(item => {
       fa.push(this.fb.group({
-        itemId: [item.id],
-        quantity: [1, [Validators.required, Validators.min(1), Validators.max(item.totalStorageStock)]],
-        marketPrice: [item.defaultPrice, [Validators.required, Validators.min(0)]],
-        currency: [item.currency, Validators.required],
+        itemId: [item.itemId],
+        quantity: [1, [Validators.required, Validators.min(1)]],
       }));
     });
   }
 
   async submit(): Promise<void> {
     if (this.quantityForm.invalid) return;
+    const warehouseId = this.warehouseState.defaultWarehouseId();
+    if (!warehouseId) {
+      this.notify.error('No warehouse', 'Please create a warehouse before shifting items');
+      return;
+    }
+
     this.saving.set(true);
     const items = this.itemsArray.getRawValue();
     try {
-      for (const item of items) {
-        const req: ShiftItemRequest = {
-          itemId: item.itemId,
-          quantity: item.quantity,
-          marketPrice: item.marketPrice,
-          currency: item.currency,
-        };
-        await this.stockState.shiftItem(this.marketId, req);
+      for (const row of items) {
+        await this.stockState.shiftToMarket({
+          itemId: row.itemId,
+          quantity: row.quantity,
+          sourceType: 'WAREHOUSE',
+          sourceId: warehouseId,
+          destinationType: 'MARKET',
+          destinationId: this.marketId,
+        });
       }
       this.router.navigate(['/markets', this.marketId]);
     } finally {

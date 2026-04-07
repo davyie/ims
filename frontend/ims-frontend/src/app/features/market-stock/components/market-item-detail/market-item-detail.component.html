@@ -1,26 +1,17 @@
-<div class="market-item-detail" *ngIf="marketItem() as mi">
-  <app-page-header title="Market Item" [breadcrumbs]="breadcrumbs"></app-page-header>
+<div class="market-item-detail" *ngIf="marketStock() as ms">
+  <app-page-header title="Market Stock Item" [breadcrumbs]="breadcrumbs"></app-page-header>
 
   <div class="detail-grid">
-    <!-- Stock Card -->
     <mat-card class="stock-card">
       <mat-card-header>
         <mat-card-title>Stock</mat-card-title>
       </mat-card-header>
       <mat-card-content>
         <div class="stock-metrics">
-          <div class="metric">
-            <span class="metric-value">{{ mi.allocatedStock }}</span>
-            <span class="metric-label">Allocated</span>
-          </div>
           <div class="metric accent">
-            <span class="metric-value">{{ mi.currentStock }}</span>
-            <span class="metric-label">Current</span>
-            <app-stock-level [stock]="mi.currentStock"></app-stock-level>
-          </div>
-          <div class="metric sold">
-            <span class="metric-value">{{ mi.allocatedStock - mi.currentStock }}</span>
-            <span class="metric-label">Sold</span>
+            <span class="metric-value">{{ ms.quantity }}</span>
+            <span class="metric-label">Current Stock</span>
+            <app-stock-level [stock]="ms.quantity"></app-stock-level>
           </div>
         </div>
 
@@ -42,10 +33,6 @@
               <mat-label>Quantity</mat-label>
               <input matInput type="number" formControlName="quantity" min="1">
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Note</mat-label>
-              <input matInput formControlName="note">
-            </mat-form-field>
             <div class="inline-actions">
               <button mat-stroked-button type="button" (click)="showIncrementForm.set(false)">Cancel</button>
               <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Apply</button>
@@ -58,118 +45,19 @@
           <form [formGroup]="decrementForm" (ngSubmit)="applyDecrement()">
             <mat-form-field appearance="outline">
               <mat-label>Quantity</mat-label>
-              <input matInput type="number" formControlName="quantity" min="1">
-            </mat-form-field>
-            <div class="price-row">
-              <mat-form-field appearance="outline" class="price-field">
-                <mat-label>Sale Price</mat-label>
-                <input matInput type="number" formControlName="salePrice" min="0" step="0.01">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="currency-field">
-                <mat-label>Currency</mat-label>
-                <mat-select formControlName="saleCurrency">
-                  <mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <mat-form-field appearance="outline">
-              <mat-label>Note</mat-label>
-              <input matInput formControlName="note">
+              <input matInput type="number" formControlName="quantity" min="1" [max]="ms.quantity">
             </mat-form-field>
             <div class="inline-actions">
               <button mat-stroked-button type="button" (click)="showDecrementForm.set(false)">Cancel</button>
-              <button mat-flat-button color="warn" type="submit" [disabled]="saving()">Record Sale</button>
-            </div>
-          </form>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Price Card -->
-    <mat-card class="price-card">
-      <mat-card-header>
-        <mat-card-title>Price</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="price-display">
-          <span class="price-value">{{ mi.marketPrice | currencyFormat:mi.currency }}</span>
-        </div>
-        <button mat-stroked-button (click)="showPriceForm.set(!showPriceForm())">
-          <mat-icon>edit</mat-icon> Edit Price
-        </button>
-
-        <div *ngIf="showPriceForm()" class="inline-form">
-          <form [formGroup]="priceForm" (ngSubmit)="updatePrice()">
-            <div class="price-row">
-              <mat-form-field appearance="outline" class="price-field">
-                <mat-label>Price</mat-label>
-                <input matInput type="number" formControlName="price" min="0" step="0.01">
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="currency-field">
-                <mat-label>Currency</mat-label>
-                <mat-select formControlName="currency">
-                  <mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-            <div class="inline-actions">
-              <button mat-stroked-button type="button" (click)="showPriceForm.set(false)">Cancel</button>
-              <button mat-flat-button color="primary" type="submit" [disabled]="saving()">Update</button>
+              <button mat-flat-button color="warn" type="submit" [disabled]="saving()">Apply</button>
             </div>
           </form>
         </div>
       </mat-card-content>
     </mat-card>
   </div>
+</div>
 
-  <!-- Transactions -->
-  <mat-card class="transactions-card">
-    <mat-card-header>
-      <mat-card-title>Transactions</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <table mat-table [dataSource]="transactions()" class="full-width" *ngIf="transactions().length > 0">
-        <ng-container matColumnDef="occurred">
-          <th mat-header-cell *matHeaderCellDef>Date</th>
-          <td mat-cell *matCellDef="let t">{{ t.occurredAt | dateFormat:'absolute' }}</td>
-        </ng-container>
-        <ng-container matColumnDef="type">
-          <th mat-header-cell *matHeaderCellDef>Type</th>
-          <td mat-cell *matCellDef="let t">
-            <app-status-badge [status]="t.type" type="transaction"></app-status-badge>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="delta">
-          <th mat-header-cell *matHeaderCellDef>Delta</th>
-          <td mat-cell *matCellDef="let t">
-            <span [class.positive]="t.quantityDelta > 0" [class.negative]="t.quantityDelta < 0">
-              {{ t.quantityDelta > 0 ? '+' : '' }}{{ t.quantityDelta }}
-            </span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="before">
-          <th mat-header-cell *matHeaderCellDef>Before</th>
-          <td mat-cell *matCellDef="let t">{{ t.stockBefore }}</td>
-        </ng-container>
-        <ng-container matColumnDef="after">
-          <th mat-header-cell *matHeaderCellDef>After</th>
-          <td mat-cell *matCellDef="let t">{{ t.stockAfter }}</td>
-        </ng-container>
-        <ng-container matColumnDef="sale-price">
-          <th mat-header-cell *matHeaderCellDef>Sale Price</th>
-          <td mat-cell *matCellDef="let t">
-            <span *ngIf="t.salePrice != null">{{ t.salePrice | currencyFormat:t.saleCurrency }}</span>
-            <span *ngIf="t.salePrice == null" class="na">—</span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="note">
-          <th mat-header-cell *matHeaderCellDef>Note</th>
-          <td mat-cell *matCellDef="let t">{{ t.note || '-' }}</td>
-        </ng-container>
-        <tr mat-header-row *matHeaderRowDef="txnColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: txnColumns"></tr>
-      </table>
-      <p *ngIf="transactions().length === 0" class="empty-msg">No transactions yet.</p>
-    </mat-card-content>
-  </mat-card>
+<div *ngIf="!marketStock() && !saving()" class="empty-msg" style="padding: 32px; text-align: center">
+  Stock entry not found for this item in this market.
 </div>

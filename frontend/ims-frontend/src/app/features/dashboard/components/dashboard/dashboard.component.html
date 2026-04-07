@@ -15,38 +15,26 @@
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="kpi-card kpi-lowstock">
+    <mat-card class="kpi-card kpi-items">
       <mat-card-content>
         <div class="kpi-content">
           <div class="kpi-info">
-            <span class="kpi-label">Low Stock Items</span>
-            <span class="kpi-value">{{ state.lowStockCount() }}</span>
+            <span class="kpi-label">Total Items</span>
+            <span class="kpi-value">{{ state.totalItemCount() }}</span>
           </div>
-          <mat-icon class="kpi-icon">warning</mat-icon>
+          <mat-icon class="kpi-icon">inventory_2</mat-icon>
         </div>
       </mat-card-content>
     </mat-card>
 
-    <mat-card class="kpi-card kpi-sold">
+    <mat-card class="kpi-card kpi-total-markets">
       <mat-card-content>
         <div class="kpi-content">
           <div class="kpi-info">
-            <span class="kpi-label">Total Items Sold</span>
-            <span class="kpi-value">{{ totalItemsSold }}</span>
+            <span class="kpi-label">Total Markets</span>
+            <span class="kpi-value">{{ state.markets().length }}</span>
           </div>
-          <mat-icon class="kpi-icon">sell</mat-icon>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="kpi-card kpi-revenue">
-      <mat-card-content>
-        <div class="kpi-content">
-          <div class="kpi-info">
-            <span class="kpi-label">Total Revenue</span>
-            <span class="kpi-value kpi-money">{{ totalRevenue | currencyFormat:currency }}</span>
-          </div>
-          <mat-icon class="kpi-icon">payments</mat-icon>
+          <mat-icon class="kpi-icon">bar_chart</mat-icon>
         </div>
       </mat-card-content>
     </mat-card>
@@ -59,54 +47,49 @@
       No markets are currently open.
     </div>
     <div class="markets-grid">
-      <mat-card *ngFor="let m of state.openMarkets()" class="market-card" [routerLink]="['/markets', m.id]">
+      <mat-card *ngFor="let m of state.openMarkets()" class="market-card" [routerLink]="['/markets', m.marketId]">
         <mat-card-header>
           <mat-card-title>{{ m.name }}</mat-card-title>
-          <mat-card-subtitle>{{ m.place }}</mat-card-subtitle>
+          <mat-card-subtitle>{{ m.location || '—' }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
-          <div class="market-dates">
-            <span><mat-icon inline>event</mat-icon> {{ m.openDate | dateFormat:'absolute' }}</span>
-            <span><mat-icon inline>event_busy</mat-icon> {{ m.closeDate | dateFormat:'absolute' }}</span>
+          <div class="market-meta">
+            <span>{{ m.marketType | titlecase }}</span>
           </div>
         </mat-card-content>
         <mat-card-actions>
           <app-status-badge [status]="m.status" type="market"></app-status-badge>
           <span class="spacer"></span>
-          <button mat-button color="primary" [routerLink]="['/markets', m.id, 'summary']">View Summary</button>
+          <button mat-button color="primary" [routerLink]="['/markets', m.marketId, 'summary']">View Summary</button>
         </mat-card-actions>
       </mat-card>
     </div>
   </div>
 
-  <!-- Markets Summary -->
-  <div class="section" *ngIf="state.allSummary() as summary">
-    <h2 class="section-title">Markets Performance</h2>
+  <!-- All Markets -->
+  <div class="section" *ngIf="state.markets().length > 0">
+    <h2 class="section-title">All Markets</h2>
     <mat-card>
       <mat-card-content>
         <div class="table-scroll">
-        <table mat-table [dataSource]="summary.markets" class="full-width">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Market</th>
-            <td mat-cell *matCellDef="let m">
-              <a [routerLink]="['/markets', m.marketId]" class="link">{{ m.marketName }}</a>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="items">
-            <th mat-header-cell *matHeaderCellDef>Item Types</th>
-            <td mat-cell *matCellDef="let m">{{ m.totalItemTypes }}</td>
-          </ng-container>
-          <ng-container matColumnDef="sold">
-            <th mat-header-cell *matHeaderCellDef>Sold</th>
-            <td mat-cell *matCellDef="let m">{{ m.totalSold }}</td>
-          </ng-container>
-          <ng-container matColumnDef="revenue">
-            <th mat-header-cell *matHeaderCellDef>Revenue</th>
-            <td mat-cell *matCellDef="let m">{{ m.totalRevenue | currencyFormat:m.currency }}</td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="['name','items','sold','revenue']"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['name','items','sold','revenue']"></tr>
-        </table>
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>Market</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of state.markets()" [routerLink]="['/markets', m.marketId]" class="clickable-row">
+                <td><a [routerLink]="['/markets', m.marketId]" class="link">{{ m.name }}</a></td>
+                <td>{{ m.marketType | titlecase }}</td>
+                <td>{{ m.location || '—' }}</td>
+                <td><app-status-badge [status]="m.status" type="market"></app-status-badge></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </mat-card-content>
     </mat-card>

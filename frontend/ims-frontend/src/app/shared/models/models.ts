@@ -1,197 +1,199 @@
-export interface Category {
-  id: string;
-  name: string;
-  createdAt: string;
-}
-
-export interface CreateCategoryRequest {
-  name: string;
-}
-
-export interface Money { amount: number; currency: string; }
-export interface StoragePosition { zone: string; shelf: string; row: number; column: number; }
+// ---- Backend domain models ----
 
 export interface Item {
-  id: string;
+  itemId: string;
+  userId: string;
   sku: string;
   name: string;
   description?: string;
-  category: string;
-  defaultPrice: number;
-  currency: string;
-  zone: string;
-  shelf: string;
-  row: number;
-  column: number;
-  totalStorageStock: number;
+  category?: string;
+  unitOfMeasure?: string;
+  unitPrice?: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface Market {
-  id: string;
+export interface Warehouse {
+  warehouseId: string;
+  userId: string;
   name: string;
-  place: string;
-  openDate: string;
-  closeDate: string;
-  status: 'SCHEDULED' | 'OPEN' | 'CLOSED';
+  address?: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
   createdAt: string;
+  updatedAt: string;
 }
 
-export interface MarketItem {
-  id: string;
+export interface WarehouseStock {
+  stockId: string;
+  warehouseId: string;
+  itemId: string;
+  quantity: number;
+  reservedQty: number;
+  binLocation?: string;
+  reorderLevel: number;
+  lastUpdated: string;
+}
+
+export type MarketType = 'FARMERS_MARKET' | 'RETAIL' | 'WHOLESALE' | 'POP_UP' | 'OTHER';
+export type MarketStatus = 'SCHEDULED' | 'OPEN' | 'CLOSED' | 'ARCHIVED' | 'SUSPENDED';
+
+export interface Market {
   marketId: string;
-  itemId: string;
-  allocatedStock: number;
-  currentStock: number;
-  marketPrice: number;
-  currency: string;
-}
-
-export type TransactionType =
-  | 'SHIFT_TO_MARKET'
-  | 'SALE'
-  | 'RETURN_FROM_MARKET'
-  | 'STOCK_ADJUSTMENT'
-  | 'INCREMENT';
-
-export interface Transaction {
-  id: string;
-  marketId?: string;
-  itemId: string;
-  type: TransactionType;
-  quantityDelta: number;
-  stockBefore: number;
-  stockAfter: number;
-  note?: string;
-  occurredAt: string;
-  createdBy: string;
-  salePrice?: number;
-  saleCurrency?: string;
-}
-
-export interface MarketItemSummary {
-  itemId: string;
-  itemName: string;
-  sku: string;
-  allocatedStock: number;
-  currentStock: number;
-  sold: number;
-  revenue: number;
-  currency: string;
-}
-
-export interface MarketSummary {
-  marketId: string;
-  marketName: string;
-  totalItemTypes: number;
-  totalAllocatedStock: number;
-  totalCurrentStock: number;
-  totalSold: number;
-  totalRevenue: number;
-  currency: string;
-  items: MarketItemSummary[];
-}
-
-export interface AllMarketsSummary {
-  totalMarkets: number;
-  totalItemsSold: number;
-  totalRevenue: number;
-  currency: string;
-  markets: MarketSummary[];
-}
-
-export interface StorageItem {
-  itemId: string;
-  sku: string;
+  userId: string;
   name: string;
-  category: string;
-  currentStock: number;
+  location?: string;
+  marketType: MarketType;
+  status: MarketStatus;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface StorageSummary {
-  items: StorageItem[];
+export interface MarketStock {
+  marketStockId: string;
+  marketId: string;
+  itemId: string;
+  quantity: number;
+  lastUpdated: string;
+}
+
+export type LocationType = 'WAREHOUSE' | 'MARKET';
+export type TransferStatus = 'PENDING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
+
+export interface Transfer {
+  transferId: string;
+  userId: string;
+  itemId: string;
+  quantity: number;
+  sourceType: LocationType;
+  sourceId: string;
+  destinationType: LocationType;
+  destinationId: string;
+  status: TransferStatus;
+  failureReason?: string;
+  correlationId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TransactionRecord {
+  recordId: string;
+  eventId: string;
+  correlationId?: string;
+  eventType: string;
+  originService: string;
+  entityId?: string;
+  userId?: string;
+  occurredAt?: string;
+  recordedAt: string;
+  payload?: string;
+  kafkaTopic?: string;
+  kafkaPartition?: number;
+}
+
+export interface EventProjectionDocument {
+  id: string;
+  eventId: string;
+  eventType: string;
+  originService: string;
+  entityId?: string;
+  userId?: string;
+  occurredAt?: string;
+  recordedAt?: string;
+  payload?: Record<string, unknown>;
 }
 
 export interface Page<T> {
   content: T[];
   totalElements: number;
   totalPages: number;
-  number: number;
+  page: number;
   size: number;
+}
+
+// Category — no backend support, managed locally
+export interface Category {
+  id: string;
+  name: string;
+}
+
+// Combined view for storage overview (WarehouseStock + Item lookup)
+export interface StorageItem {
+  itemId: string;
+  sku: string;
+  name: string;
+  category?: string;
+  currentStock: number;
+  binLocation?: string;
+  warehouseId: string;
 }
 
 // ---- Request DTOs ----
 
-export interface RegisterItemRequest {
+export interface CreateItemRequest {
   sku: string;
   name: string;
   description?: string;
-  category: string;
-  defaultPrice: number;
-  currency: string;
-  zone: string;
-  shelf: string;
-  row: number;
-  column: number;
-  initialStock: number;
+  category?: string;
+  unitOfMeasure?: string;
+  unitPrice?: number;
 }
 
 export interface UpdateItemRequest {
   name: string;
   description?: string;
-  category: string;
-  defaultPrice: number;
-  currency: string;
-  zone: string;
-  shelf: string;
-  row: number;
-  column: number;
+  category?: string;
+  unitOfMeasure?: string;
+  unitPrice?: number;
 }
 
-export interface AdjustStockRequest {
-  delta: number;
-  note?: string;
-  createdBy?: string;
+export interface CreateWarehouseRequest {
+  name: string;
+  address?: string;
+}
+
+export interface AddStockRequest {
+  itemId: string;
+  quantity: number;
+  binLocation?: string;
+}
+
+export interface RemoveStockRequest {
+  itemId: string;
+  quantity: number;
+}
+
+export interface WarehouseAdjustStockRequest {
+  itemId: string;
+  newQuantity: number;
 }
 
 export interface CreateMarketRequest {
   name: string;
-  place: string;
-  openDate: string;
-  closeDate: string;
+  location?: string;
+  marketType: MarketType;
+  description?: string;
 }
 
 export interface UpdateMarketRequest {
-  name: string;
-  place: string;
-  openDate: string;
-  closeDate: string;
+  name?: string;
+  location?: string;
+  description?: string;
 }
 
-export interface ShiftItemRequest {
+export interface StockOperationRequest {
   itemId: string;
   quantity: number;
-  marketPrice: number;
-  currency: string;
-  createdBy?: string;
 }
 
-export interface IncrementStockRequest {
+export interface CreateTransferRequest {
+  itemId: string;
   quantity: number;
-  note?: string;
-  createdBy?: string;
+  sourceType: LocationType;
+  sourceId: string;
+  destinationType: LocationType;
+  destinationId: string;
 }
 
-export interface DecrementStockRequest {
-  quantity: number;
-  note?: string;
-  createdBy?: string;
-  salePrice?: number;
-  saleCurrency?: string;
-}
-
-export interface SetPriceRequest {
-  price: number;
-  currency: string;
-}
+// Aliases kept for component compatibility
+export type RegisterItemRequest = CreateItemRequest;

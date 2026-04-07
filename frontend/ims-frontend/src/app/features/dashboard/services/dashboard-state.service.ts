@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Market, Transaction, AllMarketsSummary, Item } from '../../../shared/models/models';
+import { Market, Item } from '../../../shared/models/models';
 import { MarketApiService } from '../../markets/services/market-api.service';
 import { ItemApiService } from '../../items/services/item-api.service';
 import { forkJoin } from 'rxjs';
@@ -9,30 +9,24 @@ export class DashboardStateService {
   private marketApi = inject(MarketApiService);
   private itemApi = inject(ItemApiService);
 
-  readonly openMarkets = signal<Market[]>([]);
+  readonly markets = signal<Market[]>([]);
   readonly allItems = signal<Item[]>([]);
-  readonly recentTransactions = signal<Transaction[]>([]);
-  readonly allSummary = signal<AllMarketsSummary | null>(null);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  readonly lowStockCount = computed(() =>
-    this.allItems().filter(i => i.totalStorageStock <= 5).length
-  );
-
+  readonly openMarkets = computed(() => this.markets().filter(m => m.status === 'OPEN'));
   readonly openMarketCount = computed(() => this.openMarkets().length);
+  readonly totalItemCount = computed(() => this.allItems().length);
 
   loadDashboard(): void {
     this.loading.set(true);
     forkJoin({
-      openMarkets: this.marketApi.getMarkets('OPEN'),
-      allItems: this.itemApi.getItems(),
-      allSummary: this.marketApi.getAllMarketsSummary(),
+      markets: this.marketApi.getMarkets(),
+      items: this.itemApi.getItems(),
     }).subscribe({
-      next: ({ openMarkets, allItems, allSummary }) => {
-        this.openMarkets.set(openMarkets);
-        this.allItems.set(allItems);
-        this.allSummary.set(allSummary);
+      next: ({ markets, items }) => {
+        this.markets.set(markets.content);
+        this.allItems.set(items.content);
         this.loading.set(false);
       },
       error: err => { this.error.set(err.message); this.loading.set(false); }

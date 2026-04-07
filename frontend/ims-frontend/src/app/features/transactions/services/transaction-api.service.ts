@@ -1,25 +1,31 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-import { Transaction } from '../../../shared/models/models';
+import { TransactionRecord, Page } from '../../../shared/models/models';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionApiService {
   private http = inject(HttpClient);
   private base = `${environment.apiBaseUrl}/transactions`;
-  private itemsBase = `${environment.apiBaseUrl}/items`;
-  private marketsBase = `${environment.apiBaseUrl}/markets`;
 
-  getAllTransactions(): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(this.base);
+  getTransactions(options: {
+    userId?: string;
+    service?: string;
+    eventType?: string;
+    page?: number;
+    size?: number;
+  } = {}): Observable<Page<TransactionRecord>> {
+    let params = new HttpParams()
+      .set('page', options.page ?? 0)
+      .set('size', options.size ?? 50);
+    if (options.userId) params = params.set('userId', options.userId);
+    if (options.service) params = params.set('service', options.service);
+    if (options.eventType) params = params.set('eventType', options.eventType);
+    return this.http.get<Page<TransactionRecord>>(this.base, { params });
   }
 
-  getItemTransactions(itemId: string): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(`${this.itemsBase}/${itemId}/transactions`);
-  }
-
-  getMarketItemTransactions(marketId: string, itemId: string): Observable<Transaction[]> {
-    return this.http.get<Transaction[]>(`${this.marketsBase}/${marketId}/items/${itemId}/transactions`);
+  getCorrelationChain(correlationId: string): Observable<TransactionRecord[]> {
+    return this.http.get<TransactionRecord[]>(`${this.base}/${correlationId}/chain`);
   }
 }

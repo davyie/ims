@@ -9,11 +9,11 @@
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" type="email" placeholder="admin@ims.com" autocomplete="email">
-          <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="form.get('email')?.hasError('required')">Email is required</mat-error>
-          <mat-error *ngIf="form.get('email')?.hasError('email')">Enter a valid email</mat-error>
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username" type="text" placeholder="admin" autocomplete="username">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="form.get('username')?.hasError('required')">Username is required</mat-error>
+          <mat-error *ngIf="form.get('username')?.hasError('minlength')">Min 3 characters</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -32,6 +32,10 @@
           <span *ngIf="!loading()">Sign In</span>
         </button>
       </form>
+
+      <div class="signup-link">
+        Don't have an account? <a routerLink="/signup">Sign up</a>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

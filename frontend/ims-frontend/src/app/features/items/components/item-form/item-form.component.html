@@ -32,58 +32,31 @@
             <mat-form-field appearance="outline">
               <mat-label>Category</mat-label>
               <mat-select formControlName="category">
+                <mat-option value="">— None —</mat-option>
                 <mat-option *ngFor="let c of categoryState.categories()" [value]="c.name">{{ c.name }}</mat-option>
               </mat-select>
-              <mat-error *ngIf="form.get('category')?.hasError('required')">Category is required</mat-error>
             </mat-form-field>
 
-            <div class="price-row">
-              <mat-form-field appearance="outline" class="price-field">
-                <mat-label>Default Price</mat-label>
-                <input matInput type="number" formControlName="defaultPrice" min="0" step="0.01">
-                <mat-error *ngIf="form.get('defaultPrice')?.hasError('required')">Price is required</mat-error>
-                <mat-error *ngIf="form.get('defaultPrice')?.hasError('min')">Must be >= 0</mat-error>
-              </mat-form-field>
-              <mat-form-field appearance="outline" class="currency-field">
-                <mat-label>Currency</mat-label>
-                <mat-select formControlName="currency">
-                  <mat-option *ngFor="let c of currencies" [value]="c">{{ c }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+            <mat-form-field appearance="outline">
+              <mat-label>Unit of Measure</mat-label>
+              <mat-select formControlName="unitOfMeasure">
+                <mat-option *ngFor="let u of unitOfMeasures" [value]="u">{{ u }}</mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
-        </div>
 
-        <div class="form-section">
-          <h3 class="section-label">Storage Location</h3>
           <div class="field-row">
             <mat-form-field appearance="outline">
-              <mat-label>Zone</mat-label>
-              <input matInput formControlName="zone" placeholder="e.g. A">
-              <mat-error>Zone is required</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Shelf</mat-label>
-              <input matInput formControlName="shelf" placeholder="e.g. S1">
-              <mat-error>Shelf is required</mat-error>
-            </mat-form-field>
-          </div>
-          <div class="field-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Row</mat-label>
-              <input matInput type="number" formControlName="row" min="1">
-              <mat-error>Row must be >= 1</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Column</mat-label>
-              <input matInput type="number" formControlName="column" min="1">
-              <mat-error>Column must be >= 1</mat-error>
+              <mat-label>Unit Price</mat-label>
+              <input matInput type="number" formControlName="unitPrice" min="0" step="0.01" placeholder="Optional">
+              <mat-error *ngIf="form.get('unitPrice')?.hasError('min')">Must be >= 0</mat-error>
             </mat-form-field>
           </div>
         </div>
 
         <div class="form-section" *ngIf="!isEdit">
           <h3 class="section-label">Initial Stock</h3>
+          <p class="section-hint">Stock will be added to your default warehouse.</p>
           <mat-form-field appearance="outline">
             <mat-label>Initial Stock Quantity</mat-label>
             <input matInput type="number" formControlName="initialStock" min="0">

@@ -27,23 +27,23 @@
   </app-empty-state>
 
   <div class="markets-grid">
-    <mat-card *ngFor="let m of filteredMarkets()" class="market-card" [routerLink]="['/markets', m.id]">
+    <mat-card *ngFor="let m of filteredMarkets()" class="market-card" [routerLink]="['/markets', m.marketId]">
       <mat-card-header>
         <mat-card-title>{{ m.name }}</mat-card-title>
         <mat-card-subtitle>
-          <mat-icon inline>location_on</mat-icon> {{ m.place }}
+          <mat-icon inline>location_on</mat-icon> {{ m.location || '—' }}
         </mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
         <div class="market-meta">
           <div class="meta-row">
-            <mat-icon>event</mat-icon>
-            <span>{{ m.openDate | dateFormat:'absolute' }}</span>
+            <mat-icon>category</mat-icon>
+            <span>{{ m.marketType | titlecase }}</span>
           </div>
-          <div class="meta-row">
-            <mat-icon>event_busy</mat-icon>
-            <span>{{ m.closeDate | dateFormat:'absolute' }}</span>
+          <div class="meta-row" *ngIf="m.description">
+            <mat-icon>notes</mat-icon>
+            <span class="meta-desc">{{ m.description }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -69,7 +69,7 @@
           matTooltip="Close Market">
           <mat-icon>stop</mat-icon>
         </button>
-        <button mat-icon-button [routerLink]="['/markets', m.id, 'summary']"
+        <button mat-icon-button [routerLink]="['/markets', m.marketId, 'summary']"
           (click)="$event.stopPropagation()"
           matTooltip="View Summary">
           <mat-icon>bar_chart</mat-icon>

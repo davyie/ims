@@ -37,7 +37,7 @@ export class StorageOverviewComponent implements OnInit {
     return this.state.storageItems().filter(i =>
       i.name.toLowerCase().includes(term) ||
       i.sku.toLowerCase().includes(term) ||
-      i.category.toLowerCase().includes(term)
+      (i.category ?? '').toLowerCase().includes(term)
     );
   });
 
@@ -45,7 +45,7 @@ export class StorageOverviewComponent implements OnInit {
     const items = this.filteredItems();
     const zoneMap = new Map<string, StorageItem[]>();
     items.forEach(item => {
-      const zone = item.category; // group by category as zone proxy
+      const zone = item.category ?? 'Uncategorized';
       if (!zoneMap.has(zone)) zoneMap.set(zone, []);
       zoneMap.get(zone)!.push(item);
     });

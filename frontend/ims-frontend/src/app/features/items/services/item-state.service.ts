@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Item, RegisterItemRequest, UpdateItemRequest, AdjustStockRequest } from '../../../shared/models/models';
+import { Item, CreateItemRequest, UpdateItemRequest } from '../../../shared/models/models';
 import { ItemApiService } from './item-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 
@@ -13,11 +13,11 @@ export class ItemStateService {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
-  loadItems(category?: string): void {
+  loadItems(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.api.getItems(category).subscribe({
-      next: items => { this.items.set(items); this.loading.set(false); },
+    this.api.getItems().subscribe({
+      next: page => { this.items.set(page.content); this.loading.set(false); },
       error: err => { this.error.set(err.message); this.loading.set(false); }
     });
   }
@@ -30,15 +30,15 @@ export class ItemStateService {
     });
   }
 
-  registerItem(cmd: RegisterItemRequest): Promise<Item> {
+  createItem(cmd: CreateItemRequest): Promise<Item> {
     return new Promise((resolve, reject) => {
-      this.api.registerItem(cmd).subscribe({
+      this.api.createItem(cmd).subscribe({
         next: item => {
           this.items.update(items => [...items, item]);
-          this.notify.success(`Item "${item.name}" registered`);
+          this.notify.success(`Item "${item.name}" created`);
           resolve(item);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
@@ -47,12 +47,12 @@ export class ItemStateService {
     return new Promise((resolve, reject) => {
       this.api.updateItem(id, cmd).subscribe({
         next: item => {
-          this.items.update(items => items.map(i => i.id === id ? item : i));
+          this.items.update(items => items.map(i => i.itemId === id ? item : i));
           this.selectedItem.set(item);
           this.notify.success(`Item "${item.name}" updated`);
           resolve(item);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
@@ -61,26 +61,12 @@ export class ItemStateService {
     return new Promise((resolve, reject) => {
       this.api.deleteItem(id).subscribe({
         next: () => {
-          this.items.update(items => items.filter(i => i.id !== id));
-          if (this.selectedItem()?.id === id) this.selectedItem.set(null);
+          this.items.update(items => items.filter(i => i.itemId !== id));
+          if (this.selectedItem()?.itemId === id) this.selectedItem.set(null);
           this.notify.success('Item deleted');
           resolve();
         },
-        error: err => { reject(err); }
-      });
-    });
-  }
-
-  adjustStock(id: string, cmd: AdjustStockRequest): Promise<Item> {
-    return new Promise((resolve, reject) => {
-      this.api.adjustStock(id, cmd).subscribe({
-        next: item => {
-          this.items.update(items => items.map(i => i.id === id ? item : i));
-          this.selectedItem.set(item);
-          this.notify.success('Stock adjusted');
-          resolve(item);
-        },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }

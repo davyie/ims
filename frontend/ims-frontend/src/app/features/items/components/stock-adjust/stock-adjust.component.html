@@ -11,18 +11,6 @@
     <span class="item-sku">{{ item.sku }}</span>
   </div>
 
-  <div class="stock-preview">
-    <div class="preview-box current">
-      <span class="preview-label">Current</span>
-      <span class="preview-value">{{ item.totalStorageStock }}</span>
-    </div>
-    <mat-icon class="arrow-icon">arrow_forward</mat-icon>
-    <div class="preview-box new" [class.positive]="newStock > item.totalStorageStock" [class.negative]="newStock < item.totalStorageStock">
-      <span class="preview-label">New</span>
-      <span class="preview-value">{{ newStock }}</span>
-    </div>
-  </div>
-
   <mat-divider></mat-divider>
 
   <form [formGroup]="form" (ngSubmit)="submit()" class="adjust-form">
@@ -33,22 +21,12 @@
       <mat-form-field appearance="outline" class="delta-field">
         <mat-label>Delta</mat-label>
         <input matInput type="number" formControlName="delta">
-        <mat-hint>Positive to add, negative to remove</mat-hint>
+        <mat-hint>Positive to add stock, negative to remove</mat-hint>
       </mat-form-field>
       <button mat-icon-button type="button" (click)="increment()" color="primary">
         <mat-icon>add</mat-icon>
       </button>
     </div>
-
-    <mat-form-field appearance="outline" class="full-field">
-      <mat-label>Note (optional)</mat-label>
-      <textarea matInput formControlName="note" rows="2" placeholder="Reason for adjustment..."></textarea>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-field">
-      <mat-label>Created By</mat-label>
-      <input matInput formControlName="createdBy">
-    </mat-form-field>
 
     <div class="panel-actions">
       <button mat-stroked-button type="button" (click)="close.emit()">Cancel</button>

@@ -14,9 +14,9 @@ import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { Market } from '../../../../shared/models/models';
+import { Market, MarketStatus } from '../../../../shared/models/models';
 
-type TabStatus = 'ALL' | 'SCHEDULED' | 'OPEN' | 'CLOSED';
+type TabStatus = 'ALL' | MarketStatus;
 
 @Component({
   selector: 'app-market-list',
@@ -67,12 +67,12 @@ export class MarketListComponent implements OnInit {
       }
     });
     const confirmed = await ref.afterClosed().toPromise();
-    if (confirmed) await this.state.openMarket(market.id);
+    if (confirmed) await this.state.openMarket(market.marketId);
   }
 
   editMarket(market: Market, event: Event): void {
     event.stopPropagation();
-    this.router.navigate(['/markets', market.id, 'edit']);
+    this.router.navigate(['/markets', market.marketId, 'edit']);
   }
 
   async deleteMarket(market: Market, event: Event): Promise<void> {
@@ -86,7 +86,7 @@ export class MarketListComponent implements OnInit {
       }
     });
     const confirmed = await ref.afterClosed().toPromise();
-    if (confirmed) await this.state.deleteMarket(market.id);
+    if (confirmed) await this.state.deleteMarket(market.marketId);
   }
 
   async closeMarket(market: Market, event: Event): Promise<void> {
@@ -94,11 +94,11 @@ export class MarketListComponent implements OnInit {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
         title: 'Close Market',
-        message: `Close "${market.name}"? This will finalize all stock.`,
+        message: `Close "${market.name}"?`,
         confirmLabel: 'Close', confirmColor: 'warn'
       }
     });
     const confirmed = await ref.afterClosed().toPromise();
-    if (confirmed) await this.state.closeMarket(market.id);
+    if (confirmed) await this.state.closeMarket(market.marketId);
   }
 }

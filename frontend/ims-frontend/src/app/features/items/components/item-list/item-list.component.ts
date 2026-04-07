@@ -13,7 +13,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { ItemStateService } from '../../services/item-state.service';
 import { CategoryStateService } from '../../../categories/services/category-state.service';
-import { StockLevelComponent } from '../../../../shared/components/stock-level/stock-level.component';
 import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
@@ -27,7 +26,7 @@ import { Item } from '../../../../shared/models/models';
     CommonModule, RouterModule, FormsModule,
     MatTableModule, MatInputModule, MatButtonModule, MatIconModule,
     MatChipsModule, MatPaginatorModule, MatCardModule, MatTooltipModule,
-    StockLevelComponent, CurrencyFormatPipe, PageHeaderComponent, EmptyStateComponent,
+    CurrencyFormatPipe, PageHeaderComponent, EmptyStateComponent,
     ConfirmDialogComponent
   ],
   templateUrl: './item-list.component.html',
@@ -44,7 +43,7 @@ export class ItemListComponent implements OnInit {
   pageIndex = signal(0);
   pageSize = signal(10);
 
-  displayedColumns = ['sku', 'name', 'category', 'price', 'stock', 'actions'];
+  displayedColumns = ['sku', 'name', 'category', 'price', 'actions'];
 
   filteredItems = computed(() => {
     let items = this.state.items();
@@ -54,7 +53,7 @@ export class ItemListComponent implements OnInit {
       items = items.filter(i =>
         i.name.toLowerCase().includes(term) ||
         i.sku.toLowerCase().includes(term) ||
-        i.category.toLowerCase().includes(term)
+        (i.category ?? '').toLowerCase().includes(term)
       );
     }
     if (cat !== 'All') {
@@ -99,14 +98,14 @@ export class ItemListComponent implements OnInit {
       }
     });
     const confirmed = await ref.afterClosed().toPromise();
-    if (confirmed) await this.state.deleteItem(item.id);
+    if (confirmed) await this.state.deleteItem(item.itemId);
   }
 
   exportCsv(): void {
     const items = this.filteredItems();
-    const header = 'SKU,Name,Category,Price,Currency,Stock\n';
+    const header = 'SKU,Name,Category,Unit Price,Unit Of Measure\n';
     const rows = items.map(i =>
-      `"${i.sku}","${i.name}","${i.category}",${i.defaultPrice},"${i.currency}",${i.totalStorageStock}`
+      `"${i.sku}","${i.name}","${i.category ?? ''}",${i.unitPrice ?? ''},"${i.unitOfMeasure ?? ''}"`
     ).join('\n');
     const blob = new Blob([header + rows], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);

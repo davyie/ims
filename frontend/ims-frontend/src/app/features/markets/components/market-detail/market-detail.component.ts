@@ -12,19 +12,15 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MarketStateService } from '../../services/market-state.service';
 import { MarketStockStateService } from '../../../market-stock/services/market-stock-state.service';
 import { ItemStateService } from '../../../items/services/item-state.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
-import { CurrencyFormatPipe } from '../../../../shared/pipes/currency-format.pipe';
 import { StockLevelComponent } from '../../../../shared/components/stock-level/stock-level.component';
 import { PageHeaderComponent, Breadcrumb } from '../../../../shared/components/page-header/page-header.component';
 import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { TransactionApiService } from '../../../transactions/services/transaction-api.service';
-import { Transaction, MarketItem } from '../../../../shared/models/models';
-import { StatusBadgeComponent as SBadge } from '../../../../shared/components/status-badge/status-badge.component';
+import { MarketStock } from '../../../../shared/models/models';
 
 @Component({
   selector: 'app-market-detail',
@@ -33,9 +29,9 @@ import { StatusBadgeComponent as SBadge } from '../../../../shared/components/st
     CommonModule, RouterModule, ReactiveFormsModule,
     MatTabsModule, MatCardModule, MatButtonModule, MatIconModule,
     MatTableModule, MatDividerModule, MatTooltipModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule,
-    StatusBadgeComponent, DateFormatPipe, CurrencyFormatPipe,
-    StockLevelComponent, PageHeaderComponent
+    MatFormFieldModule, MatInputModule,
+    StatusBadgeComponent, DateFormatPipe,
+    StockLevelComponent, PageHeaderComponent, ConfirmDialogComponent
   ],
   templateUrl: './market-detail.component.html',
   styleUrls: ['./market-detail.component.scss']
@@ -47,20 +43,15 @@ export class MarketDetailComponent implements OnInit {
   stockState = inject(MarketStockStateService);
   private itemState = inject(ItemStateService);
   private dialog = inject(MatDialog);
-  private txnApi = inject(TransactionApiService);
 
-  transactions = signal<Transaction[]>([]);
   savingItemId = signal<string | null>(null);
   activeSaleItemId = signal<string | null>(null);
 
   saleForm = this.fb.group({
-    price: [0 as number, [Validators.required, Validators.min(0)]],
-    currency: ['SEK', Validators.required]
+    quantity: [1, [Validators.required, Validators.min(1)]]
   });
 
-  readonly currencies = ['SEK', 'EUR', 'USD', 'GBP', 'CHF'];
-  itemColumns = ['item', 'allocated', 'stock-control', 'price', 'actions'];
-  txnColumns = ['occurred', 'type', 'delta', 'before', 'after', 'note'];
+  itemColumns = ['item', 'stock-control', 'actions'];
 
   get id(): string { return this.route.snapshot.paramMap.get('id')!; }
 
@@ -73,43 +64,39 @@ export class MarketDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.state.loadMarket(this.id);
-    this.stockState.loadMarketItems(this.id);
+    this.stockState.loadMarketStock(this.id);
     this.itemState.loadItems();
   }
 
   getItemName(itemId: string): string {
-    return this.itemState.items().find(i => i.id === itemId)?.name ?? itemId.slice(0, 8) + '…';
+    return this.itemState.items().find(i => i.itemId === itemId)?.name ?? itemId.slice(0, 8) + '…';
   }
 
-  async quickIncrement(mi: MarketItem): Promise<void> {
-    this.savingItemId.set(mi.itemId);
+  async quickIncrement(ms: MarketStock): Promise<void> {
+    this.savingItemId.set(ms.itemId);
     try {
-      await this.stockState.increment(this.id, mi.itemId, { quantity: 1 });
+      await this.stockState.increment(this.id, { itemId: ms.itemId, quantity: 1 });
     } finally {
       this.savingItemId.set(null);
     }
   }
 
-  openSaleForm(mi: MarketItem): void {
-    if (mi.currentStock <= 0) return;
-    this.activeSaleItemId.set(mi.itemId);
-    this.saleForm.patchValue({ price: mi.marketPrice ?? 0, currency: mi.currency ?? 'SEK' });
+  openSaleForm(ms: MarketStock): void {
+    if (ms.quantity <= 0) return;
+    this.activeSaleItemId.set(ms.itemId);
+    this.saleForm.patchValue({ quantity: 1 });
   }
 
   cancelSale(): void {
     this.activeSaleItemId.set(null);
   }
 
-  async confirmSale(mi: MarketItem): Promise<void> {
+  async confirmSale(ms: MarketStock): Promise<void> {
     if (this.saleForm.invalid) return;
-    const v = this.saleForm.getRawValue();
-    this.savingItemId.set(mi.itemId);
+    const qty = this.saleForm.get('quantity')?.value ?? 1;
+    this.savingItemId.set(ms.itemId);
     try {
-      await this.stockState.decrement(this.id, mi.itemId, {
-        quantity: 1,
-        salePrice: v.price ?? undefined,
-        saleCurrency: v.currency ?? undefined
-      });
+      await this.stockState.decrement(this.id, { itemId: ms.itemId, quantity: qty });
       this.activeSaleItemId.set(null);
     } finally {
       this.savingItemId.set(null);

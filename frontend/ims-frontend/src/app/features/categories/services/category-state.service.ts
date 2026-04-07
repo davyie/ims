@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Category, CreateCategoryRequest } from '../../../shared/models/models';
+import { Category } from '../../../shared/models/models';
 import { CategoryApiService } from './category-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
 
@@ -10,18 +10,17 @@ export class CategoryStateService {
 
   readonly categories = signal<Category[]>([]);
   readonly loading = signal(false);
-  readonly error = signal<string | null>(null);
 
   loadCategories(): void {
+    if (this.categories().length > 0) return;
     this.loading.set(true);
-    this.error.set(null);
     this.api.getCategories().subscribe({
       next: cats => { this.categories.set(cats); this.loading.set(false); },
-      error: err => { this.error.set(err.message); this.loading.set(false); }
+      error: () => { this.loading.set(false); }
     });
   }
 
-  createCategory(req: CreateCategoryRequest): Promise<Category> {
+  createCategory(req: { name: string }): Promise<Category> {
     return new Promise((resolve, reject) => {
       this.api.createCategory(req).subscribe({
         next: cat => {
@@ -29,7 +28,7 @@ export class CategoryStateService {
           this.notify.success(`Category "${cat.name}" created`);
           resolve(cat);
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
@@ -39,10 +38,10 @@ export class CategoryStateService {
       this.api.deleteCategory(id).subscribe({
         next: () => {
           this.categories.update(cats => cats.filter(c => c.id !== id));
-          this.notify.success('Category deleted');
+          this.notify.success('Category removed');
           resolve();
         },
-        error: err => { reject(err); }
+        error: err => reject(err)
       });
     });
   }
