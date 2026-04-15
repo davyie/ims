@@ -10,10 +10,17 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TransactionStateService } from '../../services/transaction-state.service';
+import { ItemStateService } from '../../../items/services/item-state.service';
+import { WarehouseStateService } from '../../../storage/services/warehouse-state.service';
+import { MarketStateService } from '../../../markets/services/market-state.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { TransactionRecord } from '../../../../shared/models/models';
+
+interface EntityLabel { type: string; name: string; }
 
 @Component({
   selector: 'app-transaction-list',
@@ -22,14 +29,18 @@ import { TransactionRecord } from '../../../../shared/models/models';
     CommonModule, RouterModule, FormsModule,
     MatCardModule, MatTableModule, MatButtonModule, MatIconModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
-    MatPaginatorModule,
+    MatPaginatorModule, MatTooltipModule,
     DateFormatPipe, PageHeaderComponent
   ],
   templateUrl: './transaction-list.component.html',
   styleUrls: ['./transaction-list.component.scss']
 })
 export class TransactionListComponent implements OnInit {
-  txnState = inject(TransactionStateService);
+  txnState       = inject(TransactionStateService);
+  private itemState  = inject(ItemStateService);
+  private wh         = inject(WarehouseStateService);
+  private mkt        = inject(MarketStateService);
+  private auth       = inject(AuthService);
 
   selectedService = signal<string>('');
   selectedEventType = signal<string>('');
@@ -62,6 +73,47 @@ export class TransactionListComponent implements OnInit {
 
   ngOnInit(): void {
     this.txnState.loadTransactions({ size: 100 });
+    this.itemState.loadItems();
+    this.wh.loadWarehouses();
+    this.mkt.loadMarkets();
+  }
+
+  getEntityLabel(t: TransactionRecord): EntityLabel {
+    const p = this.parsePayload(t.payload);
+    if (p['warehouseId']) {
+      const wh = this.wh.warehouses().find(w => w.warehouseId === p['warehouseId']);
+      return { type: 'Warehouse', name: wh?.name ?? this.short(p['warehouseId']) };
+    }
+    if (p['marketId']) {
+      const mkt = this.mkt.markets().find(m => m.marketId === p['marketId']);
+      return { type: 'Market', name: mkt?.name ?? this.short(p['marketId']) };
+    }
+    if (p['transferId']) {
+      return { type: 'Transfer', name: this.short(p['transferId']) };
+    }
+    if (p['itemId']) {
+      const item = this.itemState.items().find(i => i.itemId === p['itemId']);
+      return { type: 'Item', name: item?.name ?? this.short(p['itemId']) };
+    }
+    if (t.entityId) {
+      return { type: '', name: this.short(t.entityId) };
+    }
+    return { type: '', name: '—' };
+  }
+
+  getUserLabel(userId: string | undefined): string {
+    if (!userId) return '—';
+    if (userId === this.auth.currentUserId()) return this.auth.currentUsername() ?? this.short(userId);
+    return this.short(userId);
+  }
+
+  private parsePayload(raw: string | undefined): Record<string, string> {
+    if (!raw) return {};
+    try { return JSON.parse(raw) as Record<string, string>; } catch { return {}; }
+  }
+
+  private short(id: string): string {
+    return id.slice(0, 8) + '…';
   }
 
   onPage(e: PageEvent): void {

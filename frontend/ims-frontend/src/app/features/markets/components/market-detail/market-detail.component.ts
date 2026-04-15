@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MarketStateService } from '../../services/market-state.service';
 import { MarketStockStateService } from '../../../market-stock/services/market-stock-state.service';
+import { MarketApiService } from '../../services/market-api.service';
 import { ItemStateService } from '../../../items/services/item-state.service';
 import { StatusBadgeComponent } from '../../../../shared/components/status-badge/status-badge.component';
 import { DateFormatPipe } from '../../../../shared/pipes/date-format.pipe';
@@ -38,17 +39,24 @@ import { MarketStock } from '../../../../shared/models/models';
 })
 export class MarketDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private fb = inject(FormBuilder);
   state = inject(MarketStateService);
   stockState = inject(MarketStockStateService);
+  private marketApi = inject(MarketApiService);
   private itemState = inject(ItemStateService);
   private dialog = inject(MatDialog);
 
   savingItemId = signal<string | null>(null);
   activeSaleItemId = signal<string | null>(null);
+  activeSetupItemId = signal<string | null>(null);
 
   saleForm = this.fb.group({
     quantity: [1, [Validators.required, Validators.min(1)]]
+  });
+
+  setupForm = this.fb.group({
+    delta: [null as number | null, [Validators.required, Validators.min(-9999), Validators.max(9999)]]
   });
 
   itemColumns = ['item', 'stock-control', 'actions'];
@@ -66,6 +74,14 @@ export class MarketDetailComponent implements OnInit {
     this.state.loadMarket(this.id);
     this.stockState.loadMarketStock(this.id);
     this.itemState.loadItems();
+
+    // If navigated here from a shift-items operation, the Kafka saga runs async
+    // (~700ms). Reload stock once after 1.5s to pick up the update.
+    const nav = this.router.getCurrentNavigation();
+    const shifted = nav?.extras?.state?.['shifted'] ?? history.state?.['shifted'];
+    if (shifted) {
+      setTimeout(() => this.stockState.loadMarketStock(this.id), 1500);
+    }
   }
 
   getItemName(itemId: string): string {
@@ -98,6 +114,30 @@ export class MarketDetailComponent implements OnInit {
     try {
       await this.stockState.decrement(this.id, { itemId: ms.itemId, quantity: qty });
       this.activeSaleItemId.set(null);
+    } finally {
+      this.savingItemId.set(null);
+    }
+  }
+
+  openSetupForm(ms: MarketStock): void {
+    this.activeSetupItemId.set(ms.itemId);
+    this.activeSaleItemId.set(null);
+    this.setupForm.reset({ delta: null });
+  }
+
+  cancelSetup(): void {
+    this.activeSetupItemId.set(null);
+  }
+
+  async confirmSetup(ms: MarketStock): Promise<void> {
+    if (this.setupForm.invalid) return;
+    const delta = this.setupForm.get('delta')?.value;
+    if (delta == null || delta === 0) return;
+    this.savingItemId.set(ms.itemId);
+    try {
+      await this.marketApi.setupAdjust(this.id, ms.itemId, delta).toPromise();
+      this.stockState.loadMarketStock(this.id);
+      this.activeSetupItemId.set(null);
     } finally {
       this.savingItemId.set(null);
     }

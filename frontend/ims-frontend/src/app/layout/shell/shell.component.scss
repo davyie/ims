@@ -8,29 +8,62 @@
   color: white;
   display: flex;
   flex-direction: column;
+  transition: width 0.25s ease;
+  overflow: hidden;
 }
+
+// ── Collapsed state (desktop only) ──────────────────────────────────────────
+
+.shell-sidenav.collapsed {
+
+  .sidenav-header {
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  .nav-label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .version {
+    display: none;
+  }
+}
+
+// ── Header ───────────────────────────────────────────────────────────────────
 
 .sidenav-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 16px 16px;
+  padding: 8px 4px 8px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
 
   .brand-icon {
     color: #FFD54F;
     font-size: 28px;
     width: 28px;
     height: 28px;
+    flex-shrink: 0;
   }
 
   .brand-name {
+    flex: 1;
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 1px;
     color: white;
+    transition: opacity 0.2s ease, width 0.25s ease;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }
+
+// ── Nav list ─────────────────────────────────────────────────────────────────
 
 .nav-list {
   flex: 1;
@@ -42,6 +75,7 @@
     margin-right: 12px;
     margin-bottom: 2px;
     transition: background 0.2s, color 0.2s;
+    overflow: hidden;
 
     &:hover {
       background: rgba(255, 255, 255, 0.1);
@@ -50,6 +84,7 @@
 
     mat-icon {
       color: rgba(255, 255, 255, 0.7);
+      flex-shrink: 0;
     }
 
     &.nav-active {
@@ -64,14 +99,34 @@
   }
 }
 
+.nav-label {
+  transition: opacity 0.2s ease, width 0.25s ease;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+
 .sidenav-footer {
   padding: 12px 16px;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
+
   .version {
     font-size: 11px;
     color: rgba(255, 255, 255, 0.4);
   }
 }
+
+.collapse-toggle {
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
+
+  &:hover {
+    color: white;
+  }
+}
+
+// ── Toolbar ──────────────────────────────────────────────────────────────────
 
 .app-toolbar {
   background: white !important;
@@ -79,9 +134,21 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   z-index: 100;
 
+  .menu-toggle {
+    margin-right: 4px;
+    display: none; // shown only on mobile via media query below
+  }
+
+  .toolbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: inherit;
+  }
+
   .toolbar-brand-icon {
     color: var(--primary);
-    margin-right: 8px;
     font-size: 22px;
     width: 22px;
     height: 22px;
@@ -102,6 +169,8 @@
   }
 }
 
+// ── Main content ─────────────────────────────────────────────────────────────
+
 .shell-content {
   display: flex;
   flex-direction: column;
@@ -115,7 +184,8 @@
   overflow-y: auto;
 }
 
-// Bottom navigation – hidden on desktop
+// ── Bottom navigation – hidden on desktop ────────────────────────────────────
+
 .bottom-nav {
   display: none;
 }
@@ -131,9 +201,7 @@
     padding-bottom: calc(60px + env(safe-area-inset-bottom) + 8px);
   }
 
-  .app-toolbar {
-    .toolbar-brand-icon { display: none; }
-  }
+  .menu-toggle { display: flex; }
 
   .bottom-nav {
     display: flex;

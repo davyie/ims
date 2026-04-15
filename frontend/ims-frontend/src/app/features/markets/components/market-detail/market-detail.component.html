@@ -75,7 +75,7 @@
               <ng-container matColumnDef="stock-control">
                 <th mat-header-cell *matHeaderCellDef>Stock</th>
                 <td mat-cell *matCellDef="let ms">
-                  <div class="stock-control">
+                  <div class="stock-control" *ngIf="market.status === 'OPEN'">
                     <button mat-icon-button color="warn"
                       matTooltip="Record sale / decrement"
                       [disabled]="ms.quantity <= 0 || savingItemId() === ms.itemId"
@@ -90,16 +90,26 @@
                       <mat-icon>add</mat-icon>
                     </button>
                   </div>
+                  <span *ngIf="market.status !== 'OPEN'" class="stock-num" [class.stock-zero]="ms.quantity === 0">
+                    {{ ms.quantity }}
+                  </span>
                 </td>
               </ng-container>
 
               <ng-container matColumnDef="actions">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell *matCellDef="let ms">
+                  <button mat-icon-button color="primary"
+                    *ngIf="market.status === 'SCHEDULED'"
+                    matTooltip="Adjust quantity"
+                    [disabled]="savingItemId() === ms.itemId"
+                    (click)="$event.stopPropagation(); openSetupForm(ms)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
                 </td>
               </ng-container>
 
-              <!-- Expandable sale form row -->
+              <!-- Expandable sale form row (OPEN markets) -->
               <ng-container matColumnDef="sale-form">
                 <td mat-cell *matCellDef="let ms" [attr.colspan]="itemColumns.length" class="sale-form-cell">
                   <form *ngIf="activeSaleItemId() === ms.itemId"
@@ -120,9 +130,31 @@
                 </td>
               </ng-container>
 
+              <!-- Expandable setup-adjust form row (SCHEDULED markets) -->
+              <ng-container matColumnDef="setup-form">
+                <td mat-cell *matCellDef="let ms" [attr.colspan]="itemColumns.length" class="sale-form-cell">
+                  <form *ngIf="activeSetupItemId() === ms.itemId"
+                    class="sale-form-panel" [formGroup]="setupForm" (ngSubmit)="confirmSetup(ms)">
+                    <span class="sale-form-label">Adjust quantity for <strong>{{ getItemName(ms.itemId) }}</strong></span>
+                    <mat-form-field appearance="outline" class="sale-price-field">
+                      <mat-label>Delta (+ add / - remove)</mat-label>
+                      <input matInput type="number" formControlName="delta" placeholder="e.g. 5 or -3">
+                    </mat-form-field>
+                    <button mat-flat-button color="primary" type="submit"
+                      [disabled]="setupForm.invalid || savingItemId() === ms.itemId">
+                      <mat-icon>check</mat-icon> {{ savingItemId() === ms.itemId ? 'Saving…' : 'Apply' }}
+                    </button>
+                    <button mat-icon-button type="button" matTooltip="Cancel" (click)="cancelSetup()">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </form>
+                </td>
+              </ng-container>
+
               <tr mat-header-row *matHeaderRowDef="itemColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: itemColumns" class="clickable-row"></tr>
               <tr mat-row *matRowDef="let row; columns: ['sale-form']" class="sale-form-row"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['setup-form']" class="sale-form-row"></tr>
             </table>
           </mat-card-content>
         </mat-card>

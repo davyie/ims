@@ -19,6 +19,11 @@ export class ReportApiService {
     return this.http.get<Page<EventProjectionDocument>>(`${this.base}/warehouse/${warehouseId}`, { params });
   }
 
+  getMarketSalesReport(page = 0, size = 1000): Observable<Page<EventProjectionDocument>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<Page<EventProjectionDocument>>(`${this.base}/markets/sales`, { params });
+  }
+
   getTransferReport(page = 0, size = 50): Observable<Page<EventProjectionDocument>> {
     const params = new HttpParams().set('page', page).set('size', size);
     return this.http.get<Page<EventProjectionDocument>>(`${this.base}/transfers`, { params });

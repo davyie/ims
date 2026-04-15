@@ -1,47 +1,150 @@
 <div class="all-markets-report">
-  <app-page-header title="Transfer History Report" [breadcrumbs]="[{label:'Reports'}]">
-    <button mat-stroked-button (click)="exportCsv()">
+  <app-page-header title="Market Sales Comparison" [breadcrumbs]="[{label:'Reports'}]">
+    <button mat-stroked-button (click)="exportCsv()" [disabled]="loading()">
       <mat-icon>download</mat-icon> Export CSV
     </button>
   </app-page-header>
 
-  <mat-card *ngIf="state.loading()">
-    <mat-card-content>
-      <p>Loading report...</p>
-    </mat-card-content>
-  </mat-card>
+  <!-- Loading -->
+  <div class="loading-wrap" *ngIf="loading()">
+    <mat-spinner diameter="40"></mat-spinner>
+    <span>Loading sales data…</span>
+  </div>
 
-  <mat-card *ngIf="!state.loading()">
-    <mat-card-header>
-      <mat-card-title>Transfer Events ({{ state.events().length }})</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <p *ngIf="state.events().length === 0" class="empty-msg">No transfer events recorded yet.</p>
-      <div class="table-scroll" *ngIf="state.events().length > 0">
-        <table mat-table [dataSource]="state.events()" class="full-width">
-          <ng-container matColumnDef="occurred">
-            <th mat-header-cell *matHeaderCellDef>Date</th>
-            <td mat-cell *matCellDef="let e">{{ (e.occurredAt || e.recordedAt) | dateFormat:'absolute' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="eventType">
-            <th mat-header-cell *matHeaderCellDef>Event Type</th>
-            <td mat-cell *matCellDef="let e"><span class="type-badge">{{ e.eventType }}</span></td>
-          </ng-container>
-          <ng-container matColumnDef="service">
-            <th mat-header-cell *matHeaderCellDef>Service</th>
-            <td mat-cell *matCellDef="let e">{{ e.originService }}</td>
-          </ng-container>
-          <ng-container matColumnDef="entityId">
-            <th mat-header-cell *matHeaderCellDef>Entity ID</th>
-            <td mat-cell *matCellDef="let e">
-              <span *ngIf="e.entityId" class="id-chip">{{ e.entityId | slice:0:8 }}…</span>
-              <span *ngIf="!e.entityId">—</span>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="eventColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: eventColumns"></tr>
-        </table>
-      </div>
-    </mat-card-content>
-  </mat-card>
+  <ng-container *ngIf="!loading()">
+
+    <!-- KPI summary -->
+    <div class="kpi-row">
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <span class="kpi-label">Markets</span>
+          <span class="kpi-value">{{ stats().length }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <span class="kpi-label">Sale Transactions</span>
+          <span class="kpi-value">{{ totalTransactions() }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="kpi-card">
+        <mat-card-content>
+          <span class="kpi-label">Total Units Sold</span>
+          <span class="kpi-value highlight">{{ totalUnitsSold() }}</span>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="kpi-card" *ngIf="topMarket()">
+        <mat-card-content>
+          <span class="kpi-label">Top Market</span>
+          <span class="kpi-value top">{{ topMarket()!.market.name }}</span>
+          <span class="kpi-sub">{{ topMarket()!.totalUnitsSold }} units sold</span>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- No data -->
+    <mat-card *ngIf="stats().length === 0">
+      <mat-card-content>
+        <p class="empty-msg">No markets found.</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Comparison table -->
+    <mat-card *ngIf="stats().length > 0">
+      <mat-card-header>
+        <mat-card-title>Sales by Market</mat-card-title>
+        <mat-card-subtitle>Ranked by units sold · sales = stock decrements</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="table-scroll">
+          <table mat-table [dataSource]="stats()" class="full-width">
+
+            <ng-container matColumnDef="market">
+              <th mat-header-cell *matHeaderCellDef>Market</th>
+              <td mat-cell *matCellDef="let r">
+                <a class="link" [routerLink]="['/markets', r.market.marketId]">{{ r.market.name }}</a>
+                <span class="location-sub" *ngIf="r.market.location">{{ r.market.location }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let r">
+                <app-status-badge [status]="r.market.status" type="market"></app-status-badge>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="transactions">
+              <th mat-header-cell *matHeaderCellDef class="num-col">Transactions</th>
+              <td mat-cell *matCellDef="let r" class="num-col">{{ r.totalTransactions }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="units">
+              <th mat-header-cell *matHeaderCellDef class="num-col">Units Sold</th>
+              <td mat-cell *matCellDef="let r" class="num-col">
+                <strong>{{ r.totalUnitsSold }}</strong>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="bar">
+              <th mat-header-cell *matHeaderCellDef>Relative Sales</th>
+              <td mat-cell *matCellDef="let r">
+                <div class="bar-wrap" [matTooltip]="r.totalUnitsSold + ' units'">
+                  <div class="bar-fill"
+                    [style.width]="barWidth(r.totalUnitsSold)"
+                    [class.bar-zero]="r.totalUnitsSold === 0">
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="top-item">
+              <th mat-header-cell *matHeaderCellDef>Top Item</th>
+              <td mat-cell *matCellDef="let r">
+                <ng-container *ngIf="r.topItems.length > 0">
+                  <span class="top-item-name">{{ getItemName(r.topItems[0].itemId) }}</span>
+                  <span class="top-item-qty">{{ r.topItems[0].unitsSold }} sold</span>
+                </ng-container>
+                <span *ngIf="r.topItems.length === 0" class="no-sales">No sales yet</span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="columns"></tr>
+            <tr mat-row *matRowDef="let row; columns: columns"
+              [class.row-no-sales]="row.totalUnitsSold === 0"></tr>
+          </table>
+        </div>
+
+        <!-- Per-market item breakdown -->
+        <ng-container *ngFor="let r of stats()">
+          <div class="breakdown-section" *ngIf="r.topItems.length > 0">
+            <div class="breakdown-header">
+              <mat-icon>store</mat-icon>
+              <a class="link" [routerLink]="['/markets', r.market.marketId]">{{ r.market.name }}</a>
+              <app-status-badge [status]="r.market.status" type="market"></app-status-badge>
+              <span class="breakdown-total">{{ r.totalUnitsSold }} units · {{ r.totalTransactions }} transactions</span>
+            </div>
+            <table mat-table [dataSource]="r.topItems" class="full-width items-table">
+              <ng-container matColumnDef="item">
+                <th mat-header-cell *matHeaderCellDef>Item</th>
+                <td mat-cell *matCellDef="let s">{{ getItemName(s.itemId) }}</td>
+              </ng-container>
+              <ng-container matColumnDef="txns">
+                <th mat-header-cell *matHeaderCellDef class="num-col">Transactions</th>
+                <td mat-cell *matCellDef="let s" class="num-col">{{ s.transactions }}</td>
+              </ng-container>
+              <ng-container matColumnDef="sold">
+                <th mat-header-cell *matHeaderCellDef class="num-col">Units Sold</th>
+                <td mat-cell *matCellDef="let s" class="num-col"><strong>{{ s.unitsSold }}</strong></td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="['item','txns','sold']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['item','txns','sold']"></tr>
+            </table>
+          </div>
+        </ng-container>
+
+      </mat-card-content>
+    </mat-card>
+
+  </ng-container>
 </div>

@@ -12,4 +12,10 @@ export class LoadingService {
   decrement(): void {
     this._counter.update(c => Math.max(0, c - 1));
   }
+
+  /** Hard reset — call on NavigationStart so a hung request from page A
+   *  never blocks interaction on page B. */
+  reset(): void {
+    this._counter.set(0);
+  }
 }

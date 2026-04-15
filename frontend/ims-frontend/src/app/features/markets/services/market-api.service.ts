@@ -50,4 +50,8 @@ export class MarketApiService {
   decrementStock(marketId: string, req: StockOperationRequest): Observable<MarketStock> {
     return this.http.post<MarketStock>(`${this.base}/${marketId}/stock/decrement`, req);
   }
+
+  setupAdjust(marketId: string, itemId: string, delta: number): Observable<MarketStock> {
+    return this.http.post<MarketStock>(`${this.base}/${marketId}/stock/setup-adjust`, { itemId, delta });
+  }
 }

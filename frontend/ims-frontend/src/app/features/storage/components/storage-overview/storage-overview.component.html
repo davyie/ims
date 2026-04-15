@@ -1,6 +1,74 @@
 <div class="storage-overview">
   <app-page-header title="Storage Overview" [breadcrumbs]="[{label:'Storage'}]">
+    <button mat-flat-button color="primary" (click)="openWarehouseForm()">
+      <mat-icon>add_business</mat-icon> New Warehouse
+    </button>
   </app-page-header>
+
+  <!-- Warehouse list -->
+  <mat-card class="warehouse-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon class="section-icon">warehouse</mat-icon>
+        Warehouses
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+
+      <!-- No warehouses state -->
+      <div *ngIf="warehouseState.warehouses().length === 0 && !warehouseState.loading()" class="no-warehouse-state">
+        <mat-icon class="no-warehouse-icon">warehouse</mat-icon>
+        <p>No warehouses yet. Create one to start tracking stock.</p>
+        <button mat-flat-button color="primary" (click)="openWarehouseForm()">
+          <mat-icon>add</mat-icon> Create Warehouse
+        </button>
+      </div>
+
+      <!-- Warehouse chips -->
+      <div *ngIf="warehouseState.warehouses().length > 0" class="warehouse-list">
+        <div *ngFor="let w of warehouseState.warehouses()" class="warehouse-chip">
+          <mat-icon class="wh-icon">store</mat-icon>
+          <div class="wh-info">
+            <span class="wh-name">{{ w.name }}</span>
+            <span *ngIf="w.address" class="wh-address">{{ w.address }}</span>
+          </div>
+          <span class="wh-status" [class.active]="w.status === 'ACTIVE'">{{ w.status }}</span>
+        </div>
+      </div>
+
+      <!-- Inline create form -->
+      <div *ngIf="showWarehouseForm()" class="warehouse-form">
+        <mat-divider *ngIf="warehouseState.warehouses().length > 0" class="form-divider"></mat-divider>
+        <h4 class="form-title">New Warehouse</h4>
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Warehouse Name</mat-label>
+            <input matInput [value]="newWarehouseName()"
+                   (input)="newWarehouseName.set($any($event.target).value)"
+                   placeholder="e.g. Main Warehouse"
+                   (keydown.enter)="createWarehouse()">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Address (optional)</mat-label>
+            <input matInput [value]="newWarehouseAddress()"
+                   (input)="newWarehouseAddress.set($any($event.target).value)"
+                   placeholder="e.g. 123 Main St"
+                   (keydown.enter)="createWarehouse()">
+          </mat-form-field>
+        </div>
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="cancelWarehouseForm()">Cancel</button>
+          <button mat-flat-button color="primary" type="button"
+                  [disabled]="!newWarehouseName().trim() || savingWarehouse()"
+                  (click)="createWarehouse()">
+            <mat-icon>save</mat-icon>
+            {{ savingWarehouse() ? 'Saving…' : 'Create Warehouse' }}
+          </button>
+        </div>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
 
   <!-- Low stock alert -->
   <div *ngIf="state.lowStockItems().length > 0" class="alert-banner">
@@ -28,9 +96,6 @@
         </span>
         <span class="stat">
           <strong>{{ state.lowStockItems().length }}</strong> out of stock
-        </span>
-        <span class="stat">
-          Total: <strong>{{ filteredItems().length }}</strong>
         </span>
       </div>
     </mat-card-content>

@@ -2,11 +2,13 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Item, CreateItemRequest, UpdateItemRequest } from '../../../shared/models/models';
 import { ItemApiService } from './item-api.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { CategoryApiService } from '../../categories/services/category-api.service';
 
 @Injectable({ providedIn: 'root' })
 export class ItemStateService {
   private api = inject(ItemApiService);
   private notify = inject(NotificationService);
+  private categoryApi = inject(CategoryApiService);
 
   readonly items = signal<Item[]>([]);
   readonly selectedItem = signal<Item | null>(null);
@@ -17,7 +19,12 @@ export class ItemStateService {
     this.loading.set(true);
     this.error.set(null);
     this.api.getItems().subscribe({
-      next: page => { this.items.set(page.content); this.loading.set(false); },
+      next: page => {
+        this.items.set(page.content);
+        this.loading.set(false);
+        const cats = page.content.map(i => i.category).filter((c): c is string => !!c);
+        this.categoryApi.seedFromItems(cats);
+      },
       error: err => { this.error.set(err.message); this.loading.set(false); }
     });
   }

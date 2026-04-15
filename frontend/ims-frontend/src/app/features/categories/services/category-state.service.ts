@@ -12,7 +12,6 @@ export class CategoryStateService {
   readonly loading = signal(false);
 
   loadCategories(): void {
-    if (this.categories().length > 0) return;
     this.loading.set(true);
     this.api.getCategories().subscribe({
       next: cats => { this.categories.set(cats); this.loading.set(false); },

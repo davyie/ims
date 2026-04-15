@@ -34,7 +34,7 @@ type TabStatus = 'ALL' | MarketStatus;
 export class MarketListComponent implements OnInit {
   state = inject(MarketStateService);
   private dialog = inject(MatDialog);
-  private router = inject(Router);
+  router = inject(Router);
 
   selectedTab = signal<TabStatus>('ALL');
   tabs: TabStatus[] = ['ALL', 'SCHEDULED', 'OPEN', 'CLOSED'];

@@ -111,7 +111,10 @@ export class ShiftItemsComponent implements OnInit {
           destinationId: this.marketId,
         });
       }
-      this.router.navigate(['/markets', this.marketId]);
+      this.router.navigate(['/markets', this.marketId], { state: { shifted: true } });
+    } catch (err: unknown) {
+      const msg = (err instanceof Error) ? err.message : 'Transfer failed';
+      this.notify.error('Shift failed', msg);
     } finally {
       this.saving.set(false);
     }

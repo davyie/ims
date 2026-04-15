@@ -35,7 +35,7 @@
         </mat-form-field>
 
         <div class="form-actions">
-          <button mat-stroked-button type="button" routerLink="/markets">Cancel</button>
+          <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
           <button mat-flat-button color="primary" type="submit" [disabled]="saving">
             <mat-icon>save</mat-icon>
             {{ saving ? 'Saving...' : (isEdit ? 'Update Market' : 'Create Market') }}

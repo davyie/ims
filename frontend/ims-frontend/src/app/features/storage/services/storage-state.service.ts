@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { StorageItem, Item, WarehouseStock } from '../../../shared/models/models';
+import { StorageItem, WarehouseStock } from '../../../shared/models/models';
 import { WarehouseApiService } from './warehouse-api.service';
 import { ItemApiService } from '../../items/services/item-api.service';
 
@@ -19,40 +19,59 @@ export class StorageStateService {
     this.loading.set(true);
     this.error.set(null);
 
-    // First load warehouses, then load stock for the first warehouse + items
-    this.warehouseApi.listWarehouses().subscribe({
-      next: warehousePage => {
+    // Load items and warehouses in parallel first
+    forkJoin([this.itemApi.getItems(), this.warehouseApi.listWarehouses()]).subscribe({
+      next: ([itemPage, warehousePage]) => {
+        const items = itemPage.content;
         const warehouses = warehousePage.content;
+
         if (warehouses.length === 0) {
-          this.storageItems.set([]);
+          // No warehouses yet — still show all items with zero stock
+          this.storageItems.set(items.map(item => ({
+            itemId: item.itemId,
+            sku: item.sku,
+            name: item.name,
+            category: item.category,
+            currentStock: 0,
+            warehouseId: '',
+          })));
           this.loading.set(false);
           return;
         }
 
-        // Load all stock across all warehouses and items
-        const stockRequests = warehouses.map(w => this.warehouseApi.listStock(w.warehouseId));
-        forkJoin([this.itemApi.getItems(), ...stockRequests]).subscribe({
-          next: ([itemPage, ...stockPages]) => {
-            const items = (itemPage as Awaited<typeof itemPage>).content as Item[];
-            const itemMap = new Map<string, Item>(items.map(i => [i.itemId, i]));
-
-            const combined: StorageItem[] = [];
-            (stockPages as Array<{ content: WarehouseStock[] }>).forEach((stockPage, idx) => {
+        // Load stock for every warehouse in parallel
+        forkJoin(warehouses.map(w => this.warehouseApi.listStock(w.warehouseId))).subscribe({
+          next: stockPages => {
+            // Build a map: itemId -> aggregated stock across all warehouses
+            const stockMap = new Map<string, { quantity: number; binLocation?: string; warehouseId: string }>();
+            stockPages.forEach((stockPage, idx) => {
               stockPage.content.forEach((stock: WarehouseStock) => {
-                const item = itemMap.get(stock.itemId);
-                combined.push({
-                  itemId: stock.itemId,
-                  sku: item?.sku ?? stock.itemId.slice(0, 8),
-                  name: item?.name ?? 'Unknown',
-                  category: item?.category,
-                  currentStock: stock.quantity,
-                  binLocation: stock.binLocation,
-                  warehouseId: warehouses[idx].warehouseId,
-                });
+                const existing = stockMap.get(stock.itemId);
+                if (existing) {
+                  existing.quantity += stock.quantity;
+                } else {
+                  stockMap.set(stock.itemId, {
+                    quantity: stock.quantity,
+                    binLocation: stock.binLocation,
+                    warehouseId: warehouses[idx].warehouseId,
+                  });
+                }
               });
             });
 
-            this.storageItems.set(combined);
+            // Every item appears — stock defaults to 0 if no warehouse record exists
+            this.storageItems.set(items.map(item => {
+              const stock = stockMap.get(item.itemId);
+              return {
+                itemId: item.itemId,
+                sku: item.sku,
+                name: item.name,
+                category: item.category,
+                currentStock: stock?.quantity ?? 0,
+                binLocation: stock?.binLocation,
+                warehouseId: stock?.warehouseId ?? warehouses[0].warehouseId,
+              };
+            }));
             this.loading.set(false);
           },
           error: err => { this.error.set(err.message); this.loading.set(false); }

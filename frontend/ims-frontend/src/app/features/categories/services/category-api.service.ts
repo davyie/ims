@@ -2,33 +2,50 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Category } from '../../../shared/models/models';
 
-// Categories are managed locally — the backend has no category service.
-// Items store category as a free-text string; this list provides the dropdown options.
-const PREDEFINED_CATEGORIES: Category[] = [
-  { id: '1', name: 'Food & Beverage' },
-  { id: '2', name: 'Clothing & Accessories' },
-  { id: '3', name: 'Crafts & Handmade' },
-  { id: '4', name: 'Plants & Garden' },
-  { id: '5', name: 'Home & Kitchen' },
-  { id: '6', name: 'Health & Beauty' },
-  { id: '7', name: 'Books & Media' },
-  { id: '8', name: 'Tools & Hardware' },
-  { id: '9', name: 'Toys & Games' },
-  { id: '10', name: 'Other' },
-];
+const STORAGE_KEY = 'ims_categories';
+
+function loadFromStorage(): Category[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveToStorage(cats: Category[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cats));
+}
 
 @Injectable({ providedIn: 'root' })
 export class CategoryApiService {
+
   getCategories(): Observable<Category[]> {
-    return of(PREDEFINED_CATEGORIES);
+    return of(loadFromStorage());
   }
 
   createCategory(req: { name: string }): Observable<Category> {
+    const cats = loadFromStorage();
+    const existing = cats.find(c => c.name.toLowerCase() === req.name.toLowerCase());
+    if (existing) return of(existing);
     const cat: Category = { id: Date.now().toString(), name: req.name };
+    saveToStorage([...cats, cat]);
     return of(cat);
   }
 
-  deleteCategory(_id: string): Observable<void> {
+  deleteCategory(id: string): Observable<void> {
+    const cats = loadFromStorage().filter(c => c.id !== id);
+    saveToStorage(cats);
     return of(undefined as void);
+  }
+
+  /** Adds categories from item data that are not already stored. */
+  seedFromItems(names: string[]): void {
+    const cats = loadFromStorage();
+    const existing = new Set(cats.map(c => c.name.toLowerCase()));
+    const toAdd = names
+      .filter(n => n && !existing.has(n.toLowerCase()))
+      .map(n => ({ id: Date.now().toString() + Math.random(), name: n }));
+    if (toAdd.length > 0) saveToStorage([...cats, ...toAdd]);
   }
 }

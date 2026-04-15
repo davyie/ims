@@ -1,6 +1,6 @@
-import { Component, inject, ViewChild, OnInit, signal } from '@angular/core';
+import { Component, inject, ViewChild, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { Router, RouterModule, NavigationEnd, NavigationStart } from '@angular/router';
 import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
@@ -11,12 +11,14 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { filter } from 'rxjs/operators';
 import { LoadingOverlayComponent } from '../../shared/components/loading-overlay/loading-overlay.component';
 import { AuthService } from '../../core/services/auth.service';
+import { LoadingService } from '../../core/services/loading.service';
 
 interface NavItem {
   label: string;
   shortLabel: string;
   icon: string;
   route: string;
+  bottomNav?: boolean;
 }
 
 @Component({
@@ -37,20 +39,33 @@ export class ShellComponent implements OnInit {
   private breakpoint = inject(BreakpointObserver);
   private router = inject(Router);
   auth = inject(AuthService);
+  private loading = inject(LoadingService);
 
   currentUrl = signal(this.router.url);
+  collapsed = signal(false);
+
+  sidenavWidth = computed(() => this.collapsed() ? '64px' : '240px');
 
   navItems: NavItem[] = [
-    { label: 'Dashboard', shortLabel: 'Home',   icon: 'dashboard',    route: '/dashboard' },
-    { label: 'Items',     shortLabel: 'Items',   icon: 'inventory_2',  route: '/items' },
-    { label: 'Markets',   shortLabel: 'Markets', icon: 'storefront',   route: '/markets' },
-    { label: 'Storage',   shortLabel: 'Storage', icon: 'warehouse',    route: '/storage' },
-    { label: 'Reports',   shortLabel: 'Reports', icon: 'bar_chart',    route: '/reports' },
-    { label: 'Txns',      shortLabel: 'Txns',    icon: 'receipt_long', route: '/transactions' },
-    { label: 'Categories', shortLabel: 'Cats',   icon: 'label',        route: '/categories' },
+    { label: 'Home',       shortLabel: 'Home',    icon: 'home',         route: '/dashboard',     bottomNav: true },
+    { label: 'Items',      shortLabel: 'Items',   icon: 'inventory_2',  route: '/items',          bottomNav: true },
+    { label: 'Markets',    shortLabel: 'Markets', icon: 'storefront',   route: '/markets',        bottomNav: true },
+    { label: 'Storage',    shortLabel: 'Storage', icon: 'warehouse',    route: '/storage',        bottomNav: true },
+    { label: 'Reports',    shortLabel: 'Reports', icon: 'bar_chart',    route: '/reports',        bottomNav: false },
+    { label: 'Txns',       shortLabel: 'Txns',    icon: 'receipt_long', route: '/transactions',   bottomNav: false },
+    { label: 'Categories', shortLabel: 'Cats',    icon: 'label',        route: '/categories',     bottomNav: false },
   ];
 
+  get bottomNavItems(): NavItem[] {
+    return this.navItems.filter(i => i.bottomNav);
+  }
+
   ngOnInit(): void {
+    this.router.events.pipe(filter(e => e instanceof NavigationStart)).subscribe(() => {
+      // Reset any stuck loading counter when a new navigation begins.
+      // This prevents a hung request from one page blocking the next page's UI.
+      this.loading.reset();
+    });
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((e: NavigationEnd) => {
       this.currentUrl.set(e.urlAfterRedirects);
     });
@@ -76,5 +91,9 @@ export class ShellComponent implements OnInit {
 
   toggleSidenav(): void {
     this.sidenav?.toggle();
+  }
+
+  toggleCollapsed(): void {
+    this.collapsed.update(v => !v);
   }
 }

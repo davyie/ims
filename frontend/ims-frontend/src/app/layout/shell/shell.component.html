@@ -2,11 +2,20 @@
   <mat-sidenav #sidenav
     [mode]="sidenavMode"
     [opened]="sidenavOpened"
-    class="shell-sidenav">
+    [style.width]="isMobile ? '240px' : sidenavWidth()"
+    class="shell-sidenav"
+    [class.collapsed]="collapsed() && !isMobile">
 
     <div class="sidenav-header">
-      <mat-icon class="brand-icon">inventory</mat-icon>
-      <span class="brand-name">IMS</span>
+      <ng-container *ngIf="!collapsed() || isMobile">
+        <mat-icon class="brand-icon">inventory</mat-icon>
+        <span class="brand-name">IMS</span>
+      </ng-container>
+      <button mat-icon-button class="collapse-toggle" (click)="toggleCollapsed()"
+              [matTooltip]="collapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
+              matTooltipPosition="right">
+        <mat-icon>{{ collapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      </button>
     </div>
 
     <mat-nav-list class="nav-list">
@@ -15,9 +24,11 @@
         [routerLink]="item.route"
         routerLinkActive="nav-active"
         [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+        [matTooltip]="collapsed() && !isMobile ? item.label : ''"
+        matTooltipPosition="right"
         (click)="isMobile && sidenav.close()">
         <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
-        <span matListItemTitle>{{ item.label }}</span>
+        <span matListItemTitle class="nav-label">{{ item.label }}</span>
       </a>
     </mat-nav-list>
 
@@ -28,9 +39,17 @@
 
   <mat-sidenav-content class="shell-content">
     <mat-toolbar class="app-toolbar">
-      <mat-icon class="toolbar-brand-icon">inventory</mat-icon>
-      <span class="toolbar-title">{{ isMobile ? currentPageLabel : 'Inventory Management System' }}</span>
+      <button mat-icon-button class="menu-toggle mobile-only" (click)="sidenav.toggle()" matTooltip="Menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <a routerLink="/dashboard" class="toolbar-brand" matTooltip="Go to Home">
+        <mat-icon class="toolbar-brand-icon">inventory</mat-icon>
+        <span class="toolbar-title">{{ isMobile ? currentPageLabel : 'Inventory Management System' }}</span>
+      </a>
       <span class="toolbar-spacer"></span>
+      <a mat-icon-button routerLink="/dashboard" matTooltip="Home">
+        <mat-icon>home</mat-icon>
+      </a>
       <span class="toolbar-user">{{ auth.currentUsername() }}</span>
       <button mat-icon-button (click)="auth.logout()" matTooltip="Sign out">
         <mat-icon>logout</mat-icon>
@@ -45,7 +64,7 @@
 
 <!-- Bottom navigation – mobile only -->
 <nav class="bottom-nav">
-  <a *ngFor="let item of navItems"
+  <a *ngFor="let item of bottomNavItems"
     [routerLink]="item.route"
     routerLinkActive="bottom-nav-active"
     [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"

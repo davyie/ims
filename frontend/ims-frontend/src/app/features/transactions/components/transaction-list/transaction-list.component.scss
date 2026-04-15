@@ -27,3 +27,45 @@
 .link { color: var(--primary); text-decoration: none; &:hover { text-decoration: underline; } }
 
 .empty-msg { text-align: center; color: var(--text-secondary); padding: 32px; }
+
+.state-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 32px;
+  color: var(--text-secondary);
+  justify-content: center;
+}
+
+.error-msg {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  background: #FFEBEE;
+  border-radius: 8px;
+  color: #C62828;
+  margin-bottom: 16px;
+
+  mat-icon { color: #C62828; }
+  span { flex: 1; }
+}
+
+.entity-type {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-secondary);
+  background: var(--surface-2, #f0f0f0);
+  border-radius: 3px;
+  padding: 1px 5px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.entity-name {
+  font-size: 13px;
+  vertical-align: middle;
+}

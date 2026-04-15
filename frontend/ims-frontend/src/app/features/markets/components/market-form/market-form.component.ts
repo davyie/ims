@@ -81,6 +81,14 @@ export class MarketFormComponent implements OnInit {
     }
   }
 
+  cancel(): void {
+    if (this.isEdit) {
+      this.router.navigate(['/markets', this.id]);
+    } else {
+      this.router.navigate(['/markets']);
+    }
+  }
+
   async submit(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
