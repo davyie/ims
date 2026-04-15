@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Component
 public class TransactionLedgerConsumer {
 
@@ -52,6 +55,7 @@ public class TransactionLedgerConsumer {
                     .correlationId(envelope.getCorrelationId())
                     .eventType(envelope.getEventType())
                     .originService(envelope.getOriginService())
+                    .entityId(extractEntityId(envelope))
                     .userId(envelope.getUserId())
                     .occurredAt(envelope.getOccurredAt())
                     .payload(payloadJson)
@@ -66,5 +70,20 @@ public class TransactionLedgerConsumer {
             log.error("Failed to persist event {} from topic {}: {}", envelope.getEventId(), record.topic(), e.getMessage(), e);
             throw new RuntimeException("Failed to persist transaction record", e);
         }
+    }
+
+    private UUID extractEntityId(EventEnvelope envelope) {
+        Map<String, Object> payload = envelope.getPayload();
+        if (payload == null) return null;
+        String[] candidates = {"warehouseId", "marketId", "transferId", "itemId", "entityId"};
+        for (String key : candidates) {
+            Object value = payload.get(key);
+            if (value instanceof String s) {
+                try {
+                    return UUID.fromString(s);
+                } catch (IllegalArgumentException ignored) {}
+            }
+        }
+        return null;
     }
 }

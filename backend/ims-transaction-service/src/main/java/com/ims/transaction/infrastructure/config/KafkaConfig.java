@@ -1,5 +1,6 @@
 package com.ims.transaction.infrastructure.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ims.common.event.EventEnvelope;
@@ -26,6 +27,7 @@ public class KafkaConfig {
     public ConsumerFactory<String, EventEnvelope> consumerFactory() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -33,6 +35,10 @@ public class KafkaConfig {
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        // Reduce topic-discovery latency for pattern-based subscriptions.
+        // Default is 300000ms (5 min), causing a long delay before the consumer
+        // picks up topics that are created after it first connects to the broker.
+        props.put(ConsumerConfig.METADATA_MAX_AGE_CONFIG, 10000);
 
         JsonDeserializer<EventEnvelope> deserializer = new JsonDeserializer<>(EventEnvelope.class, mapper);
         deserializer.trustedPackages("com.ims.*");

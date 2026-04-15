@@ -11,11 +11,11 @@ public interface StockUseCase {
 
     WarehouseStock removeStock(UUID warehouseId, UUID itemId, int quantity);
 
-    WarehouseStock reserveStock(UUID warehouseId, UUID itemId, int quantity);
+    WarehouseStock reserveStock(UUID warehouseId, UUID itemId, int quantity, UUID correlationId);
 
     WarehouseStock releaseReservation(UUID warehouseId, UUID itemId, int quantity);
 
-    WarehouseStock commitReservation(UUID warehouseId, UUID itemId, int quantity);
+    WarehouseStock commitReservation(UUID warehouseId, UUID itemId, int quantity, UUID correlationId);
 
     WarehouseStock adjustStock(UUID warehouseId, UUID itemId, int newQuantity);
 

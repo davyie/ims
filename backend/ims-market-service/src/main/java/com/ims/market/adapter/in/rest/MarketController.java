@@ -32,6 +32,7 @@ public class MarketController {
                                 @NotNull MarketType marketType, String description) {}
     record UpdateMarketRequest(String name, String location, String description) {}
     record StockOperationRequest(@NotNull UUID itemId, @Positive int quantity) {}
+    record SetupAdjustRequest(@NotNull UUID itemId, @NotNull Integer delta) {}
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -100,5 +101,11 @@ public class MarketController {
     public MarketStock decrementStock(@PathVariable UUID marketId,
                                        @Valid @RequestBody StockOperationRequest request) {
         return marketStockUseCase.decrementStock(marketId, request.itemId(), request.quantity());
+    }
+
+    @PostMapping("/{marketId}/stock/setup-adjust")
+    public MarketStock setupAdjustStock(@PathVariable UUID marketId,
+                                         @Valid @RequestBody SetupAdjustRequest request) {
+        return marketStockUseCase.setupAdjust(marketId, request.itemId(), request.delta());
     }
 }

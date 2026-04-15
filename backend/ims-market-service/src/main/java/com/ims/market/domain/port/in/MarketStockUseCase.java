@@ -11,7 +11,10 @@ public interface MarketStockUseCase {
 
     MarketStock decrementStock(UUID marketId, UUID itemId, int quantity);
 
-    MarketStock receiveStock(UUID marketId, UUID itemId, int quantity);
+    MarketStock receiveStock(UUID marketId, UUID itemId, int quantity, UUID correlationId);
+
+    /** Adjust stock during market setup (SCHEDULED status only). Positive = add, negative = remove. */
+    MarketStock setupAdjust(UUID marketId, UUID itemId, int delta);
 
     MarketStock getStock(UUID marketId, UUID itemId);
 

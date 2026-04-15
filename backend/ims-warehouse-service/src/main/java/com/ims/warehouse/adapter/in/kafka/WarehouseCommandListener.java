@@ -2,11 +2,14 @@ package com.ims.warehouse.adapter.in.kafka;
 
 import com.ims.common.event.EventEnvelope;
 import com.ims.warehouse.domain.port.in.StockUseCase;
+import com.ims.warehouse.domain.port.out.WarehouseEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -14,11 +17,14 @@ import java.util.UUID;
 public class WarehouseCommandListener {
 
     private static final Logger log = LoggerFactory.getLogger(WarehouseCommandListener.class);
+    private static final String WAREHOUSE_EVENTS_TOPIC = "ims.warehouse.events";
 
     private final StockUseCase stockUseCase;
+    private final WarehouseEventPublisher eventPublisher;
 
-    public WarehouseCommandListener(StockUseCase stockUseCase) {
+    public WarehouseCommandListener(StockUseCase stockUseCase, WarehouseEventPublisher eventPublisher) {
         this.stockUseCase = stockUseCase;
+        this.eventPublisher = eventPublisher;
     }
 
     @KafkaListener(topics = "ims.warehouse.commands", groupId = "ims-warehouse-service")
@@ -44,9 +50,30 @@ public class WarehouseCommandListener {
         UUID warehouseId = UUID.fromString((String) payload.get("warehouseId"));
         UUID itemId = UUID.fromString((String) payload.get("itemId"));
         int quantity = ((Number) payload.get("quantity")).intValue();
+        UUID correlationId = envelope.getCorrelationId();
 
-        stockUseCase.reserveStock(warehouseId, itemId, quantity);
-        log.info("Reserved {} units of item {} in warehouse {}", quantity, itemId, warehouseId);
+        try {
+            stockUseCase.reserveStock(warehouseId, itemId, quantity, correlationId);
+            log.info("Reserved {} units of item {} in warehouse {}", quantity, itemId, warehouseId);
+        } catch (Exception e) {
+            log.warn("Stock reservation failed for correlationId {}: {}", correlationId, e.getMessage());
+            publishReservationFailed(correlationId, e.getMessage());
+        }
+    }
+
+    private void publishReservationFailed(UUID correlationId, String reason) {
+        Map<String, Object> failPayload = new HashMap<>();
+        failPayload.put("reason", reason != null ? reason : "Stock reservation failed");
+        EventEnvelope failEvent = EventEnvelope.builder()
+                .eventId(UUID.randomUUID())
+                .correlationId(correlationId)
+                .eventType("STOCK_RESERVATION_FAILED")
+                .version(1)
+                .originService("ims-warehouse-service")
+                .occurredAt(Instant.now())
+                .payload(failPayload)
+                .build();
+        eventPublisher.publishCommand(WAREHOUSE_EVENTS_TOPIC, failEvent);
     }
 
     private void handleStockTransferCommit(EventEnvelope envelope) {
@@ -54,8 +81,9 @@ public class WarehouseCommandListener {
         UUID warehouseId = UUID.fromString((String) payload.get("warehouseId"));
         UUID itemId = UUID.fromString((String) payload.get("itemId"));
         int quantity = ((Number) payload.get("quantity")).intValue();
+        UUID correlationId = envelope.getCorrelationId();
 
-        stockUseCase.commitReservation(warehouseId, itemId, quantity);
+        stockUseCase.commitReservation(warehouseId, itemId, quantity, correlationId);
         log.info("Committed transfer of {} units of item {} from warehouse {}", quantity, itemId, warehouseId);
     }
 

@@ -3,6 +3,7 @@ package com.ims.transaction.application.service;
 import com.ims.common.dto.PageResponse;
 import com.ims.common.exception.ResourceNotFoundException;
 import com.ims.transaction.adapter.out.persistence.TransactionJpaRepository;
+import com.ims.transaction.adapter.out.persistence.TransactionRecordSpec;
 import com.ims.transaction.domain.model.TransactionRecord;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +35,9 @@ public class TransactionQueryService {
             int size) {
 
         PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "recordedAt"));
-        Page<TransactionRecord> result = repository.findByFilters(userId, originService, eventType, from, to, pageable);
+        Page<TransactionRecord> result = repository.findAll(
+                TransactionRecordSpec.withFilters(userId, originService, eventType, from, to),
+                pageable);
         return PageResponse.of(result.getContent(), page, size, result.getTotalElements());
     }
 

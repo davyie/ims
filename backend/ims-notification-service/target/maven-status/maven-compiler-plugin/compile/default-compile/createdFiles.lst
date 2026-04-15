@@ -1,6 +1,6 @@
 com/ims/notification/infrastructure/config/NotificationProperties.class
-com/ims/notification/NotificationServiceApplication.class
 com/ims/notification/adapter/out/redis/NotificationIdempotencyCache.class
+com/ims/notification/NotificationServiceApplication.class
 com/ims/notification/infrastructure/config/SecurityConfig.class
 com/ims/notification/infrastructure/config/KafkaConfig.class
 com/ims/notification/application/service/NotificationService.class

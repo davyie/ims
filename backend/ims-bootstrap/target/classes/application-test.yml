@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:imsdb_test}
+    username: ${DB_USERNAME:ims}
+    password: ${DB_PASSWORD:ims}
+
+  flyway:
+    clean-disabled: false
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    root: INFO
+    com.ims: DEBUG
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+jwt:
+  secret: dGVzdFNlY3JldEtleUZvckpXVEF1dGhlbnRpY2F0aW9uVGVzdEVudmlyb25tZW50
+  expiration-ms: 86400000
+
+ims:
+  outbox:
+    # Long interval so Kafka errors don't spam logs when Kafka isn't available in test
+    poll-ms: 3600000

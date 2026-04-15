@@ -28,13 +28,13 @@ public class TransactionController {
      */
     @GetMapping
     public ResponseEntity<PageResponse<TransactionRecord>> queryTransactions(
-            @RequestParam(required = false) UUID userId,
-            @RequestParam(required = false) String service,
-            @RequestParam(required = false) String eventType,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(name = "userId", required = false) UUID userId,
+            @RequestParam(name = "service", required = false) String service,
+            @RequestParam(name = "eventType", required = false) String eventType,
+            @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
+            @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "20") int size
     ) {
         return ResponseEntity.ok(queryService.queryTransactions(userId, service, eventType, from, to, page, size));
     }
@@ -44,7 +44,7 @@ public class TransactionController {
      * Returns the full ordered event chain for a saga / correlation ID.
      */
     @GetMapping("/{correlationId}/chain")
-    public ResponseEntity<List<TransactionRecord>> getCorrelationChain(@PathVariable UUID correlationId) {
+    public ResponseEntity<List<TransactionRecord>> getCorrelationChain(@PathVariable("correlationId") UUID correlationId) {
         return ResponseEntity.ok(queryService.getCorrelationChain(correlationId));
     }
 }

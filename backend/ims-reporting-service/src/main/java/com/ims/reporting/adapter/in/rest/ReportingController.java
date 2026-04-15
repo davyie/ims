@@ -45,6 +45,13 @@ public class ReportingController {
         };
     }
 
+    @GetMapping("/markets/sales")
+    public PageResponse<EventProjectionDocument> getMarketSalesReport(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size) {
+        return reportingService.getAllMarketSalesEvents(page, size);
+    }
+
     @GetMapping("/transfers")
     public PageResponse<EventProjectionDocument> getTransferReport(
             @RequestParam(defaultValue = "0") int page,

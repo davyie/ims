@@ -10,7 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -71,16 +74,22 @@ public class JwtValidationFilter implements GlobalFilter, Ordered {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            // Forward userId and role as headers to downstream services
-            ServerWebExchange mutatedExchange = exchange.mutate()
-                    .request(exchange.getRequest().mutate()
-                            .header("X-User-Id", claims.getSubject())
-                            .header("X-User-Role", claims.get("role", String.class))
-                            .header("X-Username", claims.get("username", String.class))
-                            .build())
-                    .build();
+            // Forward userId and role as headers to downstream services.
+            // Use ServerHttpRequestDecorator to avoid ReadOnlyHttpHeaders.put() in Spring 6.1+.
+            HttpHeaders headers = new HttpHeaders();
+            headers.addAll(exchange.getRequest().getHeaders());
+            headers.set("X-User-Id", claims.getSubject());
+            headers.set("X-User-Role", claims.get("role", String.class));
+            headers.set("X-Username", claims.get("username", String.class));
 
-            return chain.filter(mutatedExchange);
+            ServerHttpRequest mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {
+                @Override
+                public HttpHeaders getHeaders() {
+                    return headers;
+                }
+            };
+
+            return chain.filter(exchange.mutate().request(mutatedRequest).build());
 
         } catch (JwtException | IllegalArgumentException e) {
             log.debug("JWT validation failed for path {}: {}", path, e.getMessage());

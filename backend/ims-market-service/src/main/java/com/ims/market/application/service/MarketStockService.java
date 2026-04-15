@@ -60,13 +60,31 @@ public class MarketStockService implements MarketStockUseCase {
     }
 
     @Override
-    public MarketStock receiveStock(UUID marketId, UUID itemId, int quantity) {
+    public MarketStock setupAdjust(UUID marketId, UUID itemId, int delta) {
+        Market market = marketRepository.findById(marketId)
+                .orElseThrow(() -> new ResourceNotFoundException("Market", marketId));
+        if (market.getStatus() != com.ims.market.domain.model.MarketStatus.SCHEDULED) {
+            throw new ValidationException("Setup adjustments are only allowed while market is SCHEDULED");
+        }
+        if (delta == 0) throw new ValidationException("Delta must be non-zero");
+
+        MarketStock stock = findOrCreateStock(marketId, itemId);
+        if (delta > 0) {
+            stock.increment(delta);
+        } else {
+            stock.decrement(Math.abs(delta));
+        }
+        return stockRepository.save(stock);
+    }
+
+    @Override
+    public MarketStock receiveStock(UUID marketId, UUID itemId, int quantity, UUID correlationId) {
         // receiveStock is from transfer — market does not have to be OPEN
         MarketStock stock = findOrCreateStock(marketId, itemId);
         stock.increment(quantity);
         MarketStock saved = stockRepository.save(stock);
 
-        publishStockEvent("MARKET_STOCK_RECEIVED_CONFIRMED", marketId, itemId, quantity);
+        publishStockEvent("MARKET_STOCK_RECEIVED_CONFIRMED", marketId, itemId, quantity, correlationId);
         return saved;
     }
 
@@ -106,10 +124,24 @@ public class MarketStockService implements MarketStockUseCase {
     }
 
     private void publishStockEvent(String eventType, UUID marketId, UUID itemId, int quantity) {
+        publishStockEvent(eventType, marketId, itemId, quantity, null);
+    }
+
+    private void publishStockEvent(String eventType, UUID marketId, UUID itemId, int quantity, UUID correlationId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("marketId", marketId.toString());
         payload.put("itemId", itemId.toString());
         payload.put("quantity", quantity);
-        eventPublisher.publish(EventEnvelope.of(eventType, "ims-market-service", null, payload));
+
+        EventEnvelope event = EventEnvelope.builder()
+                .eventId(UUID.randomUUID())
+                .correlationId(correlationId != null ? correlationId : UUID.randomUUID())
+                .eventType(eventType)
+                .version(1)
+                .originService("ims-market-service")
+                .occurredAt(java.time.Instant.now())
+                .payload(payload)
+                .build();
+        eventPublisher.publish(event);
     }
 }

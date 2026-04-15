@@ -19,6 +19,8 @@ public interface EventProjectionRepository extends MongoRepository<EventProjecti
 
     List<EventProjectionDocument> findByEntityIdAndEventTypeIn(UUID entityId, List<String> eventTypes);
 
+    List<EventProjectionDocument> findByEventTypeOrderByOccurredAtDesc(String eventType);
+
     List<EventProjectionDocument> findByOriginServiceAndOccurredAtBetween(
             String originService, Instant from, Instant to);
 

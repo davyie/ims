@@ -1,4 +1,5 @@
 com/ims/gateway/infrastructure/filter/JwtValidationFilter.class
 com/ims/gateway/infrastructure/config/SecurityConfig.class
 com/ims/gateway/infrastructure/config/GatewayProperties.class
+com/ims/gateway/infrastructure/filter/JwtValidationFilter$1.class
 com/ims/gateway/ApiGatewayApplication.class

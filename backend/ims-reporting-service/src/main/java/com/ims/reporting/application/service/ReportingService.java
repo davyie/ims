@@ -55,6 +55,12 @@ public class ReportingService {
         return toPageResponse(results, page, size);
     }
 
+    public PageResponse<EventProjectionDocument> getAllMarketSalesEvents(int page, int size) {
+        List<EventProjectionDocument> results =
+                repository.findByEventTypeOrderByOccurredAtDesc("MARKET_STOCK_DECREMENTED");
+        return toPageResponse(results, page, size);
+    }
+
     public PageResponse<EventProjectionDocument> getTransferHistoryReport(int page, int size) {
         Page<EventProjectionDocument> result = repository.findByOriginService("ims-transfer-service", PageRequest.of(page, size));
         return PageResponse.of(result.getContent(), page, size, result.getTotalElements());

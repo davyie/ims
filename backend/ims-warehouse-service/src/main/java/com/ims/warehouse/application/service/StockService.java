@@ -42,7 +42,7 @@ public class StockService implements StockUseCase {
         if (binLocation != null) stock.setBinLocation(binLocation);
 
         WarehouseStock saved = stockRepository.save(stock);
-        publishStockEvent("STOCK_ADDED", warehouseId, itemId, quantity, null);
+        publishStockEvent("STOCK_ADDED", warehouseId, itemId, quantity, null, null);
         return saved;
     }
 
@@ -51,16 +51,16 @@ public class StockService implements StockUseCase {
         WarehouseStock stock = getStockOrThrow(warehouseId, itemId);
         stock.removeQuantity(quantity);
         WarehouseStock saved = stockRepository.save(stock);
-        publishStockEvent("STOCK_REMOVED", warehouseId, itemId, quantity, null);
+        publishStockEvent("STOCK_REMOVED", warehouseId, itemId, quantity, null, null);
         return saved;
     }
 
     @Override
-    public WarehouseStock reserveStock(UUID warehouseId, UUID itemId, int quantity) {
+    public WarehouseStock reserveStock(UUID warehouseId, UUID itemId, int quantity, UUID correlationId) {
         WarehouseStock stock = getStockOrThrow(warehouseId, itemId);
         stock.reserve(quantity);
         WarehouseStock saved = stockRepository.save(stock);
-        publishStockEvent("STOCK_RESERVED", warehouseId, itemId, quantity, null);
+        publishStockEvent("STOCK_RESERVED", warehouseId, itemId, quantity, null, correlationId);
         return saved;
     }
 
@@ -69,16 +69,16 @@ public class StockService implements StockUseCase {
         WarehouseStock stock = getStockOrThrow(warehouseId, itemId);
         stock.releaseReservation(quantity);
         WarehouseStock saved = stockRepository.save(stock);
-        publishStockEvent("STOCK_RESERVATION_RELEASED", warehouseId, itemId, quantity, null);
+        publishStockEvent("STOCK_RESERVATION_RELEASED", warehouseId, itemId, quantity, null, null);
         return saved;
     }
 
     @Override
-    public WarehouseStock commitReservation(UUID warehouseId, UUID itemId, int quantity) {
+    public WarehouseStock commitReservation(UUID warehouseId, UUID itemId, int quantity, UUID correlationId) {
         WarehouseStock stock = getStockOrThrow(warehouseId, itemId);
         stock.commitReservation(quantity);
         WarehouseStock saved = stockRepository.save(stock);
-        publishStockEvent("STOCK_DEDUCTED", warehouseId, itemId, quantity, null);
+        publishStockEvent("STOCK_DEDUCTED", warehouseId, itemId, quantity, null, correlationId);
         return saved;
     }
 
@@ -88,7 +88,7 @@ public class StockService implements StockUseCase {
         int previousQty = stock.getQuantity();
         stock.setQuantity(newQuantity);
         WarehouseStock saved = stockRepository.save(stock);
-        publishStockEvent("STOCK_ADJUSTED", warehouseId, itemId, newQuantity, previousQty);
+        publishStockEvent("STOCK_ADJUSTED", warehouseId, itemId, newQuantity, previousQty, null);
         return saved;
     }
 
@@ -110,13 +110,23 @@ public class StockService implements StockUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException("Stock for warehouse=" + warehouseId + " item=" + itemId));
     }
 
-    private void publishStockEvent(String eventType, UUID warehouseId, UUID itemId, int quantity, Integer previousQty) {
+    private void publishStockEvent(String eventType, UUID warehouseId, UUID itemId, int quantity,
+                                   Integer previousQty, UUID correlationId) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("warehouseId", warehouseId.toString());
         payload.put("itemId", itemId.toString());
         payload.put("quantity", quantity);
         if (previousQty != null) payload.put("previousQuantity", previousQty);
 
-        eventPublisher.publish(EventEnvelope.of(eventType, "ims-warehouse-service", null, payload));
+        EventEnvelope event = EventEnvelope.builder()
+                .eventId(UUID.randomUUID())
+                .correlationId(correlationId != null ? correlationId : UUID.randomUUID())
+                .eventType(eventType)
+                .version(1)
+                .originService("ims-warehouse-service")
+                .occurredAt(java.time.Instant.now())
+                .payload(payload)
+                .build();
+        eventPublisher.publish(event);
     }
 }

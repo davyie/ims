@@ -63,7 +63,8 @@ public class MarketCommandListener {
         UUID marketId = UUID.fromString((String) payload.get("marketId"));
         UUID itemId = UUID.fromString((String) payload.get("itemId"));
         int quantity = ((Number) payload.get("quantity")).intValue();
-        marketStockUseCase.receiveStock(marketId, itemId, quantity);
+        UUID correlationId = envelope.getCorrelationId();
+        marketStockUseCase.receiveStock(marketId, itemId, quantity, correlationId);
         log.info("Received {} units of item {} at market {}", quantity, itemId, marketId);
     }
 }

@@ -1,7 +1,8 @@
 com/ims/market/infrastructure/config/SecurityConfig.class
 com/ims/market/adapter/in/kafka/MarketCommandListener.class
-com/ims/market/domain/model/MarketStatus.class
+com/ims/market/adapter/in/rest/MarketController$SetupAdjustRequest.class
 com/ims/market/domain/port/out/MarketStockRepository.class
+com/ims/market/domain/model/MarketStatus.class
 com/ims/market/adapter/out/persistence/MarketRepositoryAdapter.class
 com/ims/market/domain/port/in/MarketStockUseCase.class
 com/ims/market/domain/model/Market.class

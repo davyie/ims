@@ -6,5 +6,5 @@ com/ims/reporting/infrastructure/config/JwtValidationFilter.class
 com/ims/reporting/ReportingServiceApplication.class
 com/ims/reporting/domain/model/EventProjectionDocument.class
 com/ims/reporting/infrastructure/config/KafkaConfig.class
-com/ims/reporting/adapter/in/kafka/ReportingEventConsumer.class
 com/ims/reporting/adapter/in/rest/ReportingController.class
+com/ims/reporting/adapter/in/kafka/ReportingEventConsumer.class
