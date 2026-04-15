@@ -118,7 +118,6 @@ services:
         kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --partitions 3  --replication-factor 1 --topic ims.transfer.events.dlq &&
         echo 'All topics created successfully.'
       "
-    restart: on-failure
     networks:
       - ims-net
 
@@ -334,8 +333,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      kafka:
-        condition: service_healthy
+      kafka-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://localhost:8087/actuator/health/readiness || exit 1"]
       interval: 20s

@@ -1,78 +1,197 @@
 name: Deploy
 
+# ── Triggers ───────────────────────────────────────────────────────────────────
+# Runs automatically after CI passes on main, or manually via workflow_dispatch.
+
 on:
   workflow_run:
-    workflows: [ "CI" ]
-    branches: [ main ]
-    types: [ completed ]
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
   workflow_dispatch:
+
+# ── Prerequisites ──────────────────────────────────────────────────────────────
+# GitHub secrets required:
+#   AZURE_CLIENT_ID       – service principal client ID (for OIDC login)
+#   AZURE_TENANT_ID       – Azure AD tenant ID
+#   AZURE_SUBSCRIPTION_ID – target subscription ID
+#   POSTGRES_ADMIN_PASSWORD – PostgreSQL admin password (min 8 chars, mixed case + symbol)
+#   JWT_SECRET            – JWT signing secret (min 32 chars)
+#   SMTP_PASS             – SMTP password (optional; leave empty if not using email)
+#
+# GitHub variables (optional, have defaults):
+#   AZURE_LOCATION        – Azure region (default: australiaeast)
+#   SMTP_HOST             – SMTP hostname
+#   SMTP_PORT             – SMTP port (default: 587)
+#   SMTP_USER             – SMTP username
+#   NOTIFICATION_FROM_EMAIL – From address for notification emails
+#
+# One-time OIDC setup (run once from your terminal):
+#   az ad sp create-for-rbac --name ims-github-actions --role Contributor \
+#     --scopes /subscriptions/<SUBSCRIPTION_ID> --sdk-auth
+#   Then add a federated credential for:
+#     Issuer: https://token.actions.githubusercontent.com
+#     Subject: repo:<owner>/ims:ref:refs/heads/main
 
 jobs:
   deploy:
-    name: Deploy to VPS
+    name: Build & deploy to Azure Container Apps
     runs-on: ubuntu-latest
-    # On workflow_run, only proceed if CI passed
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
 
+    # OIDC token permission required for azure/login federated credentials
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          script: |
-            set -e
-            cd ~/ims
+          # On workflow_run, check out the commit that triggered CI
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-            # Pull latest code
-            git pull origin main
+      # Use the first 7 chars of the git SHA as the image tag
+      - name: Derive image tag
+        id: tag
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha || github.sha }}"
+          echo "value=${SHA:0:7}" >> $GITHUB_OUTPUT
 
-            # Write .env from secrets
-            cat > .env << 'ENVEOF'
-            SPRING_PROFILES_ACTIVE=prod
+      # ── Azure authentication (OIDC) ──────────────────────────────────────────
 
-            POSTGRES_DB=imsdb
-            POSTGRES_USER=ims
-            POSTGRES_PASSWORD=${{ secrets.DB_PASSWORD }}
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-            DB_HOST=postgres
-            DB_PORT=5432
-            DB_NAME=imsdb
-            DB_USERNAME=ims
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+      # ── Bicep deployment ─────────────────────────────────────────────────────
+      # Creates/updates the resource group, all managed services, and Container Apps.
+      # Container Apps are created here with the target image tag; images are pushed
+      # in the next step, after which 'az containerapp update' forces new revisions.
 
-            KAFKA_BOOTSTRAP=localhost:9092
+      - name: Deploy Bicep
+        id: bicep
+        env:
+          POSTGRES_PASS: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
+          JWT_SEC: ${{ secrets.JWT_SECRET }}
+          SMTP_PW: ${{ secrets.SMTP_PASS }}
+        run: |
+          OUTPUT=$(az deployment sub create \
+            --name "ims-deploy-${{ steps.tag.outputs.value }}" \
+            --location "${{ vars.AZURE_LOCATION || 'swedencentral' }}" \
+            --template-file infra/main.bicep \
+            --parameters \
+              imageTag="${{ steps.tag.outputs.value }}" \
+              postgresAdminPassword="$POSTGRES_PASS" \
+              jwtSecret="$JWT_SEC" \
+              smtpHost="${{ vars.SMTP_HOST || '' }}" \
+              smtpPort="${{ vars.SMTP_PORT || '587' }}" \
+              smtpUser="${{ vars.SMTP_USER || '' }}" \
+              smtpPass="$SMTP_PW" \
+              notificationFromEmail="${{ vars.NOTIFICATION_FROM_EMAIL || 'noreply@ims.local' }}" \
+            --output json)
 
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            JWT_EXPIRATION_MS=86400000
+          echo "acr_login_server=$(echo "$OUTPUT" | jq -r '.properties.outputs.acrLoginServer.value')" >> $GITHUB_OUTPUT
+          echo "acr_name=$(echo "$OUTPUT" | jq -r '.properties.outputs.acrName.value')"               >> $GITHUB_OUTPUT
+          echo "frontend_url=$(echo "$OUTPUT" | jq -r '.properties.outputs.frontendUrl.value')"       >> $GITHUB_OUTPUT
+          echo "gateway_url=$(echo "$OUTPUT" | jq -r '.properties.outputs.gatewayUrl.value')"         >> $GITHUB_OUTPUT
 
-            APP_IMAGE=ghcr.io/${{ github.repository_owner }}/ims-backend:latest
-            FRONTEND_IMAGE=ghcr.io/${{ github.repository_owner }}/ims-frontend:latest
-            APP_PORT=8080
-            FRONTEND_PORT=80
-            API_URL=http://application:8080
+      # ── Build and push container images ──────────────────────────────────────
 
-            OUTBOX_POLL_MS=500
-            LOG_LEVEL=INFO
-            ENVEOF
+      - name: Login to ACR
+        run: az acr login --name "${{ steps.bicep.outputs.acr_name }}"
 
-            # Log in to GHCR and pull latest images
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-            docker compose pull
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-            # Bring up the stack
-            docker compose up -d --remove-orphans
+      - name: Build and push backend images
+        run: |
+          ACR="${{ steps.bicep.outputs.acr_login_server }}"
+          TAG="${{ steps.tag.outputs.value }}"
+          SERVICES=(
+            api-gateway
+            ims-user-service
+            ims-warehouse-service
+            ims-market-service
+            ims-transfer-service
+            ims-scheduling-service
+            ims-reporting-service
+            ims-transaction-service
+            ims-notification-service
+          )
+          for SERVICE in "${SERVICES[@]}"; do
+            docker build \
+              --file "backend/$SERVICE/Dockerfile" \
+              --tag "$ACR/$SERVICE:$TAG" \
+              --tag "$ACR/$SERVICE:latest" \
+              --cache-from "type=gha,scope=$SERVICE" \
+              --cache-to "type=gha,scope=$SERVICE,mode=max" \
+              backend/
+            docker push "$ACR/$SERVICE:$TAG"
+            docker push "$ACR/$SERVICE:latest"
+          done
 
-            # Health check — wait up to 50s for backend
-            echo "Waiting for backend health..."
-            for i in $(seq 1 10); do
-              if curl -sf http://localhost:8080/actuator/health | grep -q '"status":"UP"'; then
-                echo "Backend is healthy."
-                exit 0
-              fi
-              echo "  attempt $i/10, retrying in 5s..."
-              sleep 5
-            done
-            echo "Backend did not become healthy in time." >&2
-            exit 1
+      - name: Build and push frontend image
+        run: |
+          ACR="${{ steps.bicep.outputs.acr_login_server }}"
+          TAG="${{ steps.tag.outputs.value }}"
+          docker build \
+            --file frontend/ims-frontend/Dockerfile \
+            --tag "$ACR/ims-frontend:$TAG" \
+            --tag "$ACR/ims-frontend:latest" \
+            --cache-from "type=gha,scope=ims-frontend" \
+            --cache-to "type=gha,scope=ims-frontend,mode=max" \
+            frontend/ims-frontend/
+          docker push "$ACR/ims-frontend:$TAG"
+          docker push "$ACR/ims-frontend:latest"
+
+      # ── Force Container App revisions to pick up the new images ──────────────
+      # The Bicep deployment above already set the image tag. This step forces a
+      # new revision now that the images actually exist in ACR. The DEPLOYMENT_TAG
+      # env var change ensures a new revision is created even on reruns of the
+      # same commit SHA.
+
+      - name: Update Container Apps
+        run: |
+          ACR="${{ steps.bicep.outputs.acr_login_server }}"
+          TAG="${{ steps.tag.outputs.value }}"
+          RUN_ID="${{ github.run_id }}"
+
+          declare -A APPS
+          APPS["api-gateway"]="api-gateway"
+          APPS["user-service"]="ims-user-service"
+          APPS["warehouse-service"]="ims-warehouse-service"
+          APPS["market-service"]="ims-market-service"
+          APPS["transfer-service"]="ims-transfer-service"
+          APPS["scheduling-service"]="ims-scheduling-service"
+          APPS["reporting-service"]="ims-reporting-service"
+          APPS["transaction-service"]="ims-transaction-service"
+          APPS["notification-service"]="ims-notification-service"
+          APPS["frontend"]="ims-frontend"
+
+          for APP_NAME in "${!APPS[@]}"; do
+            IMAGE_NAME="${APPS[$APP_NAME]}"
+            az containerapp update \
+              --name "$APP_NAME" \
+              --resource-group ims \
+              --image "$ACR/$IMAGE_NAME:$TAG" \
+              --set-env-vars "DEPLOYMENT_TAG=$TAG" \
+              --no-wait
+          done
+
+          echo "All Container Apps update commands submitted."
+
+      # ── Summary ───────────────────────────────────────────────────────────────
+
+      - name: Deployment summary
+        run: |
+          echo "### Deployment complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| | URL |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Frontend | ${{ steps.bicep.outputs.frontend_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| API Gateway | ${{ steps.bicep.outputs.gateway_url }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Image tag | \`${{ steps.tag.outputs.value }}\` |" >> $GITHUB_STEP_SUMMARY

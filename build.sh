@@ -3,7 +3,7 @@ set -euo pipefail
 
 # ─────────────────────────────────────────────
 # IMS Full-Stack Build Script
-# Builds all backend microservices + frontend
+# Builds all backend microservices + Angular frontend
 # and brings the full stack up via Docker Compose.
 #
 # Usage:
@@ -11,7 +11,8 @@ set -euo pipefail
 #   ./build.sh --with-tests      # run Maven tests
 #   ./build.sh --no-cache        # Docker build without layer cache
 #   ./build.sh --clean           # wipe volumes before starting
-#   ./build.sh --skip-maven      # skip Maven pre-build (use Docker cache only)
+#   ./build.sh --skip-maven      # skip Maven pre-build
+#   ./build.sh --skip-npm        # skip npm frontend pre-build
 # ─────────────────────────────────────────────
 
 RED='\033[0;31m'
@@ -33,6 +34,7 @@ SKIP_TESTS=true
 NO_CACHE=false
 DOWN_VOLUMES=false
 SKIP_MAVEN=false
+SKIP_NPM=false
 
 for arg in "$@"; do
   case $arg in
@@ -40,6 +42,7 @@ for arg in "$@"; do
     --no-cache)    NO_CACHE=true ;;
     --clean)       DOWN_VOLUMES=true ;;
     --skip-maven)  SKIP_MAVEN=true ;;
+    --skip-npm)    SKIP_NPM=true ;;
     --help|-h)
       echo "Usage: ./build.sh [options]"
       echo ""
@@ -48,6 +51,7 @@ for arg in "$@"; do
       echo "  --no-cache     Build Docker images without layer cache"
       echo "  --clean        Wipe all volumes before starting (resets all data)"
       echo "  --skip-maven   Skip Maven pre-build; let Docker handle compilation"
+      echo "  --skip-npm     Skip npm frontend pre-build; let Docker handle it"
       echo "  --help         Show this help"
       exit 0
       ;;
@@ -57,17 +61,17 @@ done
 
 # ── preflight checks ─────────────────────────────────────────
 command -v docker >/dev/null 2>&1 || die "Docker not found in PATH"
+$SKIP_MAVEN || command -v mvn  >/dev/null 2>&1 || die "Maven (mvn) not found in PATH. Use --skip-maven to skip."
+$SKIP_NPM   || command -v npm  >/dev/null 2>&1 || die "npm not found in PATH. Use --skip-npm to skip."
 
 log "Starting IMS full-stack build…"
 echo ""
 
-# ── step 1: Maven pre-build (optional but speeds up Docker builds) ────────────
+# ── step 1: Maven backend pre-build ──────────────────────────
 if $SKIP_MAVEN; then
-  warn "Skipping Maven pre-build — Docker will compile each service independently"
+  warn "Step 1/4 — Skipping Maven pre-build (Docker will compile each service)"
 else
-  command -v mvn >/dev/null 2>&1 || die "Maven (mvn) not found in PATH. Use --skip-maven to skip."
-
-  log "Step 1/3 — Building all backend modules with Maven"
+  log "Step 1/4 — Building all backend modules with Maven"
 
   MVN_FLAGS="-B --no-transfer-progress"
   if $SKIP_TESTS; then
@@ -82,8 +86,24 @@ else
 fi
 echo ""
 
-# ── step 2: stop existing containers ─────────────────────────
-log "Step 2/3 — Preparing containers"
+# ── step 2: npm frontend pre-build ───────────────────────────
+if $SKIP_NPM; then
+  warn "Step 2/4 — Skipping npm pre-build (Docker will build the Angular app)"
+else
+  log "Step 2/4 — Building Angular frontend with npm"
+
+  FRONTEND_DIR="$SCRIPT_DIR/frontend/ims-frontend"
+  [ -d "$FRONTEND_DIR" ] || die "Frontend directory not found: $FRONTEND_DIR"
+
+  (cd "$FRONTEND_DIR" && npm ci && npm run build -- --configuration production) \
+    || die "npm build failed"
+
+  ok "Frontend build complete"
+fi
+echo ""
+
+# ── step 3: stop existing containers ─────────────────────────
+log "Step 3/4 — Preparing containers"
 
 if $DOWN_VOLUMES; then
   warn "--clean specified: stopping containers and wiping all volumes"
@@ -93,8 +113,8 @@ elif docker compose ps --quiet 2>/dev/null | grep -q .; then
   docker compose down
 fi
 
-# ── step 3: build images and start the full stack ────────────
-log "Step 3/3 — Building images and starting all containers"
+# ── step 4: build images and start the full stack ────────────
+log "Step 4/4 — Building images and starting all containers"
 
 COMPOSE_FLAGS="--build"
 if $NO_CACHE; then
